@@ -1,0 +1,50 @@
+# Iniciar o servidor
+go run cmd/api/main.go
+
+# Build do projeto
+go build -o bin/api cmd/api/main.go
+
+# Rodar testes
+go test ./...
+
+# Gerar documentação Swagger
+swag init -g cmd/api/main.go
+
+# Formatar código
+go fmt ./...
+
+# Verificar dependências
+go mod tidy
+
+# Conectar ao MySQL
+mysql -u root -p etools_openerp
+
+# Verificar estrutura do banco
+SHOW TABLES;
+DESCRIBE documento_venda;
+
+# Navegar até a pasta do backend
+cd D:\Projetos\OpenERP\backend
+
+# Inicializar o repositório Git
+git init
+
+# Configurar usuário (se não estiver configurado globalmente)
+git config user.name "Seu Nome"
+git config user.email "seu.email@exemplo.com"
+
+# Criar arquivo .gitignore
+echo "# Binaries" > .gitignore
+
+# Instalar todas as dependências de uma vez
+go get -u github.com/gin-gonic/gin \
+    gorm.io/gorm \
+    gorm.io/driver/mysql \
+    github.com/golang-jwt/jwt/v5 \
+    github.com/spf13/viper \
+    go.uber.org/zap \
+    github.com/go-playground/validator/v10 \
+    github.com/stretchr/testify \
+    github.com/redis/go-redis/v9 \
+    github.com/joho/godotenv \
+    github.com/google/uuid
