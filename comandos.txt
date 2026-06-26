@@ -48,3 +48,18 @@ go get -u github.com/gin-gonic/gin \
     github.com/redis/go-redis/v9 \
     github.com/joho/godotenv \
     github.com/google/uuid
+
+# Verificar se todas as dependências estão instaladas
+go list -m all
+
+# Verificar se o módulo está configurado corretamente
+go mod why -m
+
+# Verificar se o Git está funcionando
+git status
+
+# Verificar o histórico de commits
+git log --oneline
+
+# Verificar se o .gitignore está funcionando
+git status --ignored    
