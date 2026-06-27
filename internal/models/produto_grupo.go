@@ -35,8 +35,8 @@ type ProdutoGrupo struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	SubGrupos  []ProdutoSubgrupo `gorm:"foreignKey:ProdutoGrupoID;references:ID" json:"sub_grupos,omitempty"`
-	Produtos   []Produto         `gorm:"foreignKey:ProdutoGrupoID;references:ID" json:"produtos,omitempty"`
+	//SubGrupos  []ProdutoSubgrupo `gorm:"foreignKey:ProdutoGrupoID;references:ID" json:"sub_grupos,omitempty"`
+	Produtos []Produto `gorm:"foreignKey:ProdutoGrupoID;references:ID" json:"produtos,omitempty"`
 	// Impressora *Impressora       `gorm:"foreignKey:ImpressoraID;references:print_id" json:"impressora,omitempty"`
 }
 

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -68,7 +69,7 @@ func (u *Usuario) BeforeCreate() error {
 	return nil
 }
 
-func (u *Usuario) BeforeUpdate() error {
+func (u *Usuario) BeforeUpdate(tx *gorm.DB) error { // CORRIGIDO: adicionado *gorm.DB
 	if u.UpdatedBy == nil {
 		u.UpdatedBy = new(int)
 		*u.UpdatedBy = 0

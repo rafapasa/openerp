@@ -60,15 +60,15 @@ type Entidade struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	GrupoEntidade  *GrupoEntidade             `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
-	EmpresaFilial  *EmpresaFilial             `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
-	TabelaPreco    *TabelaPreco               `gorm:"foreignKey:TabelaPrecoID;references:tbp_id" json:"tabela_preco,omitempty"`
-	TabelaDesconto *TabelaDesconto            `gorm:"foreignKey:TabelaDescontoID;references:tdesc_id" json:"tabela_desconto,omitempty"`
-	Horario        *Horario                   `gorm:"foreignKey:HorarioID;references:hor_id" json:"horario,omitempty"`
-	Enderecos      []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
-	Contatos       []EntidadeContato          `gorm:"foreignKey:EntidadeID;references:ID" json:"contatos,omitempty"`
-	Documentos     []EntidadeDocumento        `gorm:"foreignKey:EntidadeID;references:ID" json:"documentos,omitempty"`
-	Regimes        []EntidadeRegimeTributario `gorm:"foreignKey:EntidadeID;references:ID" json:"regimes,omitempty"`
+	// GrupoEntidade *GrupoEntidade `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
+	// EmpresaFilial *EmpresaFilial `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
+	TabelaPreco    *TabelaPreco    `gorm:"foreignKey:TabelaPrecoID;references:tbp_id" json:"tabela_preco,omitempty"`
+	TabelaDesconto *TabelaDesconto `gorm:"foreignKey:TabelaDescontoID;references:tdesc_id" json:"tabela_desconto,omitempty"`
+	Horario        *Horario        `gorm:"foreignKey:HorarioID;references:hor_id" json:"horario,omitempty"`
+	// Enderecos  []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
+	Contatos   []EntidadeContato          `gorm:"foreignKey:EntidadeID;references:ID" json:"contatos,omitempty"`
+	Documentos []EntidadeDocumento        `gorm:"foreignKey:EntidadeID;references:ID" json:"documentos,omitempty"`
+	Regimes    []EntidadeRegimeTributario `gorm:"foreignKey:EntidadeID;references:ID" json:"regimes,omitempty"`
 }
 
 // ============================================================
@@ -144,9 +144,9 @@ func (e *Entidade) GetNomeExibicao() string {
 	return e.RazaoSocial
 }
 
-func (e *Entidade) HasEndereco() bool {
-	return len(e.Enderecos) > 0
-}
+// func (e *Entidade) HasEndereco() bool {
+// 	return len(e.Enderecos) > 0
+// }
 
 func (e *Entidade) HasContato() bool {
 	return len(e.Contatos) > 0

@@ -12,10 +12,9 @@ type ProdutoSubgrupo struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID             int    `gorm:"column:prosg_id;primaryKey;autoIncrement" json:"id"`
-	ProdutoGrupoID int    `gorm:"column:prog_id;not null" json:"produto_grupo_id"`
-	Descricao      string `gorm:"column:prosg_descricao;type:varchar(255);not null" json:"descricao"`
-	Situacao       int    `gorm:"column:prosg_situacao;not null;default:0" json:"situacao"`
+	ID        int    `gorm:"column:prosg_id;primaryKey;autoIncrement" json:"id"`
+	Descricao string `gorm:"column:prosg_descricao;type:varchar(255);not null" json:"descricao"`
+	Situacao  int    `gorm:"column:prosg_situacao;not null;default:0" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA
@@ -29,8 +28,7 @@ type ProdutoSubgrupo struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	ProdutoGrupo *ProdutoGrupo `gorm:"foreignKey:ProdutoGrupoID;references:prog_id" json:"produto_grupo,omitempty"`
-	Produtos     []Produto     `gorm:"foreignKey:ProdutoSubgrupoID;references:ID" json:"produtos,omitempty"`
+	Produtos []Produto `gorm:"foreignKey:ProdutoSubgrupoID;references:ID" json:"produtos,omitempty"`
 	// Despesas     []Despesa     `gorm:"many2many:produto_subgrupo_despesa;foreignKey:prosg_id;joinForeignKey:prosg_id;References:desp_id;joinReferences:desp_id" json:"despesas,omitempty"`
 }
 
