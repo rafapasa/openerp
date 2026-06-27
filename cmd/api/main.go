@@ -8,6 +8,9 @@ import (
 
 	"github.com/openerp/backend/internal/config"
 	"github.com/openerp/backend/internal/database"
+	"github.com/openerp/backend/internal/handler"
+	"github.com/openerp/backend/internal/middleware"
+	"github.com/openerp/backend/internal/service"
 )
 
 func main() {
@@ -22,20 +25,18 @@ func main() {
 	}
 	defer db.Close()
 
-	// 3. Testar conexão
-	if db.IsConnected() {
-		log.Println("✅ Conexão com o banco de dados está ativa")
-	} else {
-		log.Println("⚠️ Conexão com o banco de dados não está ativa")
-	}
+	// 3. Inicializar serviços
+	authService := service.NewAuthService(db.GetDB(), cfg)
 
-	// 4. Configurar o router
-	router := setupRouter(cfg, db)
+	// 4. Inicializar handlers
+	authHandler := handler.NewAuthHandler(authService)
 
-	// 5. Iniciar servidor
+	// 5. Configurar router
+	router := setupRouter(cfg, db, authHandler)
+
+	// 6. Iniciar servidor
 	port := cfg.APIPort
 	log.Printf("🌐 Servidor iniciado em http://localhost:%s", port)
-	log.Printf("📝 Ambiente: %s", cfg.APIEnv)
 
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("❌ Erro ao iniciar servidor: %v", err)
@@ -43,7 +44,7 @@ func main() {
 }
 
 // setupRouter configura as rotas da API
-func setupRouter(cfg *config.Config, db *database.MySQL) *gin.Engine {
+func setupRouter(cfg *config.Config, db *database.MySQL, authHandler *handler.AuthHandler) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -62,12 +63,9 @@ func setupRouter(cfg *config.Config, db *database.MySQL) *gin.Engine {
 			"environment": cfg.APIEnv,
 			"database":    db.IsConnected(),
 			"timestamp":   time.Now().Format(time.RFC3339),
-			"service":     "openerp-api",
-			"version":     "1.0.0",
 		})
 	})
 
-	// Rota de ping (mais simples)
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -75,23 +73,37 @@ func setupRouter(cfg *config.Config, db *database.MySQL) *gin.Engine {
 		})
 	})
 
-	// Grupo de rotas da API v1
-	v1 := router.Group("/api/v1")
+	// ============================================================
+	// ROTAS PÚBLICAS
+	// ============================================================
+	auth := router.Group("/api/v1/auth")
 	{
-		// Rotas públicas
-		v1.GET("/status", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"status": "API is running",
-				"time":   time.Now().Format(time.RFC3339),
-			})
-		})
+		auth.POST("/login", authHandler.Login)
+		auth.POST("/refresh", authHandler.RefreshToken)
+	}
 
-		// Aqui virão as rotas protegidas
-		// auth := v1.Group("/auth")
-		// {
-		// 	auth.POST("/login", authHandler.Login)
-		// 	auth.POST("/register", authHandler.Register)
-		// }
+	// ============================================================
+	// ROTAS PROTEGIDAS (requer autenticação)
+	// ============================================================
+	api := router.Group("/api/v1")
+	api.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		// Auth protegido
+		api.POST("/auth/logout", authHandler.Logout)
+		api.GET("/auth/me", authHandler.GetMe)
+
+		// TODO: Adicionar outras rotas protegidas aqui
+		// Entidades
+		// api.GET("/entidades", entidadeHandler.List)
+		// api.POST("/entidades", entidadeHandler.Create)
+
+		// Produtos
+		// api.GET("/produtos", produtoHandler.List)
+		// api.POST("/produtos", produtoHandler.Create)
+
+		// Pedidos
+		// api.GET("/pedidos", pedidoHandler.List)
+		// api.POST("/pedidos", pedidoHandler.Create)
 	}
 
 	return router

@@ -1,171 +1,133 @@
-// ============================================================
-// PACOTE E IMPORTAÇÕES
-// ============================================================
-
-// 1. Declaração do pacote
-// Todo arquivo Go começa com 'package nome'
-// 'models' é o nome do pacote onde este arquivo está
 package models
 
-// 2. Importações
-// Importamos os pacotes que vamos usar neste arquivo
 import (
-	"time" // Pacote para trabalhar com datas e horas
+	"time"
+
+	"github.com/openerp/backend/internal/constants"
 )
 
 // ============================================================
-// DEFINIÇÃO DO STRUCT (MODEL)
+// MODEL: Usuario
 // ============================================================
 
-// 3. Definição do struct Usuario
-// Um struct é como uma "receita" que define a estrutura de um objeto
-// O nome do struct deve começar com letra maiúscula para ser exportado
-// (visível para outros pacotes)
 type Usuario struct {
-    // 4. Campos do struct
-    // Cada campo tem: Nome, Tipo e Tags (opcionais)
-    // As tags são metadados entre crases ``
-    
-    // ============================================================
-    // CAMPOS PRINCIPAIS
-    // ============================================================
-    
-    // ID - Chave primária da tabela
-    // `gorm:"column:usu_id;primaryKey;autoIncrement"`
-    //   - column: nome da coluna no banco de dados
-    //   - primaryKey: indica que é chave primária
-    //   - autoIncrement: o banco gera automaticamente
-    // `json:"id"` - nome usado quando o objeto é convertido para JSON
-    ID int `gorm:"column:usu_id;primaryKey;autoIncrement" json:"id"`
-    
-    // GrupoUsuarioID - Chave estrangeira para grupo_usuario
-    // `not null` - campo obrigatório
-    // `gpu_id` - nome da coluna no banco
-    GrupoUsuarioID int `gorm:"column:gpu_id;not null" json:"grupo_usuario_id"`
-    
-    // Nome - Nome do usuário
-    // `type:varchar(100)` - define o tipo e tamanho no banco
-    Nome string `gorm:"column:usu_nome;type:varchar(100);not null" json:"nome"`
-    
-    // Login - Nome de usuário para autenticação
-    // `unique` - não pode haver dois usuários com o mesmo login
-    Login string `gorm:"column:usu_login;type:varchar(20);not null;unique" json:"login"`
-    
-    // Senha - Senha do usuário (será armazenada com hash)
-    // `-` na tag json: este campo NÃO aparece nas respostas JSON
-    // Isso é importante para não expor a senha
-    Senha string `gorm:"column:usu_senha;type:varchar(100);not null" json:"-"`
-    
-    // Situacao - Status do usuário (1-ativo, 2-inativo, etc)
-    // `situiacao` está escrito assim no banco original (com "i")
-    Situacao int `gorm:"column:usu_situiacao;not null" json:"situacao"`
-    
-    // Observacoes - Campo de texto livre
-    // `*string` - ponteiro para string (pode ser nil = null no banco)
-    // `omitempty` - se for nil, não aparece no JSON
-    Observacoes *string `gorm:"column:usu_observacoes;type:text" json:"observacoes,omitempty"`
-    
-    // SenhaExclusao - Senha para exclusão (segurança extra)
-    // `-` no JSON - nunca exposto nas respostas
-    SenhaExclusao *string `gorm:"column:usu_senhaexclusao;type:varchar(100)" json:"-"`
-    
-    // ============================================================
-    // CAMPOS DE AUDITORIA (presentes em todas as tabelas)
-    // ============================================================
-    
-    // CreatedAt - Data de criação do registro
-    // `default:CURRENT_TIMESTAMP` - valor padrão é a data/hora atual
-    CreatedAt time.Time `gorm:"column:created_at;type:datetime;default:CURRENT_TIMESTAMP" json:"created_at"`
-    
-    // UpdatedAt - Data da última atualização
-    // `ON UPDATE CURRENT_TIMESTAMP` - atualiza automaticamente quando o registro é alterado
-    UpdatedAt time.Time `gorm:"column:updated_at;type:datetime;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" json:"updated_at"`
-    
-    // DeletedAt - Data de exclusão lógica (soft delete)
-    // `*time.Time` - ponteiro (pode ser nil = não deletado)
-    // `index` - cria um índice no banco para consultas mais rápidas
-    DeletedAt *time.Time `gorm:"column:deleted_at;type:datetime;index" json:"deleted_at,omitempty"`
-    
-    // CreatedBy - ID do usuário que criou este registro
-    CreatedBy *int `gorm:"column:created_by" json:"created_by,omitempty"`
-    
-    // UpdatedBy - ID do usuário que atualizou este registro
-    UpdatedBy *int `gorm:"column:updated_by" json:"updated_by,omitempty"`
-    
-    // ============================================================
-    // RELACIONAMENTOS (associações com outras tabelas)
-    // ============================================================
-    
-    // GrupoUsuario - Relacionamento com a tabela grupo_usuario
-    // `gorm:"foreignKey:gpu_id;references:gpu_id"`
-    //   - foreignKey: campo nesta tabela que faz a referência
-    //   - references: campo na tabela relacionada
-    // `omitempty` - se for nil, não aparece no JSON
-    GrupoUsuario *GrupoUsuario `gorm:"foreignKey:gpu_id;references:gpu_id" json:"grupo_usuario,omitempty"`
+	// ============================================================
+	// CAMPOS PRINCIPAIS
+	// ============================================================
+	ID             int              `gorm:"column:usu_id;primaryKey;autoIncrement" json:"id"`
+	GrupoUsuarioID int              `gorm:"column:gpu_id;not null" json:"grupo_usuario_id"`
+	Nome           string           `gorm:"column:usu_nome;type:varchar(100);not null" json:"nome"`
+	Login          string           `gorm:"column:usu_login;type:varchar(20);not null;unique" json:"login"`
+	Senha          string           `gorm:"column:usu_senha;type:varchar(100);not null" json:"-"`
+	Situacao       constants.Status `gorm:"column:usu_situiacao;not null;default:1" json:"situacao"`
+	Observacoes    *string          `gorm:"column:usu_observacoes;type:text" json:"observacoes,omitempty"`
+	SenhaExclusao  *string          `gorm:"column:usu_senhaexclusao;type:varchar(100)" json:"-"`
+	AlterarColGrid *int             `gorm:"column:usu_alterarcolgrid;default:1" json:"alterar_col_grid,omitempty"`
+	EmailSMTP      *string          `gorm:"column:usu_emailsmtp;type:varchar(200)" json:"email_smtp,omitempty"`
+	PortaSMTP      *int             `gorm:"column:usu_portasmtp" json:"porta_smtp,omitempty"`
+	SenhaSMTP      *string          `gorm:"column:usu_senhasmtp;type:varchar(20)" json:"-"`
+	ServidorSMTP   *string          `gorm:"column:usu_servidorsmtp;type:varchar(200)" json:"servidor_smtp,omitempty"`
+	UsarTLS        *int             `gorm:"column:usu_usartls" json:"usar_tls,omitempty"`
+	UsarSSL        *int             `gorm:"column:usu_usarssl" json:"usar_ssl,omitempty"`
+	UsuarioSMTP    *string          `gorm:"column:usu_usuariosmtp;type:varchar(200)" json:"usuario_smtp,omitempty"`
+	ExigirSenhaDV  *int             `gorm:"column:usu_exigirsenhadv" json:"exigir_senha_dv,omitempty"`
+
+	// ============================================================
+	// CAMPOS DE AUDITORIA
+	// ============================================================
+	CreatedAt time.Time  `gorm:"column:created_at;type:datetime;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time  `gorm:"column:updated_at;type:datetime;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" json:"updated_at"`
+	DeletedAt *time.Time `gorm:"column:deleted_at;type:datetime;index" json:"deleted_at,omitempty"`
+	CreatedBy *int       `gorm:"column:created_by" json:"created_by,omitempty"`
+	UpdatedBy *int       `gorm:"column:updated_by" json:"updated_by,omitempty"`
+
+	// ============================================================
+	// RELACIONAMENTOS
+	// ============================================================
+	GrupoUsuario   *GrupoUsuario   `gorm:"foreignKey:GrupoUsuarioID;references:gpu_id" json:"grupo_usuario,omitempty"`
+	UsuarioFiliais []UsuarioFilial `gorm:"foreignKey:UsuarioID;references:ID" json:"usuario_filiais,omitempty"`
 }
 
 // ============================================================
 // MÉTODOS DO MODEL
 // ============================================================
 
-// 5. Método TableName
-// Define o nome da tabela no banco de dados
-// O GORM usa isso para saber qual tabela usar
-// Se não definir, ele usa o plural do nome do struct: "usuarios"
 func (Usuario) TableName() string {
-    return "usuario" // Nome exato da tabela no banco
+	return "usuario"
 }
 
-// 6. Método BeforeCreate (Hook do GORM)
-// Executado ANTES de criar um novo registro no banco
-// Útil para definir valores padrão como CreatedBy
 func (u *Usuario) BeforeCreate() error {
-    // Se CreatedBy não foi definido, usar 0
-    if u.CreatedBy == nil {
-        u.CreatedBy = new(int) // Cria um ponteiro para int
-        *u.CreatedBy = 0        // Define o valor como 0
-    }
-    // Se UpdatedBy não foi definido, usar 0
-    if u.UpdatedBy == nil {
-        u.UpdatedBy = new(int)
-        *u.UpdatedBy = 0
-    }
-    return nil
+	if u.CreatedBy == nil {
+		u.CreatedBy = new(int)
+		*u.CreatedBy = 0
+	}
+	if u.UpdatedBy == nil {
+		u.UpdatedBy = new(int)
+		*u.UpdatedBy = 0
+	}
+	return nil
 }
 
-// 7. Método BeforeUpdate (Hook do GORM)
-// Executado ANTES de atualizar um registro no banco
 func (u *Usuario) BeforeUpdate() error {
-    // Se UpdatedBy não foi definido, usar 0
-    if u.UpdatedBy == nil {
-        u.UpdatedBy = new(int)
-        *u.UpdatedBy = 0
-    }
-    return nil
+	if u.UpdatedBy == nil {
+		u.UpdatedBy = new(int)
+		*u.UpdatedBy = 0
+	}
+	return nil
 }
 
 // ============================================================
-// MÉTODOS AUXILIARES (funções de conveniência)
+// MÉTODOS AUXILIARES
 // ============================================================
 
-// 8. Método IsActive
-// Verifica se o usuário está ativo
-// Retorna true se situacao == 1 (ativo)
 func (u *Usuario) IsActive() bool {
-    return u.Situacao == 1
+	return u.Situacao == constants.StatusAtivo
 }
 
-// 9. Método IsDeleted
-// Verifica se o usuário foi deletado logicamente
-// Retorna true se DeletedAt != nil
 func (u *Usuario) IsDeleted() bool {
-    return u.DeletedAt != nil
+	return u.DeletedAt != nil
 }
 
-// 10. Método SoftDelete
-// Realiza a exclusão lógica (soft delete)
-// Define a data atual em DeletedAt
 func (u *Usuario) SoftDelete() {
-    now := time.Now()
-    u.DeletedAt = &now
+	now := time.Now()
+	u.DeletedAt = &now
+	u.Situacao = constants.StatusInativo
+}
+
+func (u *Usuario) GetEmpresaFilialID() int {
+	if len(u.UsuarioFiliais) > 0 {
+		return u.UsuarioFiliais[0].EmpresaFilialID
+	}
+	return 0
+}
+
+func (u *Usuario) GetEmpresaFilialIDs() []int {
+	var ids []int
+	for _, uf := range u.UsuarioFiliais {
+		ids = append(ids, uf.EmpresaFilialID)
+	}
+	return ids
+}
+
+func (u *Usuario) HasEmpresaFilial(emfID int) bool {
+	for _, uf := range u.UsuarioFiliais {
+		if uf.EmpresaFilialID == emfID {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *Usuario) HasEmailSMTP() bool {
+	return u.EmailSMTP != nil && *u.EmailSMTP != ""
+}
+
+func (u *Usuario) HasServidorSMTP() bool {
+	return u.ServidorSMTP != nil && *u.ServidorSMTP != ""
+}
+
+func (u *Usuario) IsDeletavel() bool {
+	// Verifica se o usuário pode ser deletado
+	// TODO: Implementar regras de negócio
+	return true
 }

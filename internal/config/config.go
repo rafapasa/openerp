@@ -54,8 +54,8 @@ func LoadConfig() *Config {
 	}
 
 	// JWT Expires In
-	jwtExpiresIn := getEnvAsDuration("JWT_EXPIRES_IN", 24*time.Hour)
-	jwtRefreshExpiresIn := getEnvAsDuration("JWT_REFRESH_EXPIRES_IN", 168*time.Hour) // 7 dias
+	// jwtExpiresIn := getEnvAsDuration("JWT_EXPIRES_IN", 24*time.Hour)
+	// jwtRefreshExpiresIn := getEnvAsDuration("JWT_REFRESH_EXPIRES_IN", 168*time.Hour) // 7 dias
 
 	// Redis DB
 	redisDB := getEnvAsInt("REDIS_DB", 0)
@@ -74,8 +74,8 @@ func LoadConfig() *Config {
 
 		// JWT
 		JWTSecret:           getEnv("JWT_SECRET", "your-super-secret-key-change-this"),
-		JWTExpiresIn:        jwtExpiresIn,
-		JWTRefreshExpiresIn: jwtRefreshExpiresIn,
+		JWTExpiresIn:        getEnvAsDuration("JWT_EXPIRES_IN", 24*time.Hour),
+		JWTRefreshExpiresIn: getEnvAsDuration("JWT_REFRESH_EXPIRES_IN", 168*time.Hour),
 
 		// Redis
 		RedisHost:     getEnv("REDIS_HOST", "localhost"),

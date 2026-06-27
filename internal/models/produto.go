@@ -32,12 +32,16 @@ type Produto struct {
 	UpdatedBy *int       `gorm:"column:updated_by" json:"updated_by,omitempty"`
 
 	// ============================================================
-	// RELACIONAMENTOS
+	// RELACIONAMENTOS (CORRIGIDOS)
 	// ============================================================
-	TipoProduto     *TipoProduto     `gorm:"foreignKey:TipoProdutoID;references:ptp_id" json:"tipo_produto,omitempty"`
-	GrupoProduto    *ProdutoGrupo    `gorm:"foreignKey:GrupoProdutoID;references:prog_id" json:"grupo_produto,omitempty"`
-	SubGrupoProduto *ProdutoSubgrupo `gorm:"foreignKey:SubGrupoProdutoID;references:prosg_id" json:"sub_grupo_produto,omitempty"`
-	Marca           *ProdutoMarca    `gorm:"foreignKey:MarcaID;references:promar_id" json:"marca,omitempty"`
+	TipoProduto     *TipoProduto         `gorm:"foreignKey:TipoProdutoID;references:ptp_id" json:"tipo_produto,omitempty"`
+	ProdutoGrupo    *ProdutoGrupo        `gorm:"foreignKey:ProdutoGrupoID;references:prog_id" json:"produto_grupo,omitempty"`        // CORRIGIDO
+	ProdutoSubgrupo *ProdutoSubgrupo     `gorm:"foreignKey:ProdutoSubgrupoID;references:prosg_id" json:"produto_subgrupo,omitempty"` // CORRIGIDO
+	Marca           *ProdutoMarca        `gorm:"foreignKey:MarcaID;references:promar_id" json:"marca,omitempty"`
+	Modelo          *ProdutoModelo       `gorm:"foreignKey:ModeloID;references:prom_id" json:"modelo,omitempty"`
+	Serie           *ProdutoSerie        `gorm:"foreignKey:SerieID;references:pros_id" json:"serie,omitempty"`
+	Especie         *ProdutoEspecie      `gorm:"foreignKey:EspecieID;references:proesp_id" json:"especie,omitempty"`
+	ItensPedido     []DocumentoVendaItem `gorm:"foreignKey:ProdutoID;references:pro_id" json:"itens_pedido,omitempty"`
 }
 
 func (Produto) TableName() string {
