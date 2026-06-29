@@ -1,0 +1,284 @@
+package service
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/openerp/backend/internal/constants"
+	"github.com/openerp/backend/internal/dto"
+	"github.com/openerp/backend/internal/models"
+	"github.com/openerp/backend/internal/repository"
+	"github.com/openerp/backend/internal/utils"
+	"gorm.io/gorm"
+)
+
+type EntidadeService struct {
+	entidadeRepo *repository.EntidadeRepository
+}
+
+// ============================================================
+// CONSTANTES DE VALIDAÇÃO
+// ============================================================
+
+const (
+	maxLengthRazaoSocial  = 100
+	maxLengthNomeFantasia = 100
+	maxLengthInscricao    = 20
+	minLengthDocumento    = 11 // CPF tem 11 dígitos
+)
+
+// ============================================================
+// MÉTODOS DE VALIDAÇÃO (PRIVADOS)
+// ============================================================
+
+// isDataValid realiza as validações básicas de uma entidade
+func (s *EntidadeService) isDataValid(req *dto.EntidadeRequest) error {
+	// 1. Validar campos obrigatórios
+	if err := s.validateRequiredFields(req); err != nil {
+		return err
+	}
+
+	// 2. Validar tamanhos dos campos
+	if err := s.validateFieldLengths(req); err != nil {
+		return err
+	}
+
+	// 3. Validar documento
+	if err := s.validateDocument(req); err != nil {
+		return err
+	}
+
+	// 4. Validar tipo de pessoa
+	if err := s.validateTipoPessoa(req); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateRequiredFields valida campos obrigatórios
+func (s *EntidadeService) validateRequiredFields(req *dto.EntidadeRequest) error {
+	if strings.TrimSpace(req.RazaoSocial) == "" {
+		return errors.New("nome/razão social é obrigatório")
+	}
+
+	if strings.TrimSpace(req.InscricaoFederal) == "" {
+		return errors.New("CPF/CNPJ é obrigatório")
+	}
+
+	// Campo obrigatório para CREATE (mas pode ser opcional no UPDATE)
+	// Por isso, deixamos essa validação separada
+	return nil
+}
+
+// validateFieldLengths valida o tamanho dos campos
+func (s *EntidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
+	// Nome / Razão Social
+	if len(req.RazaoSocial) > maxLengthRazaoSocial {
+		return fmt.Errorf("nome/razão social deve ter no máximo %d caracteres", maxLengthRazaoSocial)
+	}
+
+	// Nome Fantasia (se informado)
+	if len(req.NomeFantasia) > maxLengthNomeFantasia {
+		return fmt.Errorf("nome fantasia deve ter no máximo %d caracteres", maxLengthNomeFantasia)
+	}
+
+	// Inscrição Estadual (se informada)
+	if len(req.InscricaoEstadual) > maxLengthInscricao {
+		return fmt.Errorf("inscrição estadual deve ter no máximo %d caracteres", maxLengthInscricao)
+	}
+
+	// Inscrição Municipal (se informada)
+	if len(req.InscricaoMunicipal) > maxLengthInscricao {
+		return fmt.Errorf("inscrição municipal deve ter no máximo %d caracteres", maxLengthInscricao)
+	}
+
+	return nil
+}
+
+// validateDocument valida o documento (CPF/CNPJ)
+func (s *EntidadeService) validateDocument(req *dto.EntidadeRequest) error {
+	// Remover caracteres especiais para validação
+	documentoLimpo := utils.LimparDocumento(req.InscricaoFederal)
+
+	// Validar tamanho mínimo
+	if len(documentoLimpo) < minLengthDocumento {
+		return fmt.Errorf("documento deve ter pelo menos %d dígitos", minLengthDocumento)
+	}
+
+	// Validar formato (CPF ou CNPJ)
+	if !utils.IsValidDocumento(documentoLimpo) {
+		return errors.New("documento inválido, deve ser um CPF ou CNPJ válido")
+	}
+
+	return nil
+}
+
+// validateTipoPessoa valida o tipo de pessoa
+func (s *EntidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
+	// Verificar se o tipo de pessoa é válido (1-Física, 2-Jurídica)
+	if req.TipoPessoa != 1 && req.TipoPessoa != 2 {
+		return errors.New("tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica)")
+	}
+
+	// Validação adicional: se for pessoa física, validar CPF (11 dígitos)
+	// se for jurídica, validar CNPJ (14 dígitos)
+	documentoLimpo := utils.LimparDocumento(req.InscricaoFederal)
+	if req.TipoPessoa == 1 && len(documentoLimpo) != 11 {
+		return errors.New("CPF deve ter 11 dígitos para pessoa física")
+	}
+	if req.TipoPessoa == 2 && len(documentoLimpo) != 14 {
+		return errors.New("CNPJ deve ter 14 dígitos para pessoa jurídica")
+	}
+
+	return nil
+}
+
+// validateUniqueDocument verifica se o documento já existe
+func (s *EntidadeService) validateUniqueDocument(documento string, excludeID int) error {
+	existe, err := s.entidadeRepo.ExistsByDocumento(documento, excludeID)
+	if err != nil {
+		return fmt.Errorf("erro ao verificar duplicidade de documento: %w", err)
+	}
+	if existe {
+		return fmt.Errorf("documento %s já está cadastrado", documento)
+	}
+	return nil
+}
+
+// isCreateValid valida dados para criação
+func (s *EntidadeService) isCreateValid(req *dto.EntidadeRequest) error {
+	// 1. Validações básicas
+	if err := s.isDataValid(req); err != nil {
+		return err
+	}
+
+	// 2. Validar duplicidade de documento
+	if err := s.validateUniqueDocument(req.InscricaoFederal, 0); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// isUpdateValid valida dados para atualização
+func (s *EntidadeService) isUpdateValid(id int, req *dto.EntidadeRequest) error {
+	// 1. Validações básicas
+	if err := s.isDataValid(req); err != nil {
+		return err
+	}
+
+	// 2. Validar duplicidade de documento (excluindo o próprio ID)
+	if err := s.validateUniqueDocument(req.InscricaoFederal, id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewEntidadeService(db *gorm.DB) *EntidadeService {
+	return &EntidadeService{
+		entidadeRepo: repository.NewEntidadeRepository(db),
+	}
+}
+
+func (s *EntidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, error) {
+	if err := s.isCreateValid(rep); err != nil {
+		return nil, err
+	}
+
+	entidade, _ := s.entidadeRepo.FindByDocumento(rep.InscricaoFederal)
+	if entidade != nil {
+		return nil, fmt.Errorf("Entidade com documento %s já existe", rep.InscricaoFederal)
+	}
+
+	entidade = &models.Entidade{}
+	if err := utils.MapToModel(rep, entidade); err != nil {
+		return nil, fmt.Errorf("erro ao mapear dados da entidade: %w", err)
+	}
+
+	// 3. Definir campos que não podem ser mapeados automaticamente
+	entidade.InscricaoFederal = utils.LimparDocumento(rep.InscricaoFederal)
+	entidade.TipoPessoa = constants.TipoPessoa(rep.TipoPessoa)
+	entidade.Situacao = constants.StatusAtivo
+
+	result := s.entidadeRepo.Create(entidade)
+	if result != nil {
+		return nil, result
+	}
+	return entidade, nil
+}
+
+func (s *EntidadeService) GetByID(id int) (*models.Entidade, error) {
+	// 1. Buscar a entidade pelo ID
+	// A validaçãi de se a entidade existe e não foi deletada é feita no repositório
+	entidade, err := s.entidadeRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return entidade, nil
+}
+
+func (s *EntidadeService) GetByDocumento(documento string) (*models.Entidade, error) {
+	if !utils.IsValidDocumento(documento) {
+		return nil, fmt.Errorf("Documento inválido, deve ser um CNPJ ou CPF válido")
+	}
+
+	entidade, err := s.entidadeRepo.FindByDocumento(documento)
+	if err != nil {
+		return nil, err
+	}
+	return entidade, nil
+}
+
+func (s *EntidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Entidade, error) {
+	if err := s.isUpdateValid(id, req); err != nil {
+		return nil, err
+	}
+	// 1. Buscar a entidade pelo ID
+	entidade, err := s.entidadeRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := utils.MapToModel(req, entidade); err != nil {
+		return nil, fmt.Errorf("erro ao mapear dados da entidade: %w", err)
+	}
+
+	entidade.InscricaoFederal = utils.LimparDocumento(req.InscricaoFederal)
+	entidade.TipoPessoa = constants.TipoPessoa(req.TipoPessoa)
+
+	result := s.entidadeRepo.Update(entidade)
+	if result != nil {
+		return nil, result
+	}
+	return entidade, nil
+}
+
+func (s *EntidadeService) Delete(id int) error {
+	// 1. Buscar a entidade pelo ID
+	entidade, err := s.entidadeRepo.FindByID(id)
+	if err != nil {
+		return err
+	}
+	// TODO: Validar as tabelas dependentes para excluir
+	return s.entidadeRepo.Delete(entidade)
+}
+
+func (s *EntidadeService) List(limit, offset int, filters map[string]interface{}) ([]models.Entidade, int64, error) {
+	// 1. Listar entidades com filtros
+
+	// Validar parâmetros de paginação
+	if limit <= 0 {
+		limit = 10 // valor padrão
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	entidades, total, err := s.entidadeRepo.List(limit, offset, filters)
+	if err != nil {
+		return nil, 0, err
+	}
+	return entidades, total, nil
+}

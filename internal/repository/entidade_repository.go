@@ -42,12 +42,12 @@ func (r *EntidadeRepository) Update(entidade *models.Entidade) error {
 }
 
 // Delete realiza exclusão lógica de uma entidade pelo ID
-func (r *EntidadeRepository) Delete(id int) error {
+func (r *EntidadeRepository) Delete(entidade *models.Entidade) error {
 	// 1. Buscar a entidade
-	entidade, err := r.FindByID(id)
-	if err != nil {
-		return err
-	}
+	// entidade, err := r.FindByID(id)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// 2. Verificar se já foi deletada
 	if entidade.IsDeleted() {
