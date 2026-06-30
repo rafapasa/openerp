@@ -2,21 +2,9 @@ package models
 
 import (
 	"time"
-)
 
-// ============================================================
-// CONSTANTES
-// ============================================================
-// (Adicionar no final do constants.go)
-
-/*
-const (
-    TipoEnderecoCobranca  = 1
-    TipoEnderecoEntrega   = 2
-    TipoEnderecoComercial = 3
-    TipoEnderecoResidencial = 4
+	"github.com/openerp/backend/internal/constants"
 )
-*/
 
 // ============================================================
 // MODEL: EntidadeEndereco
@@ -26,8 +14,8 @@ type EntidadeEndereco struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID          int        `gorm:"column:ete_item;primaryKey;autoIncrement" json:"id"`
-	EntidadeID  int        `gorm:"column:ent_id;not null" json:"entidade_id"`
+	EntidadeID  int        `gorm:"column:ent_id;primaryKey" json:"entidade_id"`
+	Item        int        `gorm:"column:ete_item;primaryKey" json:"id"`
 	PaisID      int        `gorm:"column:pai_id;not null" json:"pais_id"`
 	MunicipioID int        `gorm:"column:mun_id;not null" json:"municipio_id"`
 	EstadoID    int        `gorm:"column:est_id;not null" json:"estado_id"`
@@ -100,7 +88,7 @@ func (m *EntidadeEndereco) IsDeleted() bool {
 func (m *EntidadeEndereco) SoftDelete() {
 	now := time.Now()
 	m.DeletedAt = &now
-	m.Situacao = 2
+	m.Situacao = int(constants.StatusInativo)
 }
 
 func (m *EntidadeEndereco) IsCobranca() bool {

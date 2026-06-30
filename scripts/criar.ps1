@@ -1,3 +1,8 @@
+# Navegar para a raiz do projeto
+cd D:\Projetos\OpenERP\backend
+
+# Criar o script com a sintaxe correta
+$content = @'
 # ============================================================
 # OpenERP - Development Commands
 # ============================================================
@@ -7,17 +12,17 @@ $Command = $args[0]
 
 if ($Command -eq $null -or $Command -eq "") {
     Write-Host ""
-    Write-Host "Comandos disponÃ­veis:" -ForegroundColor Cyan
+    Write-Host "Comandos disponíveis:" -ForegroundColor Cyan
     Write-Host "  build    - Compilar o projeto" -ForegroundColor White
     Write-Host "  run      - Executar o projeto" -ForegroundColor White
     Write-Host "  test     - Rodar testes" -ForegroundColor White
     Write-Host "  coverage - Rodar testes com cobertura" -ForegroundColor White
-    Write-Host "  tidy     - Limpar dependÃªncias" -ForegroundColor White
-    Write-Host "  fmt      - Formatar cÃ³digo" -ForegroundColor White
+    Write-Host "  tidy     - Limpar dependências" -ForegroundColor White
+    Write-Host "  fmt      - Formatar código" -ForegroundColor White
     Write-Host "  lint     - Rodar linter" -ForegroundColor White
     Write-Host "  gen      - Gerar models" -ForegroundColor White
-    Write-Host "  docs     - Gerar documentaÃ§Ã£o" -ForegroundColor White
-    Write-Host "  env      - Mostrar variÃ¡veis de ambiente" -ForegroundColor White
+    Write-Host "  docs     - Gerar documentação" -ForegroundColor White
+    Write-Host "  env      - Mostrar variáveis de ambiente" -ForegroundColor White
     Write-Host "  help     - Mostrar esta ajuda" -ForegroundColor White
     Write-Host ""
     Write-Host "Exemplo: .\scripts\dev.ps1 run" -ForegroundColor Cyan
@@ -33,98 +38,105 @@ Write-Host ""
 
 switch ($Command.Trim()) {
     "build" {
-        Write-Host "ðŸ”¨ Building..." -ForegroundColor Yellow
+        Write-Host "🔨 Building..." -ForegroundColor Yellow
         go build -o bin/api.exe cmd/api/main.go
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "âœ… Build concluÃ­do!" -ForegroundColor Green
+            Write-Host "✅ Build concluído!" -ForegroundColor Green
         } else {
-            Write-Host "âŒ Build falhou!" -ForegroundColor Red
+            Write-Host "❌ Build falhou!" -ForegroundColor Red
         }
     }
 
     "run" {
-        Write-Host "ðŸš€ Running..." -ForegroundColor Yellow
+        Write-Host "🚀 Running..." -ForegroundColor Yellow
         go run cmd/api/main.go
     }
 
     "test" {
-        Write-Host "ðŸ§ª Testing..." -ForegroundColor Yellow
+        Write-Host "🧪 Testing..." -ForegroundColor Yellow
         go test -v ./...
     }
 
     "coverage" {
-        Write-Host "ðŸ“Š Coverage..." -ForegroundColor Yellow
+        Write-Host "📊 Coverage..." -ForegroundColor Yellow
         go test -coverprofile=coverage.out ./...
         go tool cover -html=coverage.out
     }
 
     "tidy" {
-        Write-Host "ðŸ§¹ Tidying..." -ForegroundColor Yellow
+        Write-Host "🧹 Tidying..." -ForegroundColor Yellow
         go mod tidy
         go mod verify
-        Write-Host "âœ… DependÃªncias limpas!" -ForegroundColor Green
+        Write-Host "✅ Dependências limpas!" -ForegroundColor Green
     }
 
     "fmt" {
-        Write-Host "ðŸŽ¨ Formatting..." -ForegroundColor Yellow
+        Write-Host "🎨 Formatting..." -ForegroundColor Yellow
         go fmt ./...
-        Write-Host "âœ… CÃ³digo formatado!" -ForegroundColor Green
+        Write-Host "✅ Código formatado!" -ForegroundColor Green
     }
 
     "lint" {
-        Write-Host "ðŸ” Linting..." -ForegroundColor Yellow
+        Write-Host "🔍 Linting..." -ForegroundColor Yellow
         if (Get-Command golangci-lint -ErrorAction SilentlyContinue) {
             golangci-lint run
         } else {
-            Write-Host "âš ï¸  golangci-lint nÃ£o instalado. Instale com:" -ForegroundColor Yellow
+            Write-Host "⚠️  golangci-lint não instalado. Instale com:" -ForegroundColor Yellow
             Write-Host "   go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest" -ForegroundColor White
         }
     }
 
     "gen" {
-        Write-Host "ðŸ“ Generating models..." -ForegroundColor Yellow
+        Write-Host "📝 Generating models..." -ForegroundColor Yellow
         go run cmd/gen/main.go
     }
 
     "docs" {
-        Write-Host "ðŸ“š Generating docs..." -ForegroundColor Yellow
+        Write-Host "📚 Generating docs..." -ForegroundColor Yellow
         if (Get-Command swag -ErrorAction SilentlyContinue) {
             swag init -g cmd/api/main.go
         } else {
-            Write-Host "âš ï¸  swag nÃ£o instalado. Instale com:" -ForegroundColor Yellow
+            Write-Host "⚠️  swag não instalado. Instale com:" -ForegroundColor Yellow
             Write-Host "   go install github.com/swaggo/swag/cmd/swag@latest" -ForegroundColor White
         }
     }
 
     "env" {
-        Write-Host "ðŸ“‹ Environment Variables:" -ForegroundColor Yellow
+        Write-Host "📋 Environment Variables:" -ForegroundColor Yellow
         Get-Content .env
     }
 
     "help" {
-        Write-Host "Comandos disponÃ­veis:" -ForegroundColor Cyan
+        Write-Host "Comandos disponíveis:" -ForegroundColor Cyan
         Write-Host ""
         Write-Host "  build    - Compilar o projeto" -ForegroundColor White
         Write-Host "  run      - Executar o projeto" -ForegroundColor White
         Write-Host "  test     - Rodar testes" -ForegroundColor White
         Write-Host "  coverage - Rodar testes com cobertura" -ForegroundColor White
-        Write-Host "  tidy     - Limpar dependÃªncias" -ForegroundColor White
-        Write-Host "  fmt      - Formatar cÃ³digo" -ForegroundColor White
+        Write-Host "  tidy     - Limpar dependências" -ForegroundColor White
+        Write-Host "  fmt      - Formatar código" -ForegroundColor White
         Write-Host "  lint     - Rodar linter" -ForegroundColor White
         Write-Host "  gen      - Gerar models" -ForegroundColor White
-        Write-Host "  docs     - Gerar documentaÃ§Ã£o" -ForegroundColor White
-        Write-Host "  env      - Mostrar variÃ¡veis de ambiente" -ForegroundColor White
+        Write-Host "  docs     - Gerar documentação" -ForegroundColor White
+        Write-Host "  env      - Mostrar variáveis de ambiente" -ForegroundColor White
         Write-Host "  help     - Mostrar esta ajuda" -ForegroundColor White
         Write-Host ""
         Write-Host "Exemplo: .\scripts\dev.ps1 run" -ForegroundColor Cyan
     }
 
     default {
-        Write-Host "âŒ Comando desconhecido: '$Command'" -ForegroundColor Red
+        Write-Host "❌ Comando desconhecido: '$Command'" -ForegroundColor Red
         Write-Host ""
-        Write-Host "Comandos disponÃ­veis:" -ForegroundColor Cyan
+        Write-Host "Comandos disponíveis:" -ForegroundColor Cyan
         Write-Host "  build, run, test, coverage, tidy, fmt, lint, gen, docs, env, help" -ForegroundColor White
         Write-Host ""
         Write-Host "Exemplo: .\scripts\dev.ps1 run" -ForegroundColor Cyan
     }
 }
+'@
+
+# Salvar com UTF-8 sem BOM
+$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+[System.IO.File]::WriteAllText("scripts\dev.ps1", $content, $Utf8NoBomEncoding)
+
+Write-Host "✅ Script recriado com sucesso!" -ForegroundColor Green

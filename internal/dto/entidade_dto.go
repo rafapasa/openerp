@@ -143,45 +143,38 @@ type EntidadeListResponse struct {
 }
 
 // ============================================================
-// MÉTODOS DE CONVERSÃO
+// MÉTODOS DE CONVERSÃO (USANDO MAPPER)
 // ============================================================
 
-// ToModel converte EntidadeRequest para models.Entidade
-func (r *EntidadeRequest) ToModel() *models.Entidade {
+// ToModel converte EntidadeRequest para models.Entidade usando mapper
+func (r *EntidadeRequest) ToModel() (*models.Entidade, error) {
 	if r == nil {
-		return nil
+		return nil, nil
 	}
 
-	entidade := &models.Entidade{
-		GrupoEntidadeID:    r.GrupoEntidadeID,
-		EmpresaFilialID:    r.EmpresaFilialID,
-		TabelaPrecoID:      r.TabelaPrecoID,
-		TabelaDescontoID:   r.TabelaDescontoID,
-		HorarioID:          r.HorarioID,
-		Codigo:             r.Codigo,
-		TipoPessoa:         constants.TipoPessoa(r.TipoPessoa),
-		RazaoSocial:        r.RazaoSocial,
-		NomeFantasia:       utils.StringPtr(r.NomeFantasia),
-		InscricaoFederal:   r.InscricaoFederal,
-		InscricaoEstadual:  utils.StringPtr(r.InscricaoEstadual),
-		InscricaoProdutor:  utils.StringPtr(r.InscricaoProdutor),
-		InscricaoMunicipal: utils.StringPtr(r.InscricaoMunicipal),
-		Suframa:            utils.StringPtr(r.Suframa),
-		Situacao:           constants.Status(r.Situacao),
-		Classificacao:      utils.IntPtr(r.Classificacao),
-		Observacao:         utils.StringPtr(r.Observacao),
-		CasaPropria:        utils.IntPtr(r.CasaPropria),
-		EstadoCivil:        utils.IntPtr(r.EstadoCivil),
-		ConjujeNome:        utils.StringPtr(r.ConjujeNome),
-		ConjujeCPF:         utils.StringPtr(r.ConjujeCPF),
-		ConjujeRenda:       utils.Float64Ptr(r.ConjujeRenda),
-		ConjujeRG:          utils.StringPtr(r.ConjujeRG),
-		QuantFilhos:        utils.IntPtr(r.QuantFilhos),
-		PercentualComissao: utils.Float64Ptr(r.PercentualComissao),
-		TaxaEntrega:        utils.Float64Ptr(r.TaxaEntrega),
-		ArquivoImpDDV:      utils.StringPtr(r.ArquivoImpDDV),
-		CreatedBy:          r.CreatedBy,
-		UpdatedBy:          r.UpdatedBy,
+	entidade := &models.Entidade{}
+
+	// 1. Usar o mapper para copiar campos (mapeamento automático)
+	if err := utils.MapToModel(r, entidade); err != nil {
+		return nil, err
+	}
+
+	// 2. Tratamentos especiais que o mapper não cobre
+	// Converter TipoPessoa (int → constants.TipoPessoa)
+	entidade.TipoPessoa = constants.TipoPessoa(r.TipoPessoa)
+
+	// Limpar documento (remover pontos, traços, etc.)
+	entidade.InscricaoFederal = utils.LimparDocumento(r.InscricaoFederal)
+
+	// Converter Sexo (int → constants.Sexo)
+	if r.Sexo > 0 {
+		sexo := constants.Sexo(r.Sexo)
+		entidade.Sexo = &sexo
+	}
+
+	// Converter Situacao (se não informada, definir como ativo)
+	if r.Situacao == 0 {
+		entidade.Situacao = constants.StatusAtivo
 	}
 
 	// Converter datas
@@ -197,26 +190,55 @@ func (r *EntidadeRequest) ToModel() *models.Entidade {
 		}
 	}
 
-	// Converter sexo
-	if r.Sexo > 0 {
-		sexo := constants.Sexo(r.Sexo)
-		entidade.Sexo = &sexo
-	}
-
-	// Se situação não foi informada, definir como ativo
-	if r.Situacao == 0 {
-		entidade.Situacao = constants.StatusAtivo
-	}
-
-	return entidade
+	return entidade, nil
 }
 
-// FromModel converte models.Entidade para EntidadeResponse
+// FromModel converte models.Entidade para EntidadeResponse usando mapper
 func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeResponse {
 	if entidade == nil {
 		return nil
 	}
 
+	// 1. Usar o mapper para copiar campos (mapeamento automático)
+	// O mapper vai copiar todos os campos com nomes correspondentes
+	if err := utils.MapToDTO(entidade, r); err != nil {
+		// Se o mapper falhar, usar fallback manual
+		return r.fromModelFallback(entidade)
+	}
+
+	// 2. Preencher campos calculados (labels)
+	r.TipoPessoaLabel = entidade.TipoPessoa.String()
+	r.SituacaoLabel = entidade.Situacao.String()
+
+	if entidade.Sexo != nil {
+		r.SexoLabel = entidade.Sexo.String()
+	}
+
+	r.EstadoCivilLabel = getEstadoCivilLabel(r.EstadoCivil)
+
+	// 3. Formatar datas (o mapper não faz isso)
+	r.CreatedAt = utils.FormatDateTime(entidade.CreatedAt)
+	r.UpdatedAt = utils.FormatDateTime(entidade.UpdatedAt)
+
+	if entidade.DataNascimento != nil {
+		r.DataNascimento = utils.FormatDate(*entidade.DataNascimento)
+	}
+
+	if entidade.DataCadastro != nil {
+		r.DataCadastro = utils.FormatDateTime(*entidade.DataCadastro)
+	}
+
+	return r
+}
+
+// ============================================================
+// FALLBACK (caso o mapper falhe)
+// ============================================================
+
+// fromModelFallback é o fallback manual caso o mapper falhe
+// Isso garante que o sistema continue funcionando mesmo com erro no mapper
+func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *EntidadeResponse {
+	// Mapeamento manual campo por campo (seguro)
 	r.ID = entidade.ID
 	r.GrupoEntidadeID = entidade.GrupoEntidadeID
 	r.EmpresaFilialID = entidade.EmpresaFilialID
@@ -225,7 +247,6 @@ func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeRespons
 	r.HorarioID = entidade.HorarioID
 	r.Codigo = entidade.Codigo
 	r.TipoPessoa = int(entidade.TipoPessoa)
-	r.TipoPessoaLabel = entidade.TipoPessoa.String()
 	r.RazaoSocial = entidade.RazaoSocial
 	r.NomeFantasia = utils.StringValue(entidade.NomeFantasia)
 	r.InscricaoFederal = entidade.InscricaoFederal
@@ -234,42 +255,43 @@ func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeRespons
 	r.InscricaoMunicipal = utils.StringValue(entidade.InscricaoMunicipal)
 	r.Suframa = utils.StringValue(entidade.Suframa)
 	r.Situacao = int(entidade.Situacao)
-	r.SituacaoLabel = entidade.Situacao.String()
 	r.Classificacao = utils.IntValue(entidade.Classificacao)
 	r.Observacao = utils.StringValue(entidade.Observacao)
-
-	// Dados pessoais
-	if entidade.DataNascimento != nil {
-		r.DataNascimento = utils.FormatDate(*entidade.DataNascimento)
-	}
 	r.NomeDaMae = utils.StringValue(entidade.NomeDaMae)
 	r.NomeDoPai = utils.StringValue(entidade.NomeDoPai)
 	if entidade.Sexo != nil {
 		r.Sexo = int(*entidade.Sexo)
-		r.SexoLabel = entidade.Sexo.String()
 	}
 	r.CasaPropria = utils.IntValue(entidade.CasaPropria)
 	r.EstadoCivil = utils.IntValue(entidade.EstadoCivil)
-	r.EstadoCivilLabel = getEstadoCivilLabel(r.EstadoCivil)
 	r.ConjujeNome = utils.StringValue(entidade.ConjujeNome)
 	r.ConjujeCPF = utils.StringValue(entidade.ConjujeCPF)
 	r.ConjujeRenda = utils.Float64Value(entidade.ConjujeRenda)
 	r.ConjujeRG = utils.StringValue(entidade.ConjujeRG)
 	r.QuantFilhos = utils.IntValue(entidade.QuantFilhos)
-
-	// Dados comerciais
-	if entidade.DataCadastro != nil {
-		r.DataCadastro = utils.FormatDateTime(*entidade.DataCadastro)
-	}
 	r.PercentualComissao = utils.Float64Value(entidade.PercentualComissao)
 	r.TaxaEntrega = utils.Float64Value(entidade.TaxaEntrega)
 	r.ArquivoImpDDV = utils.StringValue(entidade.ArquivoImpDDV)
-
-	// Auditoria
-	r.CreatedAt = utils.FormatDateTime(entidade.CreatedAt)
-	r.UpdatedAt = utils.FormatDateTime(entidade.UpdatedAt)
 	r.CreatedBy = entidade.CreatedBy
 	r.UpdatedBy = entidade.UpdatedBy
+
+	// Labels
+	r.TipoPessoaLabel = entidade.TipoPessoa.String()
+	r.SituacaoLabel = entidade.Situacao.String()
+	if entidade.Sexo != nil {
+		r.SexoLabel = entidade.Sexo.String()
+	}
+	r.EstadoCivilLabel = getEstadoCivilLabel(r.EstadoCivil)
+
+	// Datas
+	r.CreatedAt = utils.FormatDateTime(entidade.CreatedAt)
+	r.UpdatedAt = utils.FormatDateTime(entidade.UpdatedAt)
+	if entidade.DataNascimento != nil {
+		r.DataNascimento = utils.FormatDate(*entidade.DataNascimento)
+	}
+	if entidade.DataCadastro != nil {
+		r.DataCadastro = utils.FormatDateTime(*entidade.DataCadastro)
+	}
 
 	return r
 }
@@ -297,7 +319,7 @@ func getEstadoCivilLabel(valor int) string {
 }
 
 // ============================================================
-// MÉTODOS DE VALIDAÇÃO (opcional)
+// MÉTODOS DE VALIDAÇÃO
 // ============================================================
 
 // Validate valida o EntidadeRequest

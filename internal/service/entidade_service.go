@@ -14,7 +14,8 @@ import (
 )
 
 type EntidadeService struct {
-	entidadeRepo *repository.EntidadeRepository
+	entidadeRepo         *repository.EntidadeRepository
+	entidadeEnderecoRepo *repository.EntidadeEnderecoRepository
 }
 
 // ============================================================
@@ -27,6 +28,13 @@ const (
 	maxLengthInscricao    = 20
 	minLengthDocumento    = 11 // CPF tem 11 dígitos
 )
+
+func NewEntidadeService(db *gorm.DB) *EntidadeService {
+	return &EntidadeService{
+		entidadeRepo:         repository.NewEntidadeRepository(db),
+		entidadeEnderecoRepo: repository.NewEntidadeEnderecoRepository(db),
+	}
+}
 
 // ============================================================
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
@@ -177,12 +185,6 @@ func (s *EntidadeService) isUpdateValid(id int, req *dto.EntidadeRequest) error 
 	return nil
 }
 
-func NewEntidadeService(db *gorm.DB) *EntidadeService {
-	return &EntidadeService{
-		entidadeRepo: repository.NewEntidadeRepository(db),
-	}
-}
-
 func (s *EntidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, error) {
 	if err := s.isCreateValid(rep); err != nil {
 		return nil, err
@@ -262,8 +264,12 @@ func (s *EntidadeService) Delete(id int) error {
 	if err != nil {
 		return err
 	}
-	// TODO: Validar as tabelas dependentes para excluir
-	return s.entidadeRepo.Delete(entidade)
+
+	if err := s.checkDependencies(id); err != nil {
+		return err
+	}
+
+	return s.entidadeRepo.Delete(entidade.ID)
 }
 
 func (s *EntidadeService) List(limit, offset int, filters map[string]interface{}) ([]models.Entidade, int64, error) {
@@ -281,4 +287,59 @@ func (s *EntidadeService) List(limit, offset int, filters map[string]interface{}
 		return nil, 0, err
 	}
 	return entidades, total, nil
+}
+
+// ============================================================
+// MÉTODOS DE VALIDAÇÃO (REGRAS DE NEGÓCIO)
+// ============================================================
+
+// checkDependencies verifica se a entidade tem dependências
+// ESTE MÉTODO DEVE ESTAR NO SERVICE, NÃO NO REPOSITORY!
+func (s *EntidadeService) checkDependencies(entidadeID int) error {
+	// 1. Verificar se tem endereços
+	enderecos, err := s.entidadeEnderecoRepo.FindByEntidadeID(entidadeID)
+	if err != nil {
+		return fmt.Errorf("erro ao verificar endereços: %w", err)
+	}
+	if len(enderecos) > 0 {
+		return errors.New("não é possível excluir entidade com endereços cadastrados")
+	}
+
+	// 2. TODO: Verificar se tem contatos
+	// contatos, err := s.entidadeContatoRepo.FindByEntidadeID(entidadeID)
+	// if err != nil {
+	//     return fmt.Errorf("erro ao verificar contatos: %w", err)
+	// }
+	// if len(contatos) > 0 {
+	//     return errors.New("não é possível excluir entidade com contatos cadastrados")
+	// }
+
+	// 3. TODO: Verificar se tem documentos
+	// documentos, err := s.entidadeDocumentoRepo.FindByEntidadeID(entidadeID)
+	// if err != nil {
+	//     return fmt.Errorf("erro ao verificar documentos: %w", err)
+	// }
+	// if len(documentos) > 0 {
+	//     return errors.New("não é possível excluir entidade com documentos cadastrados")
+	// }
+
+	// 4. TODO: Verificar se tem pedidos (documento_venda)
+	// pedidos, err := s.documentoVendaRepo.FindByEntidadeID(entidadeID)
+	// if err != nil {
+	//     return fmt.Errorf("erro ao verificar pedidos: %w", err)
+	// }
+	// if len(pedidos) > 0 {
+	//     return errors.New("não é possível excluir entidade com pedidos associados")
+	// }
+
+	// 5. TODO: Verificar se tem notas fiscais
+	// notas, err := s.notaFiscalRepo.FindByEntidadeID(entidadeID)
+	// if err != nil {
+	//     return fmt.Errorf("erro ao verificar notas fiscais: %w", err)
+	// }
+	// if len(notas) > 0 {
+	//     return errors.New("não é possível excluir entidade com notas fiscais associadas")
+	// }
+
+	return nil
 }

@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
-
-	"github.com/openerp/backend/internal/constants"
 )
 
 // ============================================================
@@ -88,17 +89,34 @@ func TimePtr(value time.Time) *time.Time {
 }
 
 // ============================================================
-// CONVERSÃO DE TIPOS ENUM
+// CONVERSÃO DE STRINGS
 // ============================================================
 
-// IntToStatus converte int para constants.Status
-func IntToStatus(value int) constants.Status {
-	return constants.Status(value)
+// ParseInt converte string para int
+func ParseInt(value string) (int, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0, nil
+	}
+	return strconv.Atoi(value)
 }
 
-// StatusToInt converte constants.Status para int
-func StatusToInt(status constants.Status) int {
-	return int(status)
+// ParseInt64 converte string para int64
+func ParseInt64(value string) (int64, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0, nil
+	}
+	return strconv.ParseInt(value, 10, 64)
+}
+
+// ParseFloat converte string para float64
+func ParseFloat(value string) (float64, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0, nil
+	}
+	return strconv.ParseFloat(value, 64)
 }
 
 // ============================================================
@@ -138,6 +156,27 @@ func ParseDate(value string) (time.Time, error) {
 }
 
 // ============================================================
+// FORMATAÇÃO DE NÚMEROS
+// ============================================================
+
+// FormatInt formata um inteiro com zeros à esquerda
+// Exemplo: FormatInt(123, 8) → "00000123"
+func FormatInt(value int, size int) string {
+	format := "%0" + strconv.Itoa(size) + "d"
+	return fmt.Sprintf(format, value)
+}
+
+// FormatarCEP formata o CEP no padrão 00000-000
+// Exemplo: FormatarCEP(12345678) → "12345-678"
+func FormatarCEP(cep int) string {
+	cepStr := FormatInt(cep, 8)
+	if len(cepStr) == 8 {
+		return cepStr[0:5] + "-" + cepStr[5:8]
+	}
+	return cepStr
+}
+
+// ============================================================
 // VALIDAÇÃO DE TIPOS (opcional)
 // ============================================================
 
@@ -146,7 +185,16 @@ func IsZeroOrNil(value interface{}) bool {
 	if value == nil {
 		return true
 	}
-	// Usar reflection para verificar valores zero
-	// Por simplicidade, deixamos a cargo do chamador
 	return false
+}
+
+// ParseIntOrDefault converte string para int com valor padrão
+func ParseIntOrDefault(value string, defaultValue int) int {
+	if value == "" {
+		return defaultValue
+	}
+	if val, err := strconv.Atoi(value); err == nil {
+		return val
+	}
+	return defaultValue
 }

@@ -41,13 +41,13 @@ func (r *EntidadeRepository) Update(entidade *models.Entidade) error {
 	return r.db.Save(entidade).Error
 }
 
-// Delete realiza exclusão lógica de uma entidade pelo ID
-func (r *EntidadeRepository) Delete(entidade *models.Entidade) error {
+// Delete realiza exclusão lógica de uma entidade pelo ID (CORRIGIDO)
+func (r *EntidadeRepository) Delete(id int) error {
 	// 1. Buscar a entidade
-	// entidade, err := r.FindByID(id)
-	// if err != nil {
-	// 	return err
-	// }
+	entidade, err := r.FindByID(id)
+	if err != nil {
+		return err
+	}
 
 	// 2. Verificar se já foi deletada
 	if entidade.IsDeleted() {
@@ -146,7 +146,7 @@ func (r *EntidadeRepository) List(limit, offset int, filters map[string]interfac
 	// Construir a query base
 	query := r.db.Model(&models.Entidade{}).Where("deleted_at IS NULL")
 
-	// Aplicar filtros dinamicamente (AGORA COM REFLECTION!)
+	// Aplicar filtros dinamicamente
 	query = utils.ApplyFilters(query, models.Entidade{}, filters)
 
 	// Contar total de registros
