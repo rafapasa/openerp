@@ -12,8 +12,8 @@ type EntidadeDocumento struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID           int       `gorm:"column:edoc_item;primaryKey;autoIncrement" json:"id"`
-	EntidadeID   int       `gorm:"column:ent_id;not null" json:"entidade_id"`
+	EntidadeID   int       `gorm:"column:ent_id;primaryKey" json:"entidade_id"`
+	Item         int       `gorm:"column:edoc_item;primaryKey" json:"item"`
 	Descricao    *string   `gorm:"column:edoc_descricao;type:varchar(255)" json:"descricao,omitempty"`
 	DataInclusao time.Time `gorm:"column:edoc_datainclusao;type:date;not null" json:"data_inclusao"`
 	Arquivo      []byte    `gorm:"column:edoc_arquivo;type:longblob;not null" json:"-"` // Ocultar no JSON

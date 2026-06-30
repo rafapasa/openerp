@@ -14,8 +14,11 @@ import (
 // RouteConfig contém todas as dependências para registrar rotas
 type RouteConfig struct {
 	// Handlers
-	AuthHandler     *handler.AuthHandler
-	EntidadeHandler *handler.EntidadeHandler
+	AuthHandler              *handler.AuthHandler
+	EntidadeHandler          *handler.EntidadeHandler
+	EntidadeEnderecoHandler  *handler.EntidadeEnderecoHandler
+	EntidadeContatoHandler   *handler.EntidadeContatoHandler
+	EntidadeDocumentoHandler *handler.EntidadeDocumentoHandler
 	// Futuros handlers...
 	// ProdutoHandler *handler.ProdutoHandler
 	// PedidoHandler  *handler.PedidoHandler
@@ -59,7 +62,12 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 	api.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 
 	// Rotas de entidade
-	RegisterEntidadeRoutes(api, cfg.EntidadeHandler)
+	RegisterEntidadeRoutes(api,
+		cfg.EntidadeHandler,
+		cfg.EntidadeEnderecoHandler,
+		cfg.EntidadeContatoHandler,
+		cfg.EntidadeDocumentoHandler
+	)
 
 	// Futuras rotas:
 	// RegisterProdutoRoutes(api, cfg.ProdutoHandler)

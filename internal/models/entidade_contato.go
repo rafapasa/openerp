@@ -29,8 +29,8 @@ type EntidadeContato struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID             int     `gorm:"column:efc_item;primaryKey;autoIncrement" json:"id"`
-	EntidadeID     int     `gorm:"column:ent_id;not null" json:"entidade_id"`
+	EntidadeID     int     `gorm:"column:ent_id;primaryKey" json:"entidade_id"`
+	Item           int     `gorm:"column:efc_item;primaryKey" json:"item"`
 	FormaContatoID int     `gorm:"column:frc_id;not null" json:"forma_contato_id"`
 	Informacao     string  `gorm:"column:efc_informacao;type:text;not null" json:"informacao"`
 	Descricao      *string `gorm:"column:efc_descricao;type:text" json:"descricao,omitempty"`

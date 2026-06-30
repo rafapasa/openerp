@@ -28,6 +28,9 @@ func main() {
 	// 3. Inicializar serviços
 	authService := service.NewAuthService(db.GetDB(), cfg)
 	entidadeService := service.NewEntidadeService(db.GetDB())
+	entidadeEnderecoService := service.NewEntidadeEnderecoService(db.GetDB())
+	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
+	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
 	// Futuros serviços:
 	// produtoService := service.NewProdutoService(db.GetDB())
 	// pedidoService := service.NewPedidoService(db.GetDB())
@@ -35,12 +38,15 @@ func main() {
 	// 4. Inicializar handlers
 	authHandler := handler.NewAuthHandler(authService)
 	entidadeHandler := handler.NewEntidadeHandler(entidadeService)
+	entidadeEnderecoHandler := handler.NewEntidadeEnderecoHandler(entidadeEnderecoService)
+	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
+	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
 	// Futuros handlers:
 	// produtoHandler := handler.NewProdutoHandler(produtoService)
 	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
 
 	// 5. Configurar router
-	router := setupRouter(cfg, db, authHandler, entidadeHandler)
+	router := setupRouter(cfg, db, authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler)
 
 	// 6. Iniciar servidor
 	port := cfg.APIPort
@@ -56,6 +62,9 @@ func setupRouter(
 	db *database.MySQL,
 	authHandler *handler.AuthHandler,
 	entidadeHandler *handler.EntidadeHandler,
+	entidadeEnderecoHandler *handler.EntidadeEnderecoHandler,
+	entidadeContatoHandler *handler.EntidadeContatoHandler,
+	entidadeDocumentoHandler *handler.EntidadeDocumentoHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
@@ -72,8 +81,11 @@ func setupRouter(
 	// Registrar todas as rotas
 	routes.RegisterRoutes(router, &routes.RouteConfig{
 		// Handlers
-		AuthHandler:     authHandler,
-		EntidadeHandler: entidadeHandler,
+		AuthHandler:              authHandler,
+		EntidadeHandler:          entidadeHandler,
+		EntidadeEnderecoHandler:  entidadeEnderecoHandler,
+		EntidadeContatoHandler:   entidadeContatoHandler,
+		EntidadeDocumentoHandler: entidadeDocumentoHandler,
 		// Futuros handlers...
 		// ProdutoHandler: produtoHandler,
 		// PedidoHandler:  pedidoHandler,
