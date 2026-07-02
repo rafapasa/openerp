@@ -2,39 +2,8 @@ package models
 
 import (
 	"time"
-)
 
-// ============================================================
-// CONSTANTES
-// ============================================================
-
-// Constantes para Tipo de Título
-const (
-	TipoTituloPagamento   = 1
-	TipoTituloRecebimento = 2
-)
-
-// Constantes para Situação do Título
-const (
-	SituacaoTituloAberto    = 0
-	SituacaoTituloSaldo     = 1
-	SituacaoTituloProtecao  = 2
-	SituacaoTituloCobranca  = 3
-	SituacaoTituloLiquidado = 8
-	SituacaoTituloCancelado = 9
-)
-
-// Constantes para Origem do Título
-const (
-	OrigemTituloPedidoCompra = 1
-	OrigemTituloNotaFiscal   = 2
-	OrigemTituloPedidoVenda  = 3
-)
-
-// Constantes para Compromisso do Título
-const (
-	CompromissoCompromisso = 1
-	CompromissoPrevisao    = 2
+	"github.com/openerp/backend/internal/constants"
 )
 
 // ============================================================
@@ -155,27 +124,27 @@ func (t *Titulo) BeforeUpdate() error {
 
 // IsAberto verifica se o título está aberto
 func (t *Titulo) IsAberto() bool {
-	return t.Situacao == SituacaoTituloAberto
+	return t.Situacao == constants.SituacaoTituloAberto
 }
 
 // IsLiquidado verifica se o título está liquidado
 func (t *Titulo) IsLiquidado() bool {
-	return t.Situacao == SituacaoTituloLiquidado
+	return t.Situacao == constants.SituacaoTituloLiquidado
 }
 
 // IsCancelado verifica se o título está cancelado
 func (t *Titulo) IsCancelado() bool {
-	return t.Situacao == SituacaoTituloCancelado
+	return t.Situacao == constants.SituacaoTituloCancelado
 }
 
 // IsRecebimento verifica se é título de recebimento
 func (t *Titulo) IsRecebimento() bool {
-	return t.Tipo == TipoTituloRecebimento
+	return t.Tipo == constants.TipoTituloRecebimento
 }
 
 // IsPagamento verifica se é título de pagamento
 func (t *Titulo) IsPagamento() bool {
-	return t.Tipo == TipoTituloPagamento
+	return t.Tipo == constants.TipoTituloPagamento
 }
 
 // GetValorSaldo retorna o saldo atual do título
@@ -202,5 +171,5 @@ func (t *Titulo) CalcularValorComJuros(diasAtraso int) float64 {
 func (t *Titulo) SoftDelete() {
 	now := time.Now()
 	t.DeletedAt = &now
-	t.Situacao = SituacaoTituloCancelado
+	t.Situacao = constants.SituacaoTituloCancelado
 }

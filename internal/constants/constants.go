@@ -4,7 +4,32 @@ package constants
 // CONSTANTES DE SITUAÇÃO (Status)
 // ============================================================
 
+const (
+	TipoTituloPagamento   = 1
+	TipoTituloRecebimento = 2
+)
+
+const (
+	SituacaoTituloAberto    = 0
+	SituacaoTituloLiquidado = 8
+	SituacaoTituloCancelado = 9
+)
+
+// Constantes para Origem do Título
+const (
+	OrigemTituloPedidoCompra = 1
+	OrigemTituloNotaFiscal   = 2
+	OrigemTituloPedidoVenda  = 3
+)
+
+// Constantes para Compromisso do Título
+const (
+	CompromissoCompromisso = 1
+	CompromissoPrevisao    = 2
+)
+
 // Status representa os possíveis status de um registro
+
 type Status int
 
 const (
@@ -411,4 +436,44 @@ func (s Sexo) IsMasculino() bool {
 
 func (s Sexo) IsFeminino() bool {
 	return s == SexoFeminino
+}
+
+const (
+	// Modelos de Documentos Fiscais
+	MDFCodigo01 = "01" // Nota Fiscal (modelo tradicional em papel / formulário)
+	MDFCodigo04 = "04" // Nota Fiscal de Produtor
+	MDFCodigo06 = "06" // Nota Fiscal / Conta de Energia Elétrica
+	MDFCodigo07 = "07" // Nota Fiscal de Serviço de Transporte
+	MDFCodigo08 = "08" // Conhecimento de Transporte Rodoviário de Cargas (CTRC)
+	MDFCodigo55 = "55" // NF-e (Nota Fiscal Eletrônica)
+	MDFCodigo57 = "57" // CT-e (Conhecimento de Transporte Eletrônico)
+	MDFCodigo58 = "58" // MDF-e (Manifesto Eletrônico de Documentos Fiscais)
+	MDFCodigo59 = "59" // CF-e SAT (Cupom Fiscal Eletrônico)
+	MDFCodigo63 = "63" // BP-e (Bilhete de Passagem Eletrônico)
+	MDFCodigo65 = "65" // NFC-e (Nota Fiscal de Consumidor Eletrônica)
+	MDFCodigo67 = "67" // CT-e OS (Conhecimento de Transporte Eletrônico para Outros Serviços)
+)
+
+// ModelosFiscaisEletronicos retorna todos os códigos de modelos eletrônicos
+func ModelosFiscaisEletronicos() []string {
+	return []string{
+		MDFCodigo55,
+		MDFCodigo57,
+		MDFCodigo58,
+		MDFCodigo59,
+		MDFCodigo63,
+		MDFCodigo65,
+		MDFCodigo67,
+	}
+}
+
+// ModelosFiscaisPapel retorna todos os códigos de modelos em papel
+func ModelosFiscaisPapel() []string {
+	return []string{
+		MDFCodigo01,
+		MDFCodigo04,
+		MDFCodigo06,
+		MDFCodigo07,
+		MDFCodigo08,
+	}
 }

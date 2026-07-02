@@ -66,7 +66,7 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 		cfg.EntidadeHandler,
 		cfg.EntidadeEnderecoHandler,
 		cfg.EntidadeContatoHandler,
-		cfg.EntidadeDocumentoHandler
+		cfg.EntidadeDocumentoHandler,
 	)
 
 	// Futuras rotas:
