@@ -50,7 +50,11 @@ func (r *EntidadeEnderecoRepository) Create(endereco *models.EntidadeEndereco) e
 
 // Update atualiza um endereço existente
 func (r *EntidadeEnderecoRepository) Update(endereco *models.EntidadeEndereco) error {
-	return r.db.Save(endereco).Error
+	return r.db.
+		Omit("municipio", "estado", "pais").
+		Model(&models.EntidadeEndereco{}).
+		Where("ent_id = ? AND ete_item = ?", endereco.EntidadeID, endereco.Item).
+		Updates(endereco).Error
 }
 
 // Delete realiza exclusão lógica
@@ -70,7 +74,7 @@ func (r *EntidadeEnderecoRepository) Delete(entidadeID, item int) error {
 	endereco.SoftDelete()
 
 	// 4. Salvar
-	return r.db.Save(endereco).Error
+	return r.Update(endereco)
 }
 
 // ============================================================

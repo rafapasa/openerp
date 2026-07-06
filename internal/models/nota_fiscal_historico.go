@@ -14,12 +14,12 @@ type NotaFiscalHistorico struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	NotaFiscalID int    `gorm:"column:ntf_id;primaryKey" json:"nota_fiscal_id"`
-	Item         int    `gorm:"column:nfh_item;primaryKey" json:"item"`
-	Evento       string `gorm:"column:nfh_evento;type:varchar(500);not null" json:"evento"`
-	Descricao    *string `gorm:"column:nfh_descricao;type:varchar(2000)" json:"descricao,omitempty"`
+	NotaFiscalID int       `gorm:"column:ntf_id;primaryKey" json:"nota_fiscal_id"`
+	Item         int       `gorm:"column:nfh_item;primaryKey" json:"item"`
+	Evento       string    `gorm:"column:nfh_evento;type:varchar(500);not null" json:"evento"`
+	Descricao    *string   `gorm:"column:nfh_descricao;type:varchar(2000)" json:"descricao,omitempty"`
 	DataHora     time.Time `gorm:"column:nfh_datahora;type:datetime;not null" json:"data_hora"`
-	TipoEvento   int    `gorm:"column:nfh_tipoevento;not null" json:"tipo_evento"`
+	TipoEvento   int       `gorm:"column:nfh_tipoevento;not null" json:"tipo_evento"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

@@ -14,11 +14,11 @@ type DocumentoVendaPagamentoCDC struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	CentroDeCustoID     int      `gorm:"column:cdc_id;primaryKey" json:"centro_de_custo_id"`
-	DocumentoVendaID    int      `gorm:"column:ddv_id;primaryKey" json:"documento_venda_id"`
-	DocumentoVendaPagamentoItem int `gorm:"column:dvp_item;primaryKey" json:"documento_venda_pagamento_item"`
-	Valor               *float64 `gorm:"column:dvpcdc_valor;type:decimal(15,4)" json:"valor,omitempty"`
-	Percentual          *float64 `gorm:"column:dvpcdc_percentual;type:decimal(5,2)" json:"percentual,omitempty"`
+	CentroDeCustoID             int      `gorm:"column:cdc_id;primaryKey" json:"centro_de_custo_id"`
+	DocumentoVendaID            int      `gorm:"column:ddv_id;primaryKey" json:"documento_venda_id"`
+	DocumentoVendaPagamentoItem int      `gorm:"column:dvp_item;primaryKey" json:"documento_venda_pagamento_item"`
+	Valor                       *float64 `gorm:"column:dvpcdc_valor;type:decimal(15,4)" json:"valor,omitempty"`
+	Percentual                  *float64 `gorm:"column:dvpcdc_percentual;type:decimal(5,2)" json:"percentual,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

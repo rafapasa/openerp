@@ -1,7 +1,11 @@
 // internal/models/empresa.go
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Empresa struct {
 	ID   int    `gorm:"column:emp_id;primaryKey;autoIncrement" json:"id"`
@@ -20,7 +24,7 @@ func (Empresa) TableName() string {
 	return "empresa"
 }
 
-func (e *Empresa) BeforeCreate() error {
+func (e *Empresa) BeforeCreate(tx *gorm.DB) error {
 	if e.CreatedBy == nil {
 		e.CreatedBy = new(int)
 		*e.CreatedBy = 0
@@ -32,7 +36,7 @@ func (e *Empresa) BeforeCreate() error {
 	return nil
 }
 
-func (e *Empresa) BeforeUpdate() error {
+func (e *Empresa) BeforeUpdate(tx *gorm.DB) error {
 	if e.UpdatedBy == nil {
 		e.UpdatedBy = new(int)
 		*e.UpdatedBy = 0

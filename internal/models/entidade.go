@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -60,15 +61,15 @@ type Entidade struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	GrupoEntidade  *GrupoEntidade  `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
-	EmpresaFilial  *EmpresaFilial  `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
-	TabelaPreco    *TabelaPreco    `gorm:"foreignKey:TabelaPrecoID;references:tbp_id" json:"tabela_preco,omitempty"`
-	TabelaDesconto *TabelaDesconto `gorm:"foreignKey:TabelaDescontoID;references:tdesc_id" json:"tabela_desconto,omitempty"`
-	Horario        *Horario        `gorm:"foreignKey:HorarioID;references:hor_id" json:"horario,omitempty"`
-	// Enderecos      []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
-	Contatos   []EntidadeContato          `gorm:"foreignKey:EntidadeID;references:ID" json:"contatos,omitempty"`
-	Documentos []EntidadeDocumento        `gorm:"foreignKey:EntidadeID;references:ID" json:"documentos,omitempty"`
-	Regimes    []EntidadeRegimeTributario `gorm:"foreignKey:EntidadeID;references:ID" json:"regimes,omitempty"`
+	GrupoEntidade  *GrupoEntidade             `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
+	EmpresaFilial  *EmpresaFilial             `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
+	TabelaPreco    *TabelaPreco               `gorm:"foreignKey:TabelaPrecoID;references:tbp_id" json:"tabela_preco,omitempty"`
+	TabelaDesconto *TabelaDesconto            `gorm:"foreignKey:TabelaDescontoID;references:tdesc_id" json:"tabela_desconto,omitempty"`
+	Horario        *Horario                   `gorm:"foreignKey:HorarioID;references:hor_id" json:"horario,omitempty"`
+	Enderecos      []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
+	Contatos       []EntidadeContato          `gorm:"foreignKey:EntidadeID;references:ID" json:"contatos,omitempty"`
+	Documentos     []EntidadeDocumento        `gorm:"foreignKey:EntidadeID;references:ID" json:"documentos,omitempty"`
+	Regimes        []EntidadeRegimeTributario `gorm:"foreignKey:EntidadeID;references:ID" json:"regimes,omitempty"`
 }
 
 // ============================================================
@@ -79,7 +80,13 @@ func (Entidade) TableName() string {
 	return "entidade"
 }
 
-func (e *Entidade) BeforeCreate() error {
+func (e *Entidade) BeforeCreate(tx *gorm.DB) error {
+
+	if e.DataCadastro.IsZero() {
+		dataCadastro := time.Now()
+		e.DataCadastro = &dataCadastro
+	}
+
 	if e.CreatedBy == nil {
 		e.CreatedBy = new(int)
 		*e.CreatedBy = 0
@@ -91,7 +98,7 @@ func (e *Entidade) BeforeCreate() error {
 	return nil
 }
 
-func (e *Entidade) BeforeUpdate() error {
+func (e *Entidade) BeforeUpdate(tx *gorm.DB) error {
 	if e.UpdatedBy == nil {
 		e.UpdatedBy = new(int)
 		*e.UpdatedBy = 0

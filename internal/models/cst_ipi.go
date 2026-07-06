@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -36,7 +38,7 @@ func (CSTIPI) TableName() string {
 	return "cstipi"
 }
 
-func (m *CSTIPI) BeforeCreate() error {
+func (m *CSTIPI) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -48,7 +50,7 @@ func (m *CSTIPI) BeforeCreate() error {
 	return nil
 }
 
-func (m *CSTIPI) BeforeUpdate() error {
+func (m *CSTIPI) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

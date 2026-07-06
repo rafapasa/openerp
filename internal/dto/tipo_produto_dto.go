@@ -47,20 +47,20 @@ type TipoProdutoResponse struct {
 	// ============================================================
 	// DADOS PRINCIPAIS
 	// ============================================================
-	ID                int     `json:"id"`
-	Codigo            string  `json:"codigo"`
-	Descricao         string  `json:"descricao"`
-	ValidarFornecedor int     `json:"validar_fornecedor"`
-	ValidarFornecedorLabel string `json:"validar_fornecedor_label,omitempty"`
-	MovimentaEstoque  int     `json:"movimenta_estoque"`
-	MovimentaEstoqueLabel string `json:"movimenta_estoque_label,omitempty"`
-	Sigla             *string `json:"sigla,omitempty"`
-	ReceitaID         *int    `json:"receita_id,omitempty"`
-	DespesaID         *int    `json:"despesa_id,omitempty"`
-	ProdutoPacote     int     `json:"produto_pacote"`
-	ProdutoPacoteLabel string  `json:"produto_pacote_label,omitempty"`
-	Combustivel       int     `json:"combustivel"`
-	CombustivelLabel  string  `json:"combustivel_label,omitempty"`
+	ID                     int     `json:"id"`
+	Codigo                 string  `json:"codigo"`
+	Descricao              string  `json:"descricao"`
+	ValidarFornecedor      int     `json:"validar_fornecedor"`
+	ValidarFornecedorLabel string  `json:"validar_fornecedor_label,omitempty"`
+	MovimentaEstoque       int     `json:"movimenta_estoque"`
+	MovimentaEstoqueLabel  string  `json:"movimenta_estoque_label,omitempty"`
+	Sigla                  *string `json:"sigla,omitempty"`
+	ReceitaID              *int    `json:"receita_id,omitempty"`
+	DespesaID              *int    `json:"despesa_id,omitempty"`
+	ProdutoPacote          int     `json:"produto_pacote"`
+	ProdutoPacoteLabel     string  `json:"produto_pacote_label,omitempty"`
+	Combustivel            int     `json:"combustivel"`
+	CombustivelLabel       string  `json:"combustivel_label,omitempty"`
 
 	// ============================================================
 	// AUDITORIA

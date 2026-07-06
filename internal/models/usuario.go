@@ -57,7 +57,7 @@ func (Usuario) TableName() string {
 	return "usuario"
 }
 
-func (u *Usuario) BeforeCreate() error {
+func (u *Usuario) BeforeCreate(tx *gorm.DB) error {
 	if u.CreatedBy == nil {
 		u.CreatedBy = new(int)
 		*u.CreatedBy = 0

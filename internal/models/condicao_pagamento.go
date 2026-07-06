@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -65,7 +67,7 @@ func (CondicaoPagamento) TableName() string {
 	return "condicao_pagamento"
 }
 
-func (c *CondicaoPagamento) BeforeCreate() error {
+func (c *CondicaoPagamento) BeforeCreate(tx *gorm.DB) error {
 	if c.CreatedBy == nil {
 		c.CreatedBy = new(int)
 		*c.CreatedBy = 0
@@ -77,7 +79,7 @@ func (c *CondicaoPagamento) BeforeCreate() error {
 	return nil
 }
 
-func (c *CondicaoPagamento) BeforeUpdate() error {
+func (c *CondicaoPagamento) BeforeUpdate(tx *gorm.DB) error {
 	if c.UpdatedBy == nil {
 		c.UpdatedBy = new(int)
 		*c.UpdatedBy = 0

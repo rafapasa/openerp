@@ -14,12 +14,12 @@ type OrdemProducaoComponente struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	OrdemProducaoID  int     `gorm:"column:orp_id;primaryKey" json:"ordem_producao_id"`
-	ProdutoID        int     `gorm:"column:pro_id;primaryKey" json:"produto_id"`
-	QuantSolicitada  float64 `gorm:"column:opc_quantsolicitada;type:decimal(15,4);not null" json:"quant_solicitada"`
-	QuantProduzida   float64 `gorm:"column:opc_quantproduzida;type:decimal(15,4);not null" json:"quant_produzida"`
-	QuantBaixada     float64 `gorm:"column:opc_quantbaixada;type:decimal(15,4);not null" json:"quant_baixada"`
-	QuantAlocada     float64 `gorm:"column:opc_quantalocada;type:decimal(15,4);not null" json:"quant_alocada"`
+	OrdemProducaoID int     `gorm:"column:orp_id;primaryKey" json:"ordem_producao_id"`
+	ProdutoID       int     `gorm:"column:pro_id;primaryKey" json:"produto_id"`
+	QuantSolicitada float64 `gorm:"column:opc_quantsolicitada;type:decimal(15,4);not null" json:"quant_solicitada"`
+	QuantProduzida  float64 `gorm:"column:opc_quantproduzida;type:decimal(15,4);not null" json:"quant_produzida"`
+	QuantBaixada    float64 `gorm:"column:opc_quantbaixada;type:decimal(15,4);not null" json:"quant_baixada"`
+	QuantAlocada    float64 `gorm:"column:opc_quantalocada;type:decimal(15,4);not null" json:"quant_alocada"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

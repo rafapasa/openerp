@@ -37,7 +37,7 @@ func NewEntidadeEnderecoHandler(service *service.EntidadeEnderecoService) *Entid
 
 // getEntidadeID extrai e valida o ID da entidade da URL
 func (h *EntidadeEnderecoHandler) getEntidadeID(c *gin.Context) (int, bool) {
-	entidadeID, err := strconv.Atoi(c.Param("entidadeId"))
+	entidadeID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		utils.RespondWithValidationError(c, "ID da entidade inválido")
 		return 0, false
@@ -137,7 +137,7 @@ func (h *EntidadeEnderecoHandler) List(c *gin.Context) {
 
 	// 3. Construir filtros (incluir entidadeID obrigatório)
 	filters := make(map[string]interface{})
-	filters["entidade_id"] = entidadeID
+	filters["ent_id"] = entidadeID
 
 	if tipo := utils.GetQueryInt(c, "tipo", 0); tipo > 0 {
 		filters["tipo"] = tipo

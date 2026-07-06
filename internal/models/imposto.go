@@ -14,10 +14,10 @@ type Imposto struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID              int    `gorm:"column:imp_id;primaryKey;autoIncrement" json:"id"`
-	Codigo          string `gorm:"column:imp_codigo;type:varchar(10);not null" json:"codigo"`
-	Descricao       string `gorm:"column:imp_descricao;type:varchar(100);not null" json:"descricao"`
-	ModalidadeBase  *int   `gorm:"column:imp_modalidadebase" json:"modalidade_base,omitempty"`
+	ID             int    `gorm:"column:imp_id;primaryKey;autoIncrement" json:"id"`
+	Codigo         string `gorm:"column:imp_codigo;type:varchar(10);not null" json:"codigo"`
+	Descricao      string `gorm:"column:imp_descricao;type:varchar(100);not null" json:"descricao"`
+	ModalidadeBase *int   `gorm:"column:imp_modalidadebase" json:"modalidade_base,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA
@@ -31,7 +31,7 @@ type Imposto struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	NotaFiscalItensImpostos []NotaFiscalItemImposto `gorm:"foreignKey:ImpostoID;references:imp_id" json:"nota_fiscal_itens_impostos,omitempty"`
+	NotaFiscalItensImpostos     []NotaFiscalItemImposto     `gorm:"foreignKey:ImpostoID;references:imp_id" json:"nota_fiscal_itens_impostos,omitempty"`
 	DocumentoVendaItensImpostos []DocumentoVendaItemImposto `gorm:"foreignKey:ImpostoID;references:imp_id" json:"documento_venda_itens_impostos,omitempty"`
 }
 

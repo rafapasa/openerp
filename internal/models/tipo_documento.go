@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -44,7 +45,7 @@ func (TipoDocumento) TableName() string {
 	return "tipo_documento"
 }
 
-func (m *TipoDocumento) BeforeCreate() error {
+func (m *TipoDocumento) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -56,7 +57,7 @@ func (m *TipoDocumento) BeforeCreate() error {
 	return nil
 }
 
-func (m *TipoDocumento) BeforeUpdate() error {
+func (m *TipoDocumento) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -88,7 +90,7 @@ func (DocumentoVendaItem) TableName() string {
 	return "documento_venda_item"
 }
 
-func (d *DocumentoVendaItem) BeforeCreate() error {
+func (d *DocumentoVendaItem) BeforeCreate(tx *gorm.DB) error {
 	if d.CreatedBy == nil {
 		d.CreatedBy = new(int)
 		*d.CreatedBy = 0
@@ -100,7 +102,7 @@ func (d *DocumentoVendaItem) BeforeCreate() error {
 	return nil
 }
 
-func (d *DocumentoVendaItem) BeforeUpdate() error {
+func (d *DocumentoVendaItem) BeforeUpdate(tx *gorm.DB) error {
 	if d.UpdatedBy == nil {
 		d.UpdatedBy = new(int)
 		*d.UpdatedBy = 0

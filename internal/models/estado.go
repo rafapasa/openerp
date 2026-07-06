@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -33,19 +35,17 @@ type Estado struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	Pais       *Pais              `gorm:"foreignKey:PaisID;references:pai_id" json:"pais,omitempty"`
-	Municipios []Municipio        `gorm:"foreignKey:EstadoID;references:ID" json:"municipios,omitempty"`
-	Enderecos  []EntidadeEndereco `gorm:"foreignKey:EstadoID;references:ID" json:"enderecos,omitempty"`
-	Documentos []DocumentoVenda   `gorm:"foreignKey:EstadoID;references:ID" json:"documentos,omitempty"`
-	// NotasFiscais []NotaFiscal       `gorm:"foreignKey:EstadoID;references:ID" json:"notas_fiscais,omitempty"`
-	// NCMEstados   []NCMEstado        `gorm:"foreignKey:EstadoID;references:ID" json:"ncm_estados,omitempty"`
+	Enderecos []EntidadeEndereco `gorm:"foreignKey:EstadoID;references:est_id" json:"enderecos,omitempty"`
+	// DocumentoVenda []DocumentoVenda   `gorm:"foreignKey:EstadoID;references:est_id" json:"documentos,omitempty"`
+	// NotasFiscais []NotaFiscal       `gorm:"foreignKey:EstadoID;references:est_id" json:"notas_fiscais,omitempty"`
+	// NCMEstados   []NCMEstado        `gorm:"foreignKey:EstadoID;references:est_id" json:"ncm_estados,omitempty"`
 }
 
 func (Estado) TableName() string {
 	return "estado"
 }
 
-func (m *Estado) BeforeCreate() error {
+func (m *Estado) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -57,7 +57,7 @@ func (m *Estado) BeforeCreate() error {
 	return nil
 }
 
-func (m *Estado) BeforeUpdate() error {
+func (m *Estado) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

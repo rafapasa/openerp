@@ -137,10 +137,10 @@ func (h *EntidadeContatoHandler) List(c *gin.Context) {
 
 	// 3. Construir filtros (incluir entidadeID obrigatório)
 	filters := make(map[string]interface{})
-	filters["entidade_id"] = entidadeID
+	filters["ent_id"] = entidadeID
 
 	if tipo := utils.GetQueryInt(c, "tipo", 0); tipo > 0 {
-		filters["forma_contato_id"] = tipo
+		filters["frc_id"] = tipo
 	}
 
 	// 4. Chamar service

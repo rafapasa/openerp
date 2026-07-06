@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 type Portador struct {
@@ -31,7 +32,7 @@ func (Portador) TableName() string {
 	return "portador"
 }
 
-func (m *Portador) BeforeCreate() error {
+func (m *Portador) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -43,7 +44,7 @@ func (m *Portador) BeforeCreate() error {
 	return nil
 }
 
-func (m *Portador) BeforeUpdate() error {
+func (m *Portador) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

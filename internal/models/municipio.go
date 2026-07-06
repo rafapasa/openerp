@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -30,9 +32,8 @@ type Municipio struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	Estado     *Estado            `gorm:"foreignKey:EstadoID;references:est_id" json:"estado,omitempty"`
-	Enderecos  []EntidadeEndereco `gorm:"foreignKey:MunicipioID;references:ID" json:"enderecos,omitempty"`
-	Documentos []DocumentoVenda   `gorm:"foreignKey:MunicipioID;references:ID" json:"documentos,omitempty"`
+	Enderecos []EntidadeEndereco `gorm:"foreignKey:MunicipioID;references:mun_id" json:"enderecos,omitempty"`
+	// DocumentoVenda []DocumentoVenda   `gorm:"foreignKey:MunicipioID;references:mun_id" json:"documentos,omitempty"`
 	// NotasFiscais []NotaFiscal       `gorm:"foreignKey:MunicipioID;references:ID" json:"notas_fiscais,omitempty"`
 }
 
@@ -40,7 +41,7 @@ func (Municipio) TableName() string {
 	return "municipio"
 }
 
-func (m *Municipio) BeforeCreate() error {
+func (m *Municipio) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -52,7 +53,7 @@ func (m *Municipio) BeforeCreate() error {
 	return nil
 }
 
-func (m *Municipio) BeforeUpdate() error {
+func (m *Municipio) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0
@@ -75,11 +76,4 @@ func (m *Municipio) SoftDelete() {
 
 func (m *Municipio) GetAliquotaISS() float64 {
 	return m.AliquotaISS
-}
-
-func (m *Municipio) GetNomeCompleto() string {
-	if m.Estado != nil {
-		return m.Nome + " - " + m.Estado.UF
-	}
-	return m.Nome
 }

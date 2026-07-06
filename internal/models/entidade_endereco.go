@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -42,18 +43,19 @@ type EntidadeEndereco struct {
 
 	// ============================================================
 	// RELACIONAMENTOS
-	// ============================================================
+	// references aponta para o nome da COLUNA na tabela referenciada
 	Entidade  *Entidade  `gorm:"foreignKey:EntidadeID;references:ent_id" json:"entidade,omitempty"`
 	Pais      *Pais      `gorm:"foreignKey:PaisID;references:pai_id" json:"pais,omitempty"`
 	Municipio *Municipio `gorm:"foreignKey:MunicipioID;references:mun_id" json:"municipio,omitempty"`
-	Estado    *Estado    `gorm:"foreignKey:EstadoID;references:est_id" json:"estado,omitempty"`
+	Estado    *Estado    `gorm:"foreignKey:EstadoID;references:est_id" json:"estado,omitempty"` // ============================================================
+
 }
 
 func (EntidadeEndereco) TableName() string {
 	return "entidade_endereco"
 }
 
-func (m *EntidadeEndereco) BeforeCreate() error {
+func (m *EntidadeEndereco) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -65,7 +67,7 @@ func (m *EntidadeEndereco) BeforeCreate() error {
 	return nil
 }
 
-func (m *EntidadeEndereco) BeforeUpdate() error {
+func (m *EntidadeEndereco) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

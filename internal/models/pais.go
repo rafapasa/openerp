@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -28,17 +30,16 @@ type Pais struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	Moeda      *Moeda             `gorm:"foreignKey:MoedaID;references:moeda_id" json:"moeda,omitempty"`
-	Estados    []Estado           `gorm:"foreignKey:PaisID;references:ID" json:"estados,omitempty"`
-	Enderecos  []EntidadeEndereco `gorm:"foreignKey:PaisID;references:ID" json:"enderecos,omitempty"`
-	Documentos []DocumentoVenda   `gorm:"foreignKey:PaisID;references:ID" json:"documentos,omitempty"`
+	Moeda     *Moeda             `gorm:"foreignKey:MoedaID;references:moeda_id" json:"moeda,omitempty"`
+	Enderecos []EntidadeEndereco `gorm:"foreignKey:PaisID;references:pai_id" json:"enderecos,omitempty"`
+	//Documentos []DocumentoVenda   `gorm:"foreignKey:PaisID;references:pai_id" json:"documentos,omitempty"`
 }
 
 func (Pais) TableName() string {
 	return "pais"
 }
 
-func (m *Pais) BeforeCreate() error {
+func (m *Pais) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -50,7 +51,7 @@ func (m *Pais) BeforeCreate() error {
 	return nil
 }
 
-func (m *Pais) BeforeUpdate() error {
+func (m *Pais) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

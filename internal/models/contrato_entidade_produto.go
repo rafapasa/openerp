@@ -14,13 +14,13 @@ type ContratoEntidadeProduto struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ContratoEntidadeID int     `gorm:"column:cent_id;primaryKey" json:"contrato_entidade_id"`
-	Item               int     `gorm:"column:cepro_item;primaryKey" json:"item"`
-	ProdutoID          int     `gorm:"column:pro_id;not null" json:"produto_id"`
-	
-	ValorUnitario      float64 `gorm:"column:cepro_valorunitario;type:decimal(15,4);not null" json:"valor_unitario"`
-	Quantidade         float64 `gorm:"column:cepro_quantidade;type:decimal(15,4);not null" json:"quantidade"`
-	ValorTotal         float64 `gorm:"column:cepro_valortotal;type:decimal(15,4);not null" json:"valor_total"`
+	ContratoEntidadeID int `gorm:"column:cent_id;primaryKey" json:"contrato_entidade_id"`
+	Item               int `gorm:"column:cepro_item;primaryKey" json:"item"`
+	ProdutoID          int `gorm:"column:pro_id;not null" json:"produto_id"`
+
+	ValorUnitario float64 `gorm:"column:cepro_valorunitario;type:decimal(15,4);not null" json:"valor_unitario"`
+	Quantidade    float64 `gorm:"column:cepro_quantidade;type:decimal(15,4);not null" json:"quantidade"`
+	ValorTotal    float64 `gorm:"column:cepro_valortotal;type:decimal(15,4);not null" json:"valor_total"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

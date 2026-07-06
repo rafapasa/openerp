@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -47,7 +49,7 @@ func (ConvenioBancario) TableName() string {
 	return "convenio_bancario"
 }
 
-func (m *ConvenioBancario) BeforeCreate() error {
+func (m *ConvenioBancario) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -59,7 +61,7 @@ func (m *ConvenioBancario) BeforeCreate() error {
 	return nil
 }
 
-func (m *ConvenioBancario) BeforeUpdate() error {
+func (m *ConvenioBancario) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

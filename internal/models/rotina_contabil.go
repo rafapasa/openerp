@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -40,7 +41,7 @@ func (RotinaContabil) TableName() string {
 	return "rotina_contabil"
 }
 
-func (m *RotinaContabil) BeforeCreate() error {
+func (m *RotinaContabil) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -52,7 +53,7 @@ func (m *RotinaContabil) BeforeCreate() error {
 	return nil
 }
 
-func (m *RotinaContabil) BeforeUpdate() error {
+func (m *RotinaContabil) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

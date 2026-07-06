@@ -54,15 +54,14 @@ type NotaFiscalItem struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	NotaFiscal     *NotaFiscal       `gorm:"foreignKey:NotaFiscalID;references:ntf_id" json:"nota_fiscal,omitempty"`
-	CSTICMS        *CSTICMS          `gorm:"foreignKey:CSTICMSID;references:csticms_id" json:"cst_icms,omitempty"`
-	Produto        *Produto          `gorm:"foreignKey:ProdutoID;references:pro_id" json:"produto,omitempty"`
-	CSTPISCOFINS   *CSTPISCOFINS     `gorm:"foreignKey:CSTPISCOFINSID;references:cstpiscofins_id" json:"cst_pis_cofins,omitempty"`
-	OperacaoFiscal *OperacaoFiscal   `gorm:"foreignKey:OperacaoFiscalID;references:opf_id" json:"operacao_fiscal,omitempty"`
-	CSTIPI         *CSTIPI           `gorm:"foreignKey:CSTIPIID;references:cstipi_id" json:"cst_ipi,omitempty"`
-	RotinaContabil *RotinaContabil   `gorm:"foreignKey:RotinaContabilID;references:roc_id" json:"rotina_contabil,omitempty"`
-	Grade          *GradeProduto     `gorm:"foreignKey:GradeID;references:grade_id" json:"grade,omitempty"`
-
+	NotaFiscal     *NotaFiscal     `gorm:"foreignKey:NotaFiscalID;references:ntf_id" json:"nota_fiscal,omitempty"`
+	CSTICMS        *CSTICMS        `gorm:"foreignKey:CSTICMSID;references:csticms_id" json:"cst_icms,omitempty"`
+	Produto        *Produto        `gorm:"foreignKey:ProdutoID;references:pro_id" json:"produto,omitempty"`
+	CSTPISCOFINS   *CSTPISCOFINS   `gorm:"foreignKey:CSTPISCOFINSID;references:cstpiscofins_id" json:"cst_pis_cofins,omitempty"`
+	OperacaoFiscal *OperacaoFiscal `gorm:"foreignKey:OperacaoFiscalID;references:opf_id" json:"operacao_fiscal,omitempty"`
+	CSTIPI         *CSTIPI         `gorm:"foreignKey:CSTIPIID;references:cstipi_id" json:"cst_ipi,omitempty"`
+	RotinaContabil *RotinaContabil `gorm:"foreignKey:RotinaContabilID;references:roc_id" json:"rotina_contabil,omitempty"`
+	Grade          *GradeProduto   `gorm:"foreignKey:GradeID;references:grade_id" json:"grade,omitempty"`
 
 	Impostos []NotaFiscalItemImposto `gorm:"foreignKey:NotaFiscalID,NotaFiscalItem;references:ntf_id,nfi_item" json:"impostos,omitempty"`
 	Grades   []NotaFiscalItemGrade   `gorm:"foreignKey:NotaFiscalID,NotaFiscalItem;references:ntf_id,nfi_item" json:"grades,omitempty"`

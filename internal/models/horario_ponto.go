@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -40,7 +42,7 @@ func (HorarioPonto) TableName() string {
 	return "horario_ponto"
 }
 
-func (m *HorarioPonto) BeforeCreate() error {
+func (m *HorarioPonto) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -52,7 +54,7 @@ func (m *HorarioPonto) BeforeCreate() error {
 	return nil
 }
 
-func (m *HorarioPonto) BeforeUpdate() error {
+func (m *HorarioPonto) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

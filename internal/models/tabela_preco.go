@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -44,7 +46,7 @@ func (TabelaPreco) TableName() string {
 	return "tabela_preco"
 }
 
-func (m *TabelaPreco) BeforeCreate() error {
+func (m *TabelaPreco) BeforeCreate(tx *gorm.DB) error {
 	if m.CreatedBy == nil {
 		m.CreatedBy = new(int)
 		*m.CreatedBy = 0
@@ -56,7 +58,7 @@ func (m *TabelaPreco) BeforeCreate() error {
 	return nil
 }
 
-func (m *TabelaPreco) BeforeUpdate() error {
+func (m *TabelaPreco) BeforeUpdate(tx *gorm.DB) error {
 	if m.UpdatedBy == nil {
 		m.UpdatedBy = new(int)
 		*m.UpdatedBy = 0

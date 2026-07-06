@@ -328,4 +328,3 @@ func (s *EntidadeEnderecoService) List(limit, offset int, filters map[string]int
 
 	return enderecos, total, nil
 }
-

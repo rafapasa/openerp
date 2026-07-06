@@ -37,8 +37,12 @@ func (r *EntidadeRepository) Create(entidade *models.Entidade) error {
 }
 
 // Update atualiza uma entidade existente
-func (r *EntidadeRepository) Update(entidade *models.Entidade) error {
-	return r.db.Save(entidade).Error
+func (r *EntidadeRepository) Update(id int, entidade *models.Entidade) error {
+	return r.db.
+		Omit("EmpresaFilial", "GrupoEntidade", "TabelaPreco", "TabelaDesconto", "Horario").
+		Model(&models.Entidade{}).
+		Where("ent_id = ?", id).
+		Updates(entidade).Error
 }
 
 // Delete realiza exclusão lógica de uma entidade pelo ID (CORRIGIDO)
@@ -58,7 +62,7 @@ func (r *EntidadeRepository) Delete(id int) error {
 	entidade.SoftDelete()
 
 	// 4. Salvar
-	return r.db.Save(entidade).Error
+	return r.Update(id, entidade)
 }
 
 // ============================================================
@@ -75,9 +79,9 @@ func (r *EntidadeRepository) FindByID(id int) (*models.Entidade, error) {
 		Preload("TabelaDesconto").
 		Preload("Horario").
 		Preload("Enderecos").
-		Preload("Contatos").
-		Preload("Documentos").
-		Preload("Regimes").
+		// Preload("Contatos").
+		// Preload("Documentos").
+		// Preload("Regimes").
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		First(&entidade).Error
 
@@ -182,10 +186,11 @@ func (r *EntidadeRepository) List(limit, offset int, filters map[string]interfac
 // ExistsByDocumento verifica se já existe uma entidade com o documento
 func (r *EntidadeRepository) ExistsByDocumento(documento string, excludeID int) (bool, error) {
 	var count int64
-	query := r.db.Model(&models.Entidade{}).
+
+	query := r.db.
+		Model(&models.Entidade{}).
 		Where("ent_inscricaofederal = ? AND deleted_at IS NULL", documento)
 
-	// Se for para excluir um ID (atualização)
 	if excludeID > 0 {
 		query = query.Where("ent_id != ?", excludeID)
 	}

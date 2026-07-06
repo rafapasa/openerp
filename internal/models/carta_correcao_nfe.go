@@ -14,16 +14,16 @@ type CartaCorrecaoNFe struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID               int     `gorm:"column:ccnfe_id;primaryKey;autoIncrement" json:"id"`
-	NotaFiscalID     int     `gorm:"column:ntf_id;not null" json:"nota_fiscal_id"`
-	ChaveNFe         string  `gorm:"column:ccnfe_chavenfe;type:varchar(255);not null" json:"chave_nfe"`
-	DataHoraEvento   time.Time `gorm:"column:ccnfe_datahoraevento;type:datetime;not null" json:"data_hora_evento"`
-	NumeroSeq        int     `gorm:"column:ccnfe_numeroseq;not null" json:"numero_seq"`
-	Texto            string  `gorm:"column:ccnfe_texto;type:text;not null" json:"texto"`
-	XML              *string `gorm:"column:ccnfe_xml;type:text" json:"xml,omitempty"`
-	NumeroProtocolo  *string `gorm:"column:ccnfe_numeroprotocolo;type:varchar(255)" json:"numero_protocolo,omitempty"`
-	CodigoStatus     *int    `gorm:"column:ccnfe_codigostatus" json:"codigo_status,omitempty"`
-	MotivoStatus     *string `gorm:"column:ccnfe_motivostatus;type:varchar(255)" json:"motivo_status,omitempty"`
+	ID              int       `gorm:"column:ccnfe_id;primaryKey;autoIncrement" json:"id"`
+	NotaFiscalID    int       `gorm:"column:ntf_id;not null" json:"nota_fiscal_id"`
+	ChaveNFe        string    `gorm:"column:ccnfe_chavenfe;type:varchar(255);not null" json:"chave_nfe"`
+	DataHoraEvento  time.Time `gorm:"column:ccnfe_datahoraevento;type:datetime;not null" json:"data_hora_evento"`
+	NumeroSeq       int       `gorm:"column:ccnfe_numeroseq;not null" json:"numero_seq"`
+	Texto           string    `gorm:"column:ccnfe_texto;type:text;not null" json:"texto"`
+	XML             *string   `gorm:"column:ccnfe_xml;type:text" json:"xml,omitempty"`
+	NumeroProtocolo *string   `gorm:"column:ccnfe_numeroprotocolo;type:varchar(255)" json:"numero_protocolo,omitempty"`
+	CodigoStatus    *int      `gorm:"column:ccnfe_codigostatus" json:"codigo_status,omitempty"`
+	MotivoStatus    *string   `gorm:"column:ccnfe_motivostatus;type:varchar(255)" json:"motivo_status,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

@@ -14,15 +14,15 @@ type ContratoEntidadePagamento struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ContratoEntidadeID int      `gorm:"column:cent_id;primaryKey" json:"contrato_entidade_id"`
-	Item               int      `gorm:"column:cep_item;primaryKey" json:"item"`
-	TipoDocumentoID    int      `gorm:"column:tdoc_id;not null" json:"tipo_documento_id"`
-	PortadorID         int      `gorm:"column:por_id;not null" json:"portador_id"`
-	
-	DataVencimento     time.Time `gorm:"column:cep_datavencimento;type:date;not null" json:"data_vencimento"`
-	Valor              float64   `gorm:"column:cep_valor;type:decimal(15,4)" json:"valor"`
-	DataDesconto       *time.Time `gorm:"column:cep_datadesconto;type:date" json:"data_desconto,omitempty"`
-	ValorDesconto      *float64   `gorm:"column:cep_valordesconto;type:decimal(15,4)" json:"valor_desconto,omitempty"`
+	ContratoEntidadeID int `gorm:"column:cent_id;primaryKey" json:"contrato_entidade_id"`
+	Item               int `gorm:"column:cep_item;primaryKey" json:"item"`
+	TipoDocumentoID    int `gorm:"column:tdoc_id;not null" json:"tipo_documento_id"`
+	PortadorID         int `gorm:"column:por_id;not null" json:"portador_id"`
+
+	DataVencimento time.Time  `gorm:"column:cep_datavencimento;type:date;not null" json:"data_vencimento"`
+	Valor          float64    `gorm:"column:cep_valor;type:decimal(15,4)" json:"valor"`
+	DataDesconto   *time.Time `gorm:"column:cep_datadesconto;type:date" json:"data_desconto,omitempty"`
+	ValorDesconto  *float64   `gorm:"column:cep_valordesconto;type:decimal(15,4)" json:"valor_desconto,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

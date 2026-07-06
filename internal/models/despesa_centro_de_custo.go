@@ -31,7 +31,7 @@ type DespesaCentroDeCusto struct {
 	// RELACIONAMENTOS
 	// ============================================================
 	CentroCusto *CentroDeCusto `gorm:"foreignKey:CentroCustoID;references:cdc_id" json:"centro_custo,omitempty"`
-	Despesa     *Despesa      `gorm:"foreignKey:DespesaID;references:desp_id" json:"despesa,omitempty"`
+	Despesa     *Despesa       `gorm:"foreignKey:DespesaID;references:desp_id" json:"despesa,omitempty"`
 }
 
 func (DespesaCentroDeCusto) TableName() string {

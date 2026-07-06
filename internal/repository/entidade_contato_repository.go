@@ -51,7 +51,11 @@ func (r *EntidadeContatoRepository) Create(contato *models.EntidadeContato) erro
 
 // Update atualiza um contato existente
 func (r *EntidadeContatoRepository) Update(contato *models.EntidadeContato) error {
-	return r.db.Save(contato).Error
+	return r.db.
+		Omit("FormaContato").
+		Model(&models.EntidadeContato{}).
+		Where("ent_id = ? AND efc_item = ?", contato.EntidadeID, contato.Item).
+		Updates(contato).Error
 }
 
 // Delete realiza exclusão lógica de um contato
@@ -71,7 +75,7 @@ func (r *EntidadeContatoRepository) Delete(entidadeID, item int) error {
 	contato.SoftDelete()
 
 	// 4. Salvar
-	return r.db.Save(contato).Error
+	return r.Update(contato)
 }
 
 // ============================================================
