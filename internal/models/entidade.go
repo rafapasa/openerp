@@ -35,7 +35,7 @@ type Entidade struct {
 	DataNascimento     *time.Time           `gorm:"column:ent_datanascimento;type:date" json:"data_nascimento,omitempty"`
 	NomeDaMae          *string              `gorm:"column:ent_nomedamae;type:varchar(255)" json:"nome_da_mae,omitempty"`
 	NomeDoPai          *string              `gorm:"column:ent_nomedopai;type:varchar(255)" json:"nome_do_pai,omitempty"`
-	Sexo               *constants.Sexo      `gorm:"column:ent_sexo" json:"sexo,omitempty"` // AGORA CORRETO
+	Sexo               constants.Sexo       `gorm:"column:ent_sexo" json:"sexo,omitempty"` // AGORA CORRETO
 	CasaPropria        *int                 `gorm:"column:ent_casapropria" json:"casa_propria,omitempty"`
 	EstadoCivil        *int                 `gorm:"column:ent_estadocivil" json:"estado_civil,omitempty"`
 	ConjujeNome        *string              `gorm:"column:ent_conjuje_nome;type:varchar(255)" json:"conjuje_nome,omitempty"`
@@ -60,12 +60,12 @@ type Entidade struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	// GrupoEntidade *GrupoEntidade `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
-	// EmpresaFilial *EmpresaFilial `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
+	GrupoEntidade  *GrupoEntidade  `gorm:"foreignKey:GrupoEntidadeID;references:gpe_id" json:"grupo_entidade,omitempty"`
+	EmpresaFilial  *EmpresaFilial  `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
 	TabelaPreco    *TabelaPreco    `gorm:"foreignKey:TabelaPrecoID;references:tbp_id" json:"tabela_preco,omitempty"`
 	TabelaDesconto *TabelaDesconto `gorm:"foreignKey:TabelaDescontoID;references:tdesc_id" json:"tabela_desconto,omitempty"`
 	Horario        *Horario        `gorm:"foreignKey:HorarioID;references:hor_id" json:"horario,omitempty"`
-	// Enderecos  []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
+	// Enderecos      []EntidadeEndereco         `gorm:"foreignKey:EntidadeID;references:ID" json:"enderecos,omitempty"`
 	Contatos   []EntidadeContato          `gorm:"foreignKey:EntidadeID;references:ID" json:"contatos,omitempty"`
 	Documentos []EntidadeDocumento        `gorm:"foreignKey:EntidadeID;references:ID" json:"documentos,omitempty"`
 	Regimes    []EntidadeRegimeTributario `gorm:"foreignKey:EntidadeID;references:ID" json:"regimes,omitempty"`
@@ -120,11 +120,11 @@ func (e *Entidade) IsPessoaJuridica() bool {
 }
 
 func (e *Entidade) IsMasculino() bool {
-	return e.Sexo != nil && e.Sexo.IsMasculino()
+	return e.Sexo.IsMasculino()
 }
 
 func (e *Entidade) IsFeminino() bool {
-	return e.Sexo != nil && e.Sexo.IsFeminino()
+	return e.Sexo.IsFeminino()
 }
 
 func (e *Entidade) SoftDelete() {

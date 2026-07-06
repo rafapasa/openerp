@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/openerp/backend/internal/constants"
 )
 
 // ============================================================
@@ -12,9 +14,9 @@ type ProdutoEspecie struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID        int    `gorm:"column:proesp_id;primaryKey;autoIncrement" json:"id"`
-	Descricao string `gorm:"column:proesp_descricao;type:varchar(255);not null" json:"descricao"`
-	Situacao  int    `gorm:"column:proesp_situacao;not null" json:"situacao"`
+	ID        int              `gorm:"column:proesp_id;primaryKey;autoIncrement" json:"id"`
+	Descricao string           `gorm:"column:proesp_descricao;type:varchar(255);not null" json:"descricao"`
+	Situacao  constants.Status `gorm:"column:proesp_situacao;not null" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

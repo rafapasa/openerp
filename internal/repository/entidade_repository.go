@@ -161,7 +161,7 @@ func (r *EntidadeRepository) List(limit, offset int, filters map[string]interfac
 		Preload("TabelaPreco").
 		Preload("TabelaDesconto").
 		Preload("Horario").
-		Preload("Enderecos").
+		//Preload("Enderecos").
 		Preload("Contatos").
 		Limit(limit).
 		Offset(offset).

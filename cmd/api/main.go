@@ -32,7 +32,7 @@ func main() {
 	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
 	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
 	// Futuros serviços:
-	// produtoService := service.NewProdutoService(db.GetDB())
+	produtoService := service.NewProdutoService(db.GetDB())
 	// pedidoService := service.NewPedidoService(db.GetDB())
 
 	// 4. Inicializar handlers
@@ -42,11 +42,11 @@ func main() {
 	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
 	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
 	// Futuros handlers:
-	// produtoHandler := handler.NewProdutoHandler(produtoService)
+	produtoHandler := handler.NewProdutoHandler(produtoService)
 	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
 
 	// 5. Configurar router
-	router := setupRouter(cfg, db, authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler)
+	router := setupRouter(cfg, db, authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler, produtoHandler)
 
 	// 6. Iniciar servidor
 	port := cfg.APIPort
@@ -65,6 +65,7 @@ func setupRouter(
 	entidadeEnderecoHandler *handler.EntidadeEnderecoHandler,
 	entidadeContatoHandler *handler.EntidadeContatoHandler,
 	entidadeDocumentoHandler *handler.EntidadeDocumentoHandler,
+	produtoHandler *handler.ProdutoHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
@@ -87,7 +88,7 @@ func setupRouter(
 		EntidadeContatoHandler:   entidadeContatoHandler,
 		EntidadeDocumentoHandler: entidadeDocumentoHandler,
 		// Futuros handlers...
-		// ProdutoHandler: produtoHandler,
+		ProdutoHandler: produtoHandler,
 		// PedidoHandler:  pedidoHandler,
 
 		// Configurações

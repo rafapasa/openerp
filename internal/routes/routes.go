@@ -20,7 +20,7 @@ type RouteConfig struct {
 	EntidadeContatoHandler   *handler.EntidadeContatoHandler
 	EntidadeDocumentoHandler *handler.EntidadeDocumentoHandler
 	// Futuros handlers...
-	// ProdutoHandler *handler.ProdutoHandler
+	ProdutoHandler *handler.ProdutoHandler
 	// PedidoHandler  *handler.PedidoHandler
 
 	// Configurações
@@ -70,7 +70,7 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 	)
 
 	// Futuras rotas:
-	// RegisterProdutoRoutes(api, cfg.ProdutoHandler)
+	RegisterProdutoRoutes(api, cfg.ProdutoHandler)
 	// RegisterPedidoRoutes(api, cfg.PedidoHandler)
 	// RegisterUsuarioRoutes(api, cfg.UsuarioHandler)
 }

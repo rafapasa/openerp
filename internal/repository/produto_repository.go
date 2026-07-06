@@ -65,6 +65,19 @@ func (r *ProdutoRepository) Delete(id int) error {
 // MÉTODOS DE BUSCA
 // ============================================================
 
+func (r *ProdutoRepository) ExistsByID(id int) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Produto{}).
+		Where("pro_id = ? AND deleted_at IS NULL", id).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 // FindByID busca um produto pelo ID com relacionamentos
 func (r *ProdutoRepository) FindByID(id int) (*models.Produto, error) {
 	var produto models.Produto
@@ -109,7 +122,7 @@ func (r *ProdutoRepository) FindByNome(nome string, limit int) ([]models.Produto
 }
 
 // FindByCodigo busca um produto pelo código
-func (r *ProdutoRepository) FindByCodigo(codigo string) (*models.Produto, error) {
+func (r *ProdutoRepository) FindByCodigo(codigo int) (*models.Produto, error) {
 	var produto models.Produto
 	err := r.db.
 		Preload("ProdutoEspecie").
@@ -150,6 +163,46 @@ func (r *ProdutoRepository) FindByReferencia(referencia string) (*models.Produto
 		return nil, err
 	}
 	return &produto, nil
+}
+
+func (r *ProdutoRepository) FindByCodigoBarras(codigoBarras string) (*models.Produto, error) {
+	var produto models.Produto
+	err := r.db.
+		Preload("ProdutoEspecie").
+		Preload("ProdutoGrupo").
+		Preload("ProdutoMarca").
+		Preload("ProdutoSubgrupo").
+		Preload("ProdutoSerie").
+		Preload("ProdutoTipoProduto").
+		Where("pro_codigo_barras = ? AND deleted_at IS NULL", codigoBarras).
+		First(&produto).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("produto não encontrado")
+
+		}
+		return nil, err
+	}
+	return &produto, nil
+}
+
+func (r *ProdutoRepository) ExistByCodigoBarras(codigoBarras string, excludeID string) (bool, error) {
+	var produto models.Produto
+	query := r.db.Where("pro_codigo_barras = ? AND deleted_at IS NULL", codigoBarras)
+	if excludeID != "" {
+		query = query.Where("pro_codigo_barras != ?", excludeID)
+	}
+
+	err := query.First(&produto).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 // FindByGrupo busca produtos por grupo
@@ -239,7 +292,7 @@ func (r *ProdutoRepository) List(limit, offset int, filters map[string]interface
 // ============================================================
 
 // ExistsByCodigo verifica se já existe um produto com o código
-func (r *ProdutoRepository) ExistsByCodigo(codigo string, excludeID int) (bool, error) {
+func (r *ProdutoRepository) ExistsByCodigo(codigo int, excludeID int) (bool, error) {
 	var count int64
 	query := r.db.Model(&models.Produto{}).
 		Where("pro_codigo = ? AND deleted_at IS NULL", codigo)

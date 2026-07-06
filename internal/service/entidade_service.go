@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/dto"
@@ -190,17 +191,18 @@ func (s *EntidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, er
 		return nil, err
 	}
 
-	entidade, _ := s.entidadeRepo.FindByDocumento(rep.InscricaoFederal)
-	if entidade != nil {
-		return nil, fmt.Errorf("Entidade com documento %s já existe", rep.InscricaoFederal)
-	}
+	// entidade, _ := s.entidadeRepo.FindByDocumento(rep.InscricaoFederal)
+	// if entidade != nil {
+	// 	return nil, fmt.Errorf("Entidade com documento %s já existe", rep.InscricaoFederal)
+	// }
 
-	entidade = &models.Entidade{}
+	entidade := &models.Entidade{}
 	if err := utils.MapToModel(rep, entidade); err != nil {
 		return nil, fmt.Errorf("erro ao mapear dados da entidade: %w", err)
 	}
 
 	// 3. Definir campos que não podem ser mapeados automaticamente
+	entidade.DataCadastro = utils.TimePtr(time.Now())
 	entidade.InscricaoFederal = utils.LimparDocumento(rep.InscricaoFederal)
 	entidade.TipoPessoa = constants.TipoPessoa(rep.TipoPessoa)
 	entidade.Situacao = constants.StatusAtivo
