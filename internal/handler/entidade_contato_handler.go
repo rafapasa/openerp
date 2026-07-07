@@ -60,19 +60,20 @@ func (h *EntidadeContatoHandler) getItem(c *gin.Context) (int, bool) {
 // ============================================================
 
 // Create cria um novo contato para uma entidade
-// @Summary Cria um novo contato
-// @Description Cadastra um novo contato para uma entidade
-// @Tags EntidadeContatos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param request body dto.EntidadeContatoRequest true "Dados do contato"
-// @Success 201 {object} dto.EntidadeContatoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/contatos [post]
+//
+//	@Summary		Cria um novo contato
+//	@Description	Cadastra um novo contato para uma entidade
+//	@Tags			EntidadeContatos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int							true	"ID da entidade"
+//	@Param			request		body		dto.EntidadeContatoRequest	true	"Dados do contato"
+//	@Success		201			{object}	dto.EntidadeContatoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/contatos [post]
 func (h *EntidadeContatoHandler) Create(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -110,20 +111,21 @@ func (h *EntidadeContatoHandler) Create(c *gin.Context) {
 }
 
 // List lista todos os contatos de uma entidade
-// @Summary Lista contatos de uma entidade
-// @Description Retorna todos os contatos de uma entidade
-// @Tags EntidadeContatos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param limit query int false "Limite de registros" default(10)
-// @Param offset query int false "Offset para paginação" default(0)
-// @Param tipo query int false "Filtrar por tipo de contato"
-// @Success 200 {object} dto.EntidadeContatoListResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/contatos [get]
+//
+//	@Summary		Lista contatos de uma entidade
+//	@Description	Retorna todos os contatos de uma entidade
+//	@Tags			EntidadeContatos
+//	@Produce		json
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			limit		query		int	false	"Limite de registros"	default(10)
+//	@Param			offset		query		int	false	"Offset para paginação"	default(0)
+//	@Param			tipo		query		int	false	"Filtrar por tipo de contato"
+//	@Success		200			{object}	dto.EntidadeContatoListResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/contatos [get]
 func (h *EntidadeContatoHandler) List(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -172,18 +174,19 @@ func (h *EntidadeContatoHandler) List(c *gin.Context) {
 }
 
 // GetByID busca um contato específico
-// @Summary Busca um contato específico
-// @Description Retorna os dados de um contato específico
-// @Tags EntidadeContatos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do contato"
-// @Success 200 {object} dto.EntidadeContatoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/contatos/{item} [get]
+//
+//	@Summary		Busca um contato específico
+//	@Description	Retorna os dados de um contato específico
+//	@Tags			EntidadeContatos
+//	@Produce		json
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			item		path		int	true	"ID do contato"
+//	@Success		200			{object}	dto.EntidadeContatoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/contatos/{item} [get]
 func (h *EntidadeContatoHandler) GetByID(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -212,20 +215,21 @@ func (h *EntidadeContatoHandler) GetByID(c *gin.Context) {
 }
 
 // Update atualiza um contato
-// @Summary Atualiza um contato
-// @Description Atualiza os dados de um contato existente
-// @Tags EntidadeContatos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do contato"
-// @Param request body dto.EntidadeContatoRequest true "Dados atualizados"
-// @Success 200 {object} dto.EntidadeContatoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/contatos/{item} [put]
+//
+//	@Summary		Atualiza um contato
+//	@Description	Atualiza os dados de um contato existente
+//	@Tags			EntidadeContatos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int							true	"ID da entidade"
+//	@Param			item		path		int							true	"ID do contato"
+//	@Param			request		body		dto.EntidadeContatoRequest	true	"Dados atualizados"
+//	@Success		200			{object}	dto.EntidadeContatoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/contatos/{item} [put]
 func (h *EntidadeContatoHandler) Update(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -267,18 +271,19 @@ func (h *EntidadeContatoHandler) Update(c *gin.Context) {
 }
 
 // Delete exclui um contato
-// @Summary Exclui um contato
-// @Description Realiza a exclusão lógica de um contato
-// @Tags EntidadeContatos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do contato"
-// @Success 204 "No Content"
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/contatos/{item} [delete]
+//
+//	@Summary		Exclui um contato
+//	@Description	Realiza a exclusão lógica de um contato
+//	@Tags			EntidadeContatos
+//	@Produce		json
+//	@Param			entidadeId	path	int	true	"ID da entidade"
+//	@Param			item		path	int	true	"ID do contato"
+//	@Success		204			"No Content"
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/contatos/{item} [delete]
 func (h *EntidadeContatoHandler) Delete(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)

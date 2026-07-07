@@ -5,13 +5,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/openerp/backend/internal/config"
 	"github.com/openerp/backend/internal/database"
 	"github.com/openerp/backend/internal/handler"
 	"github.com/openerp/backend/internal/routes"
 	"github.com/openerp/backend/internal/service"
+
+	_ "github.com/openerp/backend/docs"
 )
 
+// @title			OpenERP API
+// @version		0.1a
+// @description	API do sistema OpenERP.
+// @host			localhost:8080
+// @BasePath		/api/v1
+// @schemes		http https
 func main() {
 	// 1. Carregar configurações
 	cfg := config.LoadConfig()
@@ -31,6 +42,8 @@ func main() {
 	entidadeEnderecoService := service.NewEntidadeEnderecoService(db.GetDB())
 	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
 	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
+	entidadeRegimeTributarioService := service.NewEntidadeRegimeTributarioService(db.GetDB())
+	limiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
 	// Futuros serviços:
 	produtoService := service.NewProdutoService(db.GetDB())
 	// pedidoService := service.NewPedidoService(db.GetDB())
@@ -41,12 +54,23 @@ func main() {
 	entidadeEnderecoHandler := handler.NewEntidadeEnderecoHandler(entidadeEnderecoService)
 	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
 	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
+	entidadeRegimeTributarioHandler := handler.NewEntidadeRegimeTributarioHandler(entidadeRegimeTributarioService)
+	limiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(limiteCreditoService)
 	// Futuros handlers:
 	produtoHandler := handler.NewProdutoHandler(produtoService)
 	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
 
 	// 5. Configurar router
-	router := setupRouter(cfg, db, authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler, produtoHandler)
+	router := setupRouter(cfg, 
+		db, 
+		authHandler, 
+		entidadeHandler, 
+		entidadeEnderecoHandler, 
+		entidadeContatoHandler, 
+		entidadeDocumentoHandler, 
+		entidadeRegimeTributarioHandler, 
+		limiteCreditoHandler, 
+		produtoHandler)
 
 	// 6. Iniciar servidor
 	port := cfg.APIPort
@@ -65,6 +89,8 @@ func setupRouter(
 	entidadeEnderecoHandler *handler.EntidadeEnderecoHandler,
 	entidadeContatoHandler *handler.EntidadeContatoHandler,
 	entidadeDocumentoHandler *handler.EntidadeDocumentoHandler,
+	entidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler,
+	limiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
 	produtoHandler *handler.ProdutoHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
@@ -78,17 +104,22 @@ func setupRouter(
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 
+	// Rota para o Swagger
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// Health checks
 	routes.RegisterHealthRoutes(router, cfg, db)
 
 	// Registrar todas as rotas
 	routes.RegisterRoutes(router, &routes.RouteConfig{
 		// Handlers
-		AuthHandler:              authHandler,
-		EntidadeHandler:          entidadeHandler,
-		EntidadeEnderecoHandler:  entidadeEnderecoHandler,
-		EntidadeContatoHandler:   entidadeContatoHandler,
-		EntidadeDocumentoHandler: entidadeDocumentoHandler,
+		AuthHandler:                     authHandler,
+		EntidadeHandler:                 entidadeHandler,
+		EntidadeEnderecoHandler:         entidadeEnderecoHandler,
+		EntidadeContatoHandler:          entidadeContatoHandler,
+		EntidadeDocumentoHandler:        entidadeDocumentoHandler,
+		EntidadeRegimeTributarioHandler: entidadeRegimeTributarioHandler,
+		LimiteCreditoHandler:            limiteCreditoHandler,
 		// Futuros handlers...
 		ProdutoHandler: produtoHandler,
 		// PedidoHandler:  pedidoHandler,

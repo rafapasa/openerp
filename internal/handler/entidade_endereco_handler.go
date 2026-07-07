@@ -60,19 +60,20 @@ func (h *EntidadeEnderecoHandler) getItem(c *gin.Context) (int, bool) {
 // ============================================================
 
 // Create cria um novo endereço para uma entidade
-// @Summary Cria um novo endereço
-// @Description Cadastra um novo endereço para uma entidade
-// @Tags EntidadeEnderecos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param request body dto.EntidadeEnderecoRequest true "Dados do endereço"
-// @Success 201 {object} dto.EntidadeEnderecoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/enderecos [post]
+//
+//	@Summary		Cria um novo endereço
+//	@Description	Cadastra um novo endereço para uma entidade
+//	@Tags			EntidadeEnderecos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int							true	"ID da entidade"
+//	@Param			request		body		dto.EntidadeEnderecoRequest	true	"Dados do endereço"
+//	@Success		201			{object}	dto.EntidadeEnderecoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/enderecos [post]
 func (h *EntidadeEnderecoHandler) Create(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -110,20 +111,21 @@ func (h *EntidadeEnderecoHandler) Create(c *gin.Context) {
 }
 
 // List lista todos os endereços de uma entidade
-// @Summary Lista endereços de uma entidade
-// @Description Retorna todos os endereços de uma entidade
-// @Tags EntidadeEnderecos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param limit query int false "Limite de registros" default(10)
-// @Param offset query int false "Offset para paginação" default(0)
-// @Param tipo query int false "Filtrar por tipo"
-// @Success 200 {object} dto.EntidadeEnderecoListResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/enderecos [get]
+//
+//	@Summary		Lista endereços de uma entidade
+//	@Description	Retorna todos os endereços de uma entidade
+//	@Tags			EntidadeEnderecos
+//	@Produce		json
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			limit		query		int	false	"Limite de registros"	default(10)
+//	@Param			offset		query		int	false	"Offset para paginação"	default(0)
+//	@Param			tipo		query		int	false	"Filtrar por tipo"
+//	@Success		200			{object}	dto.EntidadeEnderecoListResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/enderecos [get]
 func (h *EntidadeEnderecoHandler) List(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -172,18 +174,19 @@ func (h *EntidadeEnderecoHandler) List(c *gin.Context) {
 }
 
 // GetByID busca um endereço específico
-// @Summary Busca um endereço específico
-// @Description Retorna os dados de um endereço específico
-// @Tags EntidadeEnderecos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do endereço"
-// @Success 200 {object} dto.EntidadeEnderecoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/enderecos/{item} [get]
+//
+//	@Summary		Busca um endereço específico
+//	@Description	Retorna os dados de um endereço específico
+//	@Tags			EntidadeEnderecos
+//	@Produce		json
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			item		path		int	true	"ID do endereço"
+//	@Success		200			{object}	dto.EntidadeEnderecoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/enderecos/{item} [get]
 func (h *EntidadeEnderecoHandler) GetByID(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -212,20 +215,21 @@ func (h *EntidadeEnderecoHandler) GetByID(c *gin.Context) {
 }
 
 // Update atualiza um endereço
-// @Summary Atualiza um endereço
-// @Description Atualiza os dados de um endereço existente
-// @Tags EntidadeEnderecos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do endereço"
-// @Param request body dto.EntidadeEnderecoRequest true "Dados atualizados"
-// @Success 200 {object} dto.EntidadeEnderecoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/enderecos/{item} [put]
+//
+//	@Summary		Atualiza um endereço
+//	@Description	Atualiza os dados de um endereço existente
+//	@Tags			EntidadeEnderecos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int							true	"ID da entidade"
+//	@Param			item		path		int							true	"ID do endereço"
+//	@Param			request		body		dto.EntidadeEnderecoRequest	true	"Dados atualizados"
+//	@Success		200			{object}	dto.EntidadeEnderecoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/enderecos/{item} [put]
 func (h *EntidadeEnderecoHandler) Update(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -267,18 +271,19 @@ func (h *EntidadeEnderecoHandler) Update(c *gin.Context) {
 }
 
 // Delete exclui um endereço
-// @Summary Exclui um endereço
-// @Description Realiza a exclusão lógica de um endereço
-// @Tags EntidadeEnderecos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do endereço"
-// @Success 204 "No Content"
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/enderecos/{item} [delete]
+//
+//	@Summary		Exclui um endereço
+//	@Description	Realiza a exclusão lógica de um endereço
+//	@Tags			EntidadeEnderecos
+//	@Produce		json
+//	@Param			entidadeId	path	int	true	"ID da entidade"
+//	@Param			item		path	int	true	"ID do endereço"
+//	@Success		204			"No Content"
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/enderecos/{item} [delete]
 func (h *EntidadeEnderecoHandler) Delete(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)

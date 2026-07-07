@@ -89,7 +89,7 @@ switch ($Command.Trim()) {
     "docs" {
         Write-Host "ðŸ“š Generating docs..." -ForegroundColor Yellow
         if (Get-Command swag -ErrorAction SilentlyContinue) {
-            swag init -g cmd/api/main.go
+            swag init --dir ./cmd/api/,./internal/handler/ -g main.go -o ./docs --parseDependency --parseInternal
         } else {
             Write-Host "âš ï¸  swag nÃ£o instalado. Instale com:" -ForegroundColor Yellow
             Write-Host "   go install github.com/swaggo/swag/cmd/swag@latest" -ForegroundColor White

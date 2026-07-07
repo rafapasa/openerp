@@ -18,13 +18,11 @@ type RouteConfig struct {
 	EntidadeHandler          *handler.EntidadeHandler
 	EntidadeEnderecoHandler  *handler.EntidadeEnderecoHandler
 	EntidadeContatoHandler   *handler.EntidadeContatoHandler
-	EntidadeDocumentoHandler *handler.EntidadeDocumentoHandler
-	// Futuros handlers...
-	ProdutoHandler *handler.ProdutoHandler
-	// PedidoHandler  *handler.PedidoHandler
-
-	// Configurações
-	JWTSecret string
+	EntidadeDocumentoHandler        *handler.EntidadeDocumentoHandler
+	ProdutoHandler                  *handler.ProdutoHandler
+	EntidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler
+	LimiteCreditoHandler            *handler.EntidadeLimiteCreditoHandler
+	JWTSecret                       string
 }
 
 // ============================================================
@@ -67,6 +65,7 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 		cfg.EntidadeEnderecoHandler,
 		cfg.EntidadeContatoHandler,
 		cfg.EntidadeDocumentoHandler,
+		cfg.EntidadeRegimeTributarioHandler,
 	)
 
 	// Futuras rotas:

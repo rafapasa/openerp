@@ -36,17 +36,18 @@ func NewEntidadeHandler(service *service.EntidadeService) *EntidadeHandler {
 // ============================================================
 
 // Create cria uma nova entidade
-// @Summary Cria uma nova entidade
-// @Description Cadastra uma nova entidade (cliente/fornecedor)
-// @Tags Entidades
-// @Accept json
-// @Produce json
-// @Param request body dto.EntidadeRequest true "Dados da entidade"
-// @Success 201 {object} dto.EntidadeResponse
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades [post]
+//
+//	@Summary		Cria uma nova entidade
+//	@Description	Cadastra uma nova entidade (cliente/fornecedor)
+//	@Tags			Entidades
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.EntidadeRequest	true	"Dados da entidade"
+//	@Success		201		{object}	dto.EntidadeResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades [post]
 func (h *EntidadeHandler) Create(c *gin.Context) {
 	// TODO: Implementar
 	var req dto.EntidadeRequest
@@ -72,16 +73,17 @@ func (h *EntidadeHandler) Create(c *gin.Context) {
 }
 
 // GetByID busca uma entidade por ID
-// @Summary Busca entidade por ID
-// @Description Retorna os dados de uma entidade específica
-// @Tags Entidades
-// @Produce json
-// @Param id path int true "ID da entidade"
-// @Success 200 {object} dto.EntidadeResponse
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{id} [get]
+//
+//	@Summary		Busca entidade por ID
+//	@Description	Retorna os dados de uma entidade específica
+//	@Tags			Entidades
+//	@Produce		json
+//	@Param			id	path		int	true	"ID da entidade"
+//	@Success		200	{object}	dto.EntidadeResponse
+//	@Failure		404	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{id} [get]
 func (h *EntidadeHandler) GetByID(c *gin.Context) {
 	// TODO: Implementar
 	id, ok := utils.ParseIDParam(c, "id")
@@ -101,16 +103,17 @@ func (h *EntidadeHandler) GetByID(c *gin.Context) {
 }
 
 // GetByDocumento busca uma entidade por CPF/CNPJ
-// @Summary Busca entidade por documento
-// @Description Retorna os dados de uma entidade pelo CPF/CNPJ
-// @Tags Entidades
-// @Produce json
-// @Param documento path string true "CPF/CNPJ da entidade"
-// @Success 200 {object} dto.EntidadeResponse
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/documento/{documento} [get]
+//
+//	@Summary		Busca entidade por documento
+//	@Description	Retorna os dados de uma entidade pelo CPF/CNPJ
+//	@Tags			Entidades
+//	@Produce		json
+//	@Param			documento	path		string	true	"CPF/CNPJ da entidade"
+//	@Success		200			{object}	dto.EntidadeResponse
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/documento/{documento} [get]
 func (h *EntidadeHandler) GetByDocumento(c *gin.Context) {
 	// TODO: Implementar
 	documento := c.Param("documento")
@@ -130,19 +133,20 @@ func (h *EntidadeHandler) GetByDocumento(c *gin.Context) {
 }
 
 // Update atualiza uma entidade
-// @Summary Atualiza uma entidade
-// @Description Atualiza os dados de uma entidade existente
-// @Tags Entidades
-// @Accept json
-// @Produce json
-// @Param id path int true "ID da entidade"
-// @Param request body dto.EntidadeRequest true "Dados atualizados"
-// @Success 200 {object} dto.EntidadeResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{id} [put]
+//
+//	@Summary		Atualiza uma entidade
+//	@Description	Atualiza os dados de uma entidade existente
+//	@Tags			Entidades
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int					true	"ID da entidade"
+//	@Param			request	body		dto.EntidadeRequest	true	"Dados atualizados"
+//	@Success		200		{object}	dto.EntidadeResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{id} [put]
 func (h *EntidadeHandler) Update(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -169,16 +173,17 @@ func (h *EntidadeHandler) Update(c *gin.Context) {
 }
 
 // Delete exclui uma entidade
-// @Summary Exclui uma entidade
-// @Description Realiza a exclusão lógica de uma entidade
-// @Tags Entidades
-// @Produce json
-// @Param id path int true "ID da entidade"
-// @Success 204 "No Content"
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{id} [delete]
+//
+//	@Summary		Exclui uma entidade
+//	@Description	Realiza a exclusão lógica de uma entidade
+//	@Tags			Entidades
+//	@Produce		json
+//	@Param			id	path	int	true	"ID da entidade"
+//	@Success		204	"No Content"
+//	@Failure		404	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{id} [delete]
 func (h *EntidadeHandler) Delete(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -192,20 +197,21 @@ func (h *EntidadeHandler) Delete(c *gin.Context) {
 }
 
 // List lista entidades com paginação e filtros
-// @Summary Lista entidades
-// @Description Retorna uma lista paginada de entidades
-// @Tags Entidades
-// @Produce json
-// @Param limit query int false "Limite de registros" default(10)
-// @Param offset query int false "Offset para paginação" default(0)
-// @Param nome query string false "Filtrar por nome (razao social)"
-// @Param documento query string false "Filtrar por documento"
-// @Param tipo_pessoa query int false "Filtrar por tipo (1-Física, 2-Jurídica)"
-// @Param situacao query int false "Filtrar por situação (1-Ativo, 2-Inativo)"
-// @Success 200 {object} dto.EntidadeListResponse
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades [get]
+//
+//	@Summary		Lista entidades
+//	@Description	Retorna uma lista paginada de entidades
+//	@Tags			Entidades
+//	@Produce		json
+//	@Param			limit		query		int		false	"Limite de registros"	default(10)
+//	@Param			offset		query		int		false	"Offset para paginação"	default(0)
+//	@Param			nome		query		string	false	"Filtrar por nome (razao social)"
+//	@Param			documento	query		string	false	"Filtrar por documento"
+//	@Param			tipo_pessoa	query		int		false	"Filtrar por tipo (1-Física, 2-Jurídica)"
+//	@Param			situacao	query		int		false	"Filtrar por situação (1-Ativo, 2-Inativo)"
+//	@Success		200			{object}	dto.EntidadeListResponse
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades [get]
 func (h *EntidadeHandler) List(c *gin.Context) {
 	// Extrair parâmetros de paginação
 	limit := utils.GetQueryInt(c, "limit", 10)

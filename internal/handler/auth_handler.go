@@ -35,16 +35,17 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 // ============================================================
 
 // Login realiza o login do usuário
-// @Summary Realiza o login do usuário
-// @Description Autentica o usuário e retorna tokens JWT
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param request body dto.LoginRequest true "Credenciais de login"
-// @Success 200 {object} dto.LoginResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Router /auth/login [post]
+//
+//	@Summary		Realiza o login do usuário
+//	@Description	Autentica o usuário e retorna tokens JWT
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.LoginRequest	true	"Credenciais de login"
+//	@Success		200		{object}	dto.LoginResponse
+//	@Failure		400		{object}	dto.ErrorResponse
+//	@Failure		401		{object}	dto.ErrorResponse
+//	@Router			/auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 
@@ -108,16 +109,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 // RefreshToken renova o token de acesso
-// @Summary Renova o token de acesso
-// @Description Usa o refresh token para gerar um novo access token
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param request body dto.RefreshTokenRequest true "Refresh token"
-// @Success 200 {object} dto.RefreshTokenResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Router /auth/refresh [post]
+//
+//	@Summary		Renova o token de acesso
+//	@Description	Usa o refresh token para gerar um novo access token
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.RefreshTokenRequest	true	"Refresh token"
+//	@Success		200		{object}	dto.RefreshTokenResponse
+//	@Failure		400		{object}	dto.ErrorResponse
+//	@Failure		401		{object}	dto.ErrorResponse
+//	@Router			/auth/refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var req dto.RefreshTokenRequest
 
@@ -160,12 +162,13 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 }
 
 // Logout realiza o logout do usuário
-// @Summary Realiza o logout
-// @Description Invalida a sessão do usuário
-// @Tags Auth
-// @Security BearerAuth
-// @Success 200 {object} map[string]string
-// @Router /auth/logout [post]
+//
+//	@Summary		Realiza o logout
+//	@Description	Invalida a sessão do usuário
+//	@Tags			Auth
+//	@Security		BearerAuth
+//	@Success		200	{object}	map[string]string
+//	@Router			/auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	// TODO: Implementar blacklist de tokens (com Redis)
 	c.JSON(http.StatusOK, gin.H{
@@ -174,13 +177,14 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 // GetMe retorna as informações do usuário autenticado
-// @Summary Retorna informações do usuário
-// @Description Retorna os dados do usuário autenticado
-// @Tags Auth
-// @Security BearerAuth
-// @Success 200 {object} dto.UsuarioInfo
-// @Failure 401 {object} dto.ErrorResponse
-// @Router /auth/me [get]
+//
+//	@Summary		Retorna informações do usuário
+//	@Description	Retorna os dados do usuário autenticado
+//	@Tags			Auth
+//	@Security		BearerAuth
+//	@Success		200	{object}	dto.UsuarioInfo
+//	@Failure		401	{object}	dto.ErrorResponse
+//	@Router			/auth/me [get]
 func (h *AuthHandler) GetMe(c *gin.Context) {
 	// Recuperar o usuário do contexto (setado pelo middleware)
 	userID, exists := c.Get("user_id")

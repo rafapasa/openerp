@@ -60,19 +60,20 @@ func (h *EntidadeDocumentoHandler) getItem(c *gin.Context) (int, bool) {
 // ============================================================
 
 // Create cria um novo documento para uma entidade
-// @Summary Cria um novo documento
-// @Description Cadastra um novo documento para uma entidade
-// @Tags EntidadeDocumentos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param request body dto.EntidadeDocumentoRequest true "Dados do documento"
-// @Success 201 {object} dto.EntidadeDocumentoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos [post]
+//
+//	@Summary		Cria um novo documento
+//	@Description	Cadastra um novo documento para uma entidade
+//	@Tags			EntidadeDocumentos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int								true	"ID da entidade"
+//	@Param			request		body		dto.EntidadeDocumentoRequest	true	"Dados do documento"
+//	@Success		201			{object}	dto.EntidadeDocumentoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos [post]
 func (h *EntidadeDocumentoHandler) Create(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -110,20 +111,21 @@ func (h *EntidadeDocumentoHandler) Create(c *gin.Context) {
 }
 
 // List lista todos os documentos de uma entidade
-// @Summary Lista documentos de uma entidade
-// @Description Retorna todos os documentos de uma entidade
-// @Tags EntidadeDocumentos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param limit query int false "Limite de registros" default(10)
-// @Param offset query int false "Offset para paginação" default(0)
-// @Param tipo query string false "Filtrar por tipo de documento"
-// @Success 200 {object} dto.EntidadeDocumentoListResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos [get]
+//
+//	@Summary		Lista documentos de uma entidade
+//	@Description	Retorna todos os documentos de uma entidade
+//	@Tags			EntidadeDocumentos
+//	@Produce		json
+//	@Param			entidadeId	path		int		true	"ID da entidade"
+//	@Param			limit		query		int		false	"Limite de registros"	default(10)
+//	@Param			offset		query		int		false	"Offset para paginação"	default(0)
+//	@Param			tipo		query		string	false	"Filtrar por tipo de documento"
+//	@Success		200			{object}	dto.EntidadeDocumentoListResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos [get]
 func (h *EntidadeDocumentoHandler) List(c *gin.Context) {
 	// 1. Extrair entidadeID da URL
 	entidadeID, ok := h.getEntidadeID(c)
@@ -172,18 +174,19 @@ func (h *EntidadeDocumentoHandler) List(c *gin.Context) {
 }
 
 // GetByID busca um documento específico
-// @Summary Busca um documento específico
-// @Description Retorna os dados de um documento específico
-// @Tags EntidadeDocumentos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do documento"
-// @Success 200 {object} dto.EntidadeDocumentoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos/{item} [get]
+//
+//	@Summary		Busca um documento específico
+//	@Description	Retorna os dados de um documento específico
+//	@Tags			EntidadeDocumentos
+//	@Produce		json
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			item		path		int	true	"ID do documento"
+//	@Success		200			{object}	dto.EntidadeDocumentoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos/{item} [get]
 func (h *EntidadeDocumentoHandler) GetByID(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -212,20 +215,21 @@ func (h *EntidadeDocumentoHandler) GetByID(c *gin.Context) {
 }
 
 // Update atualiza um documento
-// @Summary Atualiza um documento
-// @Description Atualiza os dados de um documento existente
-// @Tags EntidadeDocumentos
-// @Accept json
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do documento"
-// @Param request body dto.EntidadeDocumentoRequest true "Dados atualizados"
-// @Success 200 {object} dto.EntidadeDocumentoResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos/{item} [put]
+//
+//	@Summary		Atualiza um documento
+//	@Description	Atualiza os dados de um documento existente
+//	@Tags			EntidadeDocumentos
+//	@Accept			json
+//	@Produce		json
+//	@Param			entidadeId	path		int								true	"ID da entidade"
+//	@Param			item		path		int								true	"ID do documento"
+//	@Param			request		body		dto.EntidadeDocumentoRequest	true	"Dados atualizados"
+//	@Success		200			{object}	dto.EntidadeDocumentoResponse
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos/{item} [put]
 func (h *EntidadeDocumentoHandler) Update(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -267,18 +271,19 @@ func (h *EntidadeDocumentoHandler) Update(c *gin.Context) {
 }
 
 // Delete exclui um documento
-// @Summary Exclui um documento
-// @Description Realiza a exclusão lógica de um documento
-// @Tags EntidadeDocumentos
-// @Produce json
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do documento"
-// @Success 204 "No Content"
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos/{item} [delete]
+//
+//	@Summary		Exclui um documento
+//	@Description	Realiza a exclusão lógica de um documento
+//	@Tags			EntidadeDocumentos
+//	@Produce		json
+//	@Param			entidadeId	path	int	true	"ID da entidade"
+//	@Param			item		path	int	true	"ID do documento"
+//	@Success		204			"No Content"
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos/{item} [delete]
 func (h *EntidadeDocumentoHandler) Delete(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)
@@ -302,18 +307,19 @@ func (h *EntidadeDocumentoHandler) Delete(c *gin.Context) {
 }
 
 // Download arquivo
-// @Summary Download do arquivo
-// @Description Download do arquivo de um documento
-// @Tags EntidadeDocumentos
-// @Produce application/octet-stream
-// @Param entidadeId path int true "ID da entidade"
-// @Param item path int true "ID do documento"
-// @Success 200 {file} file
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Security BearerAuth
-// @Router /entidades/{entidadeId}/documentos/{item}/download [get]
+//
+//	@Summary		Download do arquivo
+//	@Description	Download do arquivo de um documento
+//	@Tags			EntidadeDocumentos
+//	@Produce		application/octet-stream
+//	@Param			entidadeId	path		int	true	"ID da entidade"
+//	@Param			item		path		int	true	"ID do documento"
+//	@Success		200			{file}		file
+//	@Failure		400			{object}	map[string]string
+//	@Failure		404			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Security		BearerAuth
+//	@Router			/entidades/{entidadeId}/documentos/{item}/download [get]
 func (h *EntidadeDocumentoHandler) Download(c *gin.Context) {
 	// 1. Extrair IDs
 	entidadeID, ok := h.getEntidadeID(c)

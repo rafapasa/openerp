@@ -1,0 +1,3494 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API do sistema OpenERP.",
+        "title": "OpenERP API",
+        "contact": {},
+        "version": "0.1a"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Autentica o usuário e retorna tokens JWT",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Realiza o login do usuário",
+                "parameters": [
+                    {
+                        "description": "Credenciais de login",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Invalida a sessão do usuário",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Realiza o logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados do usuário autenticado",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Retorna informações do usuário",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UsuarioInfo"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Usa o refresh token para gerar um novo access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Renova o token de acesso",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RefreshTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RefreshTokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma lista paginada de entidades",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Lista entidades",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome (razao social)",
+                        "name": "nome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por documento",
+                        "name": "documento",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo (1-Física, 2-Jurídica)",
+                        "name": "tipo_pessoa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1-Ativo, 2-Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra uma nova entidade (cliente/fornecedor)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Cria uma nova entidade",
+                "parameters": [
+                    {
+                        "description": "Dados da entidade",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/documento/{documento}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de uma entidade pelo CPF/CNPJ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Busca entidade por documento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CPF/CNPJ da entidade",
+                        "name": "documento",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/contatos": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna todos os contatos de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeContatos"
+                ],
+                "summary": "Lista contatos de uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo de contato",
+                        "name": "tipo",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo contato para uma entidade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeContatos"
+                ],
+                "summary": "Cria um novo contato",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do contato",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/contatos/{item}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um contato específico",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeContatos"
+                ],
+                "summary": "Busca um contato específico",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do contato",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de um contato existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeContatos"
+                ],
+                "summary": "Atualiza um contato",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do contato",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeContatoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um contato",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeContatos"
+                ],
+                "summary": "Exclui um contato",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do contato",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/documentos": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna todos os documentos de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Lista documentos de uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por tipo de documento",
+                        "name": "tipo",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo documento para uma entidade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Cria um novo documento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do documento",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/documentos/{item}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um documento específico",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Busca um documento específico",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do documento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de um documento existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Atualiza um documento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do documento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeDocumentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um documento",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Exclui um documento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do documento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/documentos/{item}/download": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Download do arquivo de um documento",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "EntidadeDocumentos"
+                ],
+                "summary": "Download do arquivo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do documento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/enderecos": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna todos os endereços de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeEnderecos"
+                ],
+                "summary": "Lista endereços de uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo",
+                        "name": "tipo",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo endereço para uma entidade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeEnderecos"
+                ],
+                "summary": "Cria um novo endereço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do endereço",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{entidadeId}/enderecos/{item}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um endereço específico",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeEnderecos"
+                ],
+                "summary": "Busca um endereço específico",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do endereço",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de um endereço existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeEnderecos"
+                ],
+                "summary": "Atualiza um endereço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do endereço",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeEnderecoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um endereço",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeEnderecos"
+                ],
+                "summary": "Exclui um endereço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "entidadeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do endereço",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de uma entidade específica",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Busca entidade por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de uma entidade existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Atualiza uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Exclui uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{id}/regimes-tributarios": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna todos os regimes tributários de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeRegimesTributarios"
+                ],
+                "summary": "Lista regimes tributários da entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo regime tributário para uma entidade específica",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeRegimesTributarios"
+                ],
+                "summary": "Cria um novo regime tributário para a entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do regime",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/{id}/regimes-tributarios/{item}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um regime tributário pelo seu item",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeRegimesTributarios"
+                ],
+                "summary": "Busca um regime tributário específico",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Regime)",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de um regime tributário existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeRegimesTributarios"
+                ],
+                "summary": "Atualiza um regime tributário",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Regime)",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualização",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRegimeTributarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um regime tributário",
+                "tags": [
+                    "EntidadeRegimesTributarios"
+                ],
+                "summary": "Exclui um regime tributário",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Regime)",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/grupos-entidades": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma lista paginada de grupos de entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GrupoEntidades"
+                ],
+                "summary": "Lista grupos de entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome",
+                        "name": "nome",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo grupo para ser usado nas entidades",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GrupoEntidades"
+                ],
+                "summary": "Cria um novo grupo de entidade",
+                "parameters": [
+                    {
+                        "description": "Dados do grupo",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/grupos-entidades/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um grupo de entidade específico",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GrupoEntidades"
+                ],
+                "summary": "Busca grupo por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza o nome de um grupo de entidade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GrupoEntidades"
+                ],
+                "summary": "Atualiza um grupo de entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualização",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoEntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um grupo de entidade",
+                "tags": [
+                    "GrupoEntidades"
+                ],
+                "summary": "Exclui um grupo de entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/limites-credito": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma lista paginada de limites de crédito",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeLimiteCredito"
+                ],
+                "summary": "Lista limites de crédito",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra um novo limite de crédito para ser usado nas entidades",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeLimiteCredito"
+                ],
+                "summary": "Cria um novo limite de crédito",
+                "parameters": [
+                    {
+                        "description": "Dados do limite de crédito",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/limites-credito/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de um limite de crédito específico",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeLimiteCredito"
+                ],
+                "summary": "Busca limite de crédito por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Limite de Crédito",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza a descrição e o valor de um limite de crédito",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EntidadeLimiteCredito"
+                ],
+                "summary": "Atualiza um limite de crédito",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Limite de Crédito",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualização",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeLimiteCreditoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de um limite de crédito",
+                "tags": [
+                    "EntidadeLimiteCredito"
+                ],
+                "summary": "Exclui um limite de crédito",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Limite de Crédito",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "constants.Sexo": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "SexoMasculino",
+                "SexoFeminino"
+            ]
+        },
+        "constants.Status": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                9
+            ],
+            "x-enum-varnames": [
+                "StatusAtivo",
+                "StatusInativo",
+                "StatusBloqueado",
+                "StatusCancelado"
+            ]
+        },
+        "constants.TipoPessoa": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "TipoPessoaFisica",
+                "TipoPessoaJuridica"
+            ]
+        },
+        "dto.EntidadeContatoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeContatoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeContatoRequest": {
+            "type": "object",
+            "required": [
+                "entidade_id",
+                "forma_contato_id",
+                "informacao"
+            ],
+            "properties": {
+                "created_by": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "forma_contato_id": {
+                    "type": "integer",
+                    "maximum": 7,
+                    "minimum": 1
+                },
+                "informacao": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeContatoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "forma_contato_id": {
+                    "type": "integer"
+                },
+                "forma_contato_nome": {
+                    "description": "Nome da forma de contato",
+                    "type": "string"
+                },
+                "forma_contato_tipo": {
+                    "description": "Tipo da forma de contato",
+                    "type": "integer"
+                },
+                "forma_contato_tipo_label": {
+                    "type": "string"
+                },
+                "informacao": {
+                    "type": "string"
+                },
+                "item": {
+                    "description": "Sequencial por entidade",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeDocumentoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeDocumentoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeDocumentoRequest": {
+            "type": "object",
+            "required": [
+                "arquivo",
+                "data_inclusao",
+                "entidade_id"
+            ],
+            "properties": {
+                "arquivo": {
+                    "description": "Base64",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "integer"
+                },
+                "data_inclusao": {
+                    "description": "Formato: 2006-01-02",
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "tipo": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeDocumentoResponse": {
+            "type": "object",
+            "properties": {
+                "arquivo": {
+                    "description": "Base64 (opcional)",
+                    "type": "string"
+                },
+                "content_type": {
+                    "description": "Tipo do arquivo (ex: application/pdf)",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_inclusao": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "item": {
+                    "description": "Sequencial por entidade",
+                    "type": "integer"
+                },
+                "tamanho": {
+                    "description": "============================================================\nMETADADOS\n============================================================",
+                    "type": "integer"
+                },
+                "tipo": {
+                    "type": "string"
+                },
+                "tipo_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeEnderecoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeEnderecoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeEnderecoRequest": {
+            "type": "object",
+            "required": [
+                "bairro",
+                "cep",
+                "data_ini",
+                "entidade_id",
+                "estado_id",
+                "logradouro",
+                "municipio_id",
+                "numero",
+                "pais_id",
+                "tipo"
+            ],
+            "properties": {
+                "bairro": {
+                    "type": "string"
+                },
+                "cep": {
+                    "type": "string"
+                },
+                "complemento": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "type": "string"
+                },
+                "data_ini": {
+                    "description": "============================================================\nDATAS\n============================================================",
+                    "type": "string"
+                },
+                "distancia": {
+                    "type": "number"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "estado_id": {
+                    "type": "integer"
+                },
+                "logradouro": {
+                    "type": "string"
+                },
+                "municipio_id": {
+                    "type": "integer"
+                },
+                "numero": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "pais_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "description": "1-Ativo, 2-Inativo",
+                    "type": "integer"
+                },
+                "tipo": {
+                    "type": "integer",
+                    "maximum": 4,
+                    "minimum": 1
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeEnderecoResponse": {
+            "type": "object",
+            "properties": {
+                "bairro": {
+                    "type": "string"
+                },
+                "cep": {
+                    "type": "string"
+                },
+                "complemento": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "type": "string"
+                },
+                "data_ini": {
+                    "description": "============================================================\nDATAS\n============================================================",
+                    "type": "string"
+                },
+                "distancia": {
+                    "type": "number"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "estado_id": {
+                    "type": "integer"
+                },
+                "estado_nome": {
+                    "type": "string"
+                },
+                "estado_uf": {
+                    "type": "string"
+                },
+                "item": {
+                    "description": "Sequencial por entidade",
+                    "type": "integer"
+                },
+                "logradouro": {
+                    "type": "string"
+                },
+                "municipio_id": {
+                    "type": "integer"
+                },
+                "municipio_nome": {
+                    "type": "string"
+                },
+                "numero": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "pais_id": {
+                    "type": "integer"
+                },
+                "pais_nome": {
+                    "type": "string"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tipo": {
+                    "type": "integer"
+                },
+                "tipo_label": {
+                    "description": "Cobrança, Entrega, Comercial, Residencial",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeLimiteCreditoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeLimiteCreditoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeLimiteCreditoRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "valor"
+            ],
+            "properties": {
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "valor": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.EntidadeLimiteCreditoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "valor": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.EntidadeListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeRegimeTributarioListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeRegimeTributarioResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeRegimeTributarioRequest": {
+            "type": "object",
+            "required": [
+                "data",
+                "entidade_id",
+                "regime"
+            ],
+            "properties": {
+                "apuracao": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "Formato: 2006-01-02",
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "regime": {
+                    "type": "integer"
+                },
+                "regime_especial": {
+                    "type": "integer"
+                },
+                "regime_municipal": {
+                    "type": "integer"
+                },
+                "situacao_trib_iss": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeRegimeTributarioResponse": {
+            "type": "object",
+            "properties": {
+                "apuracao": {
+                    "type": "integer"
+                },
+                "apuracao_label": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "============================================================\nCAMPOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "regime": {
+                    "type": "integer"
+                },
+                "regime_especial": {
+                    "type": "integer"
+                },
+                "regime_especial_label": {
+                    "type": "string"
+                },
+                "regime_label": {
+                    "type": "string"
+                },
+                "regime_municipal": {
+                    "type": "integer"
+                },
+                "regime_municipal_label": {
+                    "type": "string"
+                },
+                "situacao_trib_iss": {
+                    "type": "integer"
+                },
+                "situacao_trib_iss_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeRequest": {
+            "type": "object",
+            "required": [
+                "empresa_filial_id",
+                "inscricao_federal",
+                "razao_social",
+                "tipo_pessoa"
+            ],
+            "properties": {
+                "arquivo_imp_ddv": {
+                    "type": "string"
+                },
+                "casa_propria": {
+                    "type": "integer"
+                },
+                "classificacao": {
+                    "type": "integer"
+                },
+                "codigo": {
+                    "type": "integer"
+                },
+                "conjuje_cpf": {
+                    "type": "string"
+                },
+                "conjuje_nome": {
+                    "type": "string"
+                },
+                "conjuje_renda": {
+                    "type": "number"
+                },
+                "conjuje_rg": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "============================================================\nUSUÁRIO (para auditoria)\n============================================================",
+                    "type": "integer"
+                },
+                "data_cadastro": {
+                    "description": "============================================================\nDADOS COMERCIAIS\n============================================================",
+                    "type": "string"
+                },
+                "data_nascimento": {
+                    "description": "============================================================\nDADOS PESSOAIS\n============================================================",
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "estado_civil": {
+                    "type": "integer"
+                },
+                "grupo_entidade_id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "horario_id": {
+                    "type": "integer"
+                },
+                "inscricao_estadual": {
+                    "type": "string"
+                },
+                "inscricao_federal": {
+                    "type": "string"
+                },
+                "inscricao_municipal": {
+                    "type": "string"
+                },
+                "inscricao_produtor": {
+                    "type": "string"
+                },
+                "nome_da_mae": {
+                    "type": "string"
+                },
+                "nome_do_pai": {
+                    "type": "string"
+                },
+                "nome_fantasia": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "percentual_comissao": {
+                    "type": "number"
+                },
+                "quant_filhos": {
+                    "type": "integer"
+                },
+                "razao_social": {
+                    "type": "string"
+                },
+                "sexo": {
+                    "$ref": "#/definitions/constants.Sexo"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.Status"
+                },
+                "suframa": {
+                    "type": "string"
+                },
+                "tabela_desconto_id": {
+                    "type": "integer"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "taxa_entrega": {
+                    "type": "number"
+                },
+                "tipo_pessoa": {
+                    "maximum": 2,
+                    "minimum": 1,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/constants.TipoPessoa"
+                        }
+                    ]
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeResponse": {
+            "type": "object",
+            "properties": {
+                "arquivo_imp_ddv": {
+                    "type": "string"
+                },
+                "casa_propria": {
+                    "type": "integer"
+                },
+                "classificacao": {
+                    "type": "integer"
+                },
+                "codigo": {
+                    "type": "integer"
+                },
+                "conjuje_cpf": {
+                    "type": "string"
+                },
+                "conjuje_nome": {
+                    "type": "string"
+                },
+                "conjuje_renda": {
+                    "type": "number"
+                },
+                "conjuje_rg": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_cadastro": {
+                    "description": "============================================================\nDADOS COMERCIAIS\n============================================================",
+                    "type": "string"
+                },
+                "data_nascimento": {
+                    "description": "============================================================\nDADOS PESSOAIS\n============================================================",
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "estado_civil": {
+                    "type": "integer"
+                },
+                "estado_civil_label": {
+                    "type": "string"
+                },
+                "grupo_entidade_id": {
+                    "type": "integer"
+                },
+                "horario_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "inscricao_estadual": {
+                    "type": "string"
+                },
+                "inscricao_federal": {
+                    "type": "string"
+                },
+                "inscricao_municipal": {
+                    "type": "string"
+                },
+                "inscricao_produtor": {
+                    "type": "string"
+                },
+                "nome_da_mae": {
+                    "type": "string"
+                },
+                "nome_do_pai": {
+                    "type": "string"
+                },
+                "nome_fantasia": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "percentual_comissao": {
+                    "type": "number"
+                },
+                "quant_filhos": {
+                    "type": "integer"
+                },
+                "razao_social": {
+                    "type": "string"
+                },
+                "sexo": {
+                    "$ref": "#/definitions/constants.Sexo"
+                },
+                "sexo_label": {
+                    "type": "string"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.Status"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "suframa": {
+                    "type": "string"
+                },
+                "tabela_desconto_id": {
+                    "type": "integer"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "taxa_entrega": {
+                    "type": "number"
+                },
+                "tipo_pessoa": {
+                    "$ref": "#/definitions/constants.TipoPessoa"
+                },
+                "tipo_pessoa_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GrupoEntidadeListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GrupoEntidadeResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GrupoEntidadeRequest": {
+            "type": "object",
+            "required": [
+                "descricao"
+            ],
+            "properties": {
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "dto.GrupoEntidadeResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LoginRequest": {
+            "type": "object",
+            "required": [
+                "login",
+                "senha"
+            ],
+            "properties": {
+                "empresa_id": {
+                    "description": "Opcional para multi-empresa",
+                    "type": "integer"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "senha": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "description": "Segundos",
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/dto.UsuarioInfo"
+                }
+            }
+        },
+        "dto.RefreshTokenRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UsuarioInfo": {
+            "type": "object",
+            "properties": {
+                "empresa_id": {
+                    "type": "integer"
+                },
+                "empresa_nome": {
+                    "type": "string"
+                },
+                "grupo_id": {
+                    "type": "integer"
+                },
+                "grupo_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "nome": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,4 @@
+# .swaggo
+parseDependency: true
+parseInternal: true
+parseGoList: true

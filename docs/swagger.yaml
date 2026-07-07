@@ -1,0 +1,2374 @@
+basePath: /api/v1
+definitions:
+  constants.Sexo:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - SexoMasculino
+    - SexoFeminino
+  constants.Status:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 9
+    type: integer
+    x-enum-varnames:
+    - StatusAtivo
+    - StatusInativo
+    - StatusBloqueado
+    - StatusCancelado
+  constants.TipoPessoa:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - TipoPessoaFisica
+    - TipoPessoaJuridica
+  dto.EntidadeContatoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeContatoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeContatoRequest:
+    properties:
+      created_by:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: integer
+      descricao:
+        type: string
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      forma_contato_id:
+        maximum: 7
+        minimum: 1
+        type: integer
+      informacao:
+        type: string
+      updated_by:
+        type: integer
+    required:
+    - entidade_id
+    - forma_contato_id
+    - informacao
+    type: object
+  dto.EntidadeContatoResponse:
+    properties:
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      forma_contato_id:
+        type: integer
+      forma_contato_nome:
+        description: Nome da forma de contato
+        type: string
+      forma_contato_tipo:
+        description: Tipo da forma de contato
+        type: integer
+      forma_contato_tipo_label:
+        type: string
+      informacao:
+        type: string
+      item:
+        description: Sequencial por entidade
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.EntidadeDocumentoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeDocumentoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeDocumentoRequest:
+    properties:
+      arquivo:
+        description: Base64
+        type: string
+      created_by:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: integer
+      data_inclusao:
+        description: 'Formato: 2006-01-02'
+        type: string
+      descricao:
+        type: string
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      tipo:
+        type: string
+      updated_by:
+        type: integer
+    required:
+    - arquivo
+    - data_inclusao
+    - entidade_id
+    type: object
+  dto.EntidadeDocumentoResponse:
+    properties:
+      arquivo:
+        description: Base64 (opcional)
+        type: string
+      content_type:
+        description: 'Tipo do arquivo (ex: application/pdf)'
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data_inclusao:
+        type: string
+      descricao:
+        type: string
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      item:
+        description: Sequencial por entidade
+        type: integer
+      tamanho:
+        description: |-
+          ============================================================
+          METADADOS
+          ============================================================
+        type: integer
+      tipo:
+        type: string
+      tipo_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.EntidadeEnderecoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeEnderecoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeEnderecoRequest:
+    properties:
+      bairro:
+        type: string
+      cep:
+        type: string
+      complemento:
+        type: string
+      created_by:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: integer
+      data_fim:
+        type: string
+      data_ini:
+        description: |-
+          ============================================================
+          DATAS
+          ============================================================
+        type: string
+      distancia:
+        type: number
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      estado_id:
+        type: integer
+      logradouro:
+        type: string
+      municipio_id:
+        type: integer
+      numero:
+        type: string
+      observacao:
+        type: string
+      pais_id:
+        type: integer
+      situacao:
+        description: 1-Ativo, 2-Inativo
+        type: integer
+      tipo:
+        maximum: 4
+        minimum: 1
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - bairro
+    - cep
+    - data_ini
+    - entidade_id
+    - estado_id
+    - logradouro
+    - municipio_id
+    - numero
+    - pais_id
+    - tipo
+    type: object
+  dto.EntidadeEnderecoResponse:
+    properties:
+      bairro:
+        type: string
+      cep:
+        type: string
+      complemento:
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data_fim:
+        type: string
+      data_ini:
+        description: |-
+          ============================================================
+          DATAS
+          ============================================================
+        type: string
+      distancia:
+        type: number
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      estado_id:
+        type: integer
+      estado_nome:
+        type: string
+      estado_uf:
+        type: string
+      item:
+        description: Sequencial por entidade
+        type: integer
+      logradouro:
+        type: string
+      municipio_id:
+        type: integer
+      municipio_nome:
+        type: string
+      numero:
+        type: string
+      observacao:
+        type: string
+      pais_id:
+        type: integer
+      pais_nome:
+        type: string
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      tipo:
+        type: integer
+      tipo_label:
+        description: Cobrança, Entrega, Comercial, Residencial
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.EntidadeLimiteCreditoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeLimiteCreditoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeLimiteCreditoRequest:
+    properties:
+      descricao:
+        maxLength: 100
+        type: string
+      valor:
+        type: number
+    required:
+    - descricao
+    - valor
+    type: object
+  dto.EntidadeLimiteCreditoResponse:
+    properties:
+      created_at:
+        type: string
+      descricao:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      valor:
+        type: number
+    type: object
+  dto.EntidadeListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeRegimeTributarioListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeRegimeTributarioResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EntidadeRegimeTributarioRequest:
+    properties:
+      apuracao:
+        type: integer
+      created_by:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: integer
+      data:
+        description: 'Formato: 2006-01-02'
+        type: string
+      entidade_id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      regime:
+        type: integer
+      regime_especial:
+        type: integer
+      regime_municipal:
+        type: integer
+      situacao_trib_iss:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - data
+    - entidade_id
+    - regime
+    type: object
+  dto.EntidadeRegimeTributarioResponse:
+    properties:
+      apuracao:
+        type: integer
+      apuracao_label:
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data:
+        type: string
+      entidade_id:
+        type: integer
+      id:
+        description: |-
+          ============================================================
+          CAMPOS PRINCIPAIS
+          ============================================================
+        type: integer
+      regime:
+        type: integer
+      regime_especial:
+        type: integer
+      regime_especial_label:
+        type: string
+      regime_label:
+        type: string
+      regime_municipal:
+        type: integer
+      regime_municipal_label:
+        type: string
+      situacao_trib_iss:
+        type: integer
+      situacao_trib_iss_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.EntidadeRequest:
+    properties:
+      arquivo_imp_ddv:
+        type: string
+      casa_propria:
+        type: integer
+      classificacao:
+        type: integer
+      codigo:
+        type: integer
+      conjuje_cpf:
+        type: string
+      conjuje_nome:
+        type: string
+      conjuje_renda:
+        type: number
+      conjuje_rg:
+        type: string
+      created_by:
+        description: |-
+          ============================================================
+          USUÁRIO (para auditoria)
+          ============================================================
+        type: integer
+      data_cadastro:
+        description: |-
+          ============================================================
+          DADOS COMERCIAIS
+          ============================================================
+        type: string
+      data_nascimento:
+        description: |-
+          ============================================================
+          DADOS PESSOAIS
+          ============================================================
+        type: string
+      empresa_filial_id:
+        type: integer
+      estado_civil:
+        type: integer
+      grupo_entidade_id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      horario_id:
+        type: integer
+      inscricao_estadual:
+        type: string
+      inscricao_federal:
+        type: string
+      inscricao_municipal:
+        type: string
+      inscricao_produtor:
+        type: string
+      nome_da_mae:
+        type: string
+      nome_do_pai:
+        type: string
+      nome_fantasia:
+        type: string
+      observacao:
+        type: string
+      percentual_comissao:
+        type: number
+      quant_filhos:
+        type: integer
+      razao_social:
+        type: string
+      sexo:
+        $ref: '#/definitions/constants.Sexo'
+      situacao:
+        $ref: '#/definitions/constants.Status'
+      suframa:
+        type: string
+      tabela_desconto_id:
+        type: integer
+      tabela_preco_id:
+        type: integer
+      taxa_entrega:
+        type: number
+      tipo_pessoa:
+        allOf:
+        - $ref: '#/definitions/constants.TipoPessoa'
+        maximum: 2
+        minimum: 1
+      updated_by:
+        type: integer
+    required:
+    - empresa_filial_id
+    - inscricao_federal
+    - razao_social
+    - tipo_pessoa
+    type: object
+  dto.EntidadeResponse:
+    properties:
+      arquivo_imp_ddv:
+        type: string
+      casa_propria:
+        type: integer
+      classificacao:
+        type: integer
+      codigo:
+        type: integer
+      conjuje_cpf:
+        type: string
+      conjuje_nome:
+        type: string
+      conjuje_renda:
+        type: number
+      conjuje_rg:
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data_cadastro:
+        description: |-
+          ============================================================
+          DADOS COMERCIAIS
+          ============================================================
+        type: string
+      data_nascimento:
+        description: |-
+          ============================================================
+          DADOS PESSOAIS
+          ============================================================
+        type: string
+      empresa_filial_id:
+        type: integer
+      estado_civil:
+        type: integer
+      estado_civil_label:
+        type: string
+      grupo_entidade_id:
+        type: integer
+      horario_id:
+        type: integer
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      inscricao_estadual:
+        type: string
+      inscricao_federal:
+        type: string
+      inscricao_municipal:
+        type: string
+      inscricao_produtor:
+        type: string
+      nome_da_mae:
+        type: string
+      nome_do_pai:
+        type: string
+      nome_fantasia:
+        type: string
+      observacao:
+        type: string
+      percentual_comissao:
+        type: number
+      quant_filhos:
+        type: integer
+      razao_social:
+        type: string
+      sexo:
+        $ref: '#/definitions/constants.Sexo'
+      sexo_label:
+        type: string
+      situacao:
+        $ref: '#/definitions/constants.Status'
+      situacao_label:
+        type: string
+      suframa:
+        type: string
+      tabela_desconto_id:
+        type: integer
+      tabela_preco_id:
+        type: integer
+      taxa_entrega:
+        type: number
+      tipo_pessoa:
+        $ref: '#/definitions/constants.TipoPessoa'
+      tipo_pessoa_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.GrupoEntidadeListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.GrupoEntidadeResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.GrupoEntidadeRequest:
+    properties:
+      descricao:
+        maxLength: 100
+        type: string
+    required:
+    - descricao
+    type: object
+  dto.GrupoEntidadeResponse:
+    properties:
+      created_at:
+        type: string
+      descricao:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      empresa_id:
+        description: Opcional para multi-empresa
+        type: integer
+      login:
+        type: string
+      senha:
+        type: string
+    required:
+    - login
+    - senha
+    type: object
+  dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        description: Segundos
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+      usuario:
+        $ref: '#/definitions/dto.UsuarioInfo'
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      token_type:
+        type: string
+    type: object
+  dto.UsuarioInfo:
+    properties:
+      empresa_id:
+        type: integer
+      empresa_nome:
+        type: string
+      grupo_id:
+        type: integer
+      grupo_nome:
+        type: string
+      id:
+        type: integer
+      login:
+        type: string
+      nome:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API do sistema OpenERP.
+  title: OpenERP API
+  version: 0.1a
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica o usuário e retorna tokens JWT
+      parameters:
+      - description: Credenciais de login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Realiza o login do usuário
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Invalida a sessão do usuário
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Realiza o logout
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: Retorna os dados do usuário autenticado
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UsuarioInfo'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Retorna informações do usuário
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Usa o refresh token para gerar um novo access token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RefreshTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Renova o token de acesso
+      tags:
+      - Auth
+  /entidades:
+    get:
+      description: Retorna uma lista paginada de entidades
+      parameters:
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por nome (razao social)
+        in: query
+        name: nome
+        type: string
+      - description: Filtrar por documento
+        in: query
+        name: documento
+        type: string
+      - description: Filtrar por tipo (1-Física, 2-Jurídica)
+        in: query
+        name: tipo_pessoa
+        type: integer
+      - description: Filtrar por situação (1-Ativo, 2-Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista entidades
+      tags:
+      - Entidades
+    post:
+      consumes:
+      - application/json
+      description: Cadastra uma nova entidade (cliente/fornecedor)
+      parameters:
+      - description: Dados da entidade
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria uma nova entidade
+      tags:
+      - Entidades
+  /entidades/{entidadeId}/contatos:
+    get:
+      description: Retorna todos os contatos de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por tipo de contato
+        in: query
+        name: tipo
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeContatoListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista contatos de uma entidade
+      tags:
+      - EntidadeContatos
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo contato para uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: Dados do contato
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeContatoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeContatoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo contato
+      tags:
+      - EntidadeContatos
+  /entidades/{entidadeId}/contatos/{item}:
+    delete:
+      description: Realiza a exclusão lógica de um contato
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do contato
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um contato
+      tags:
+      - EntidadeContatos
+    get:
+      description: Retorna os dados de um contato específico
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do contato
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeContatoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca um contato específico
+      tags:
+      - EntidadeContatos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um contato existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do contato
+        in: path
+        name: item
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeContatoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeContatoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um contato
+      tags:
+      - EntidadeContatos
+  /entidades/{entidadeId}/documentos:
+    get:
+      description: Retorna todos os documentos de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por tipo de documento
+        in: query
+        name: tipo
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeDocumentoListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista documentos de uma entidade
+      tags:
+      - EntidadeDocumentos
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo documento para uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: Dados do documento
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeDocumentoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeDocumentoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo documento
+      tags:
+      - EntidadeDocumentos
+  /entidades/{entidadeId}/documentos/{item}:
+    delete:
+      description: Realiza a exclusão lógica de um documento
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do documento
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um documento
+      tags:
+      - EntidadeDocumentos
+    get:
+      description: Retorna os dados de um documento específico
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do documento
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeDocumentoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca um documento específico
+      tags:
+      - EntidadeDocumentos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um documento existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do documento
+        in: path
+        name: item
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeDocumentoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeDocumentoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um documento
+      tags:
+      - EntidadeDocumentos
+  /entidades/{entidadeId}/documentos/{item}/download:
+    get:
+      description: Download do arquivo de um documento
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do documento
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Download do arquivo
+      tags:
+      - EntidadeDocumentos
+  /entidades/{entidadeId}/enderecos:
+    get:
+      description: Retorna todos os endereços de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: tipo
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeEnderecoListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista endereços de uma entidade
+      tags:
+      - EntidadeEnderecos
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo endereço para uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: Dados do endereço
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeEnderecoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeEnderecoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo endereço
+      tags:
+      - EntidadeEnderecos
+  /entidades/{entidadeId}/enderecos/{item}:
+    delete:
+      description: Realiza a exclusão lógica de um endereço
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do endereço
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um endereço
+      tags:
+      - EntidadeEnderecos
+    get:
+      description: Retorna os dados de um endereço específico
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do endereço
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeEnderecoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca um endereço específico
+      tags:
+      - EntidadeEnderecos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um endereço existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: entidadeId
+        required: true
+        type: integer
+      - description: ID do endereço
+        in: path
+        name: item
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeEnderecoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeEnderecoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um endereço
+      tags:
+      - EntidadeEnderecos
+  /entidades/{id}:
+    delete:
+      description: Realiza a exclusão lógica de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui uma entidade
+      tags:
+      - Entidades
+    get:
+      description: Retorna os dados de uma entidade específica
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca entidade por ID
+      tags:
+      - Entidades
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma entidade existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza uma entidade
+      tags:
+      - Entidades
+  /entidades/{id}/regimes-tributarios:
+    get:
+      description: Retorna todos os regimes tributários de uma entidade
+      parameters:
+      - description: ID da Entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeRegimeTributarioListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista regimes tributários da entidade
+      tags:
+      - EntidadeRegimesTributarios
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo regime tributário para uma entidade específica
+      parameters:
+      - description: ID da Entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do regime
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRegimeTributarioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeRegimeTributarioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo regime tributário para a entidade
+      tags:
+      - EntidadeRegimesTributarios
+  /entidades/{id}/regimes-tributarios/{item}:
+    delete:
+      description: Realiza a exclusão lógica de um regime tributário
+      parameters:
+      - description: ID da Entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID do Item (Regime)
+        in: path
+        name: item
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um regime tributário
+      tags:
+      - EntidadeRegimesTributarios
+    get:
+      description: Retorna os dados de um regime tributário pelo seu item
+      parameters:
+      - description: ID da Entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID do Item (Regime)
+        in: path
+        name: item
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeRegimeTributarioResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca um regime tributário específico
+      tags:
+      - EntidadeRegimesTributarios
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um regime tributário existente
+      parameters:
+      - description: ID da Entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID do Item (Regime)
+        in: path
+        name: item
+        required: true
+        type: integer
+      - description: Dados para atualização
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRegimeTributarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeRegimeTributarioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um regime tributário
+      tags:
+      - EntidadeRegimesTributarios
+  /entidades/documento/{documento}:
+    get:
+      description: Retorna os dados de uma entidade pelo CPF/CNPJ
+      parameters:
+      - description: CPF/CNPJ da entidade
+        in: path
+        name: documento
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca entidade por documento
+      tags:
+      - Entidades
+  /grupos-entidades:
+    get:
+      description: Retorna uma lista paginada de grupos de entidade
+      parameters:
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por nome
+        in: query
+        name: nome
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoEntidadeListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista grupos de entidade
+      tags:
+      - GrupoEntidades
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo grupo para ser usado nas entidades
+      parameters:
+      - description: Dados do grupo
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GrupoEntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.GrupoEntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo grupo de entidade
+      tags:
+      - GrupoEntidades
+  /grupos-entidades/{id}:
+    delete:
+      description: Realiza a exclusão lógica de um grupo de entidade
+      parameters:
+      - description: ID do Grupo
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um grupo de entidade
+      tags:
+      - GrupoEntidades
+    get:
+      description: Retorna os dados de um grupo de entidade específico
+      parameters:
+      - description: ID do Grupo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoEntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca grupo por ID
+      tags:
+      - GrupoEntidades
+    put:
+      consumes:
+      - application/json
+      description: Atualiza o nome de um grupo de entidade
+      parameters:
+      - description: ID do Grupo
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualização
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GrupoEntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoEntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um grupo de entidade
+      tags:
+      - GrupoEntidades
+  /limites-credito:
+    get:
+      description: Retorna uma lista paginada de limites de crédito
+      parameters:
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeLimiteCreditoListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista limites de crédito
+      tags:
+      - EntidadeLimiteCredito
+    post:
+      consumes:
+      - application/json
+      description: Cadastra um novo limite de crédito para ser usado nas entidades
+      parameters:
+      - description: Dados do limite de crédito
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeLimiteCreditoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeLimiteCreditoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria um novo limite de crédito
+      tags:
+      - EntidadeLimiteCredito
+  /limites-credito/{id}:
+    delete:
+      description: Realiza a exclusão lógica de um limite de crédito
+      parameters:
+      - description: ID do Limite de Crédito
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui um limite de crédito
+      tags:
+      - EntidadeLimiteCredito
+    get:
+      description: Retorna os dados de um limite de crédito específico
+      parameters:
+      - description: ID do Limite de Crédito
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeLimiteCreditoResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca limite de crédito por ID
+      tags:
+      - EntidadeLimiteCredito
+    put:
+      consumes:
+      - application/json
+      description: Atualiza a descrição e o valor de um limite de crédito
+      parameters:
+      - description: ID do Limite de Crédito
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualização
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeLimiteCreditoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeLimiteCreditoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza um limite de crédito
+      tags:
+      - EntidadeLimiteCredito
+schemes:
+- http
+- https
+swagger: "2.0"
