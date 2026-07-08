@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
+	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 )
@@ -129,7 +130,7 @@ func (r *EntidadeRegimeTributarioResponse) FromModel(model *models.EntidadeRegim
 
 	// Preencher labels
 	r.RegimeLabel = getRegimeLabel(model.Regime)
-	r.RegimeEspecialLabel = getSimNaoLabel(model.RegimeEspecial)
+	r.RegimeEspecialLabel = constants.SimNao(model.RegimeEspecial).String()
 	if model.Apuracao != nil {
 		r.ApuracaoLabel = getApuracaoLabel(*model.Apuracao)
 	}

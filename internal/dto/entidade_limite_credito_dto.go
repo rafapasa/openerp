@@ -17,6 +17,7 @@ type EntidadeLimiteCreditoRequest struct {
 	CreatedBy *int    `json:"-"`
 	UpdatedBy *int    `json:"-"`
 }
+
 // ============================================================
 // RESPONSE
 // ============================================================
@@ -32,7 +33,7 @@ type EntidadeLimiteCreditoResponse struct {
 
 // FromModel converte o model para o DTO de resposta.
 func (r *EntidadeLimiteCreditoResponse) FromModel(m *models.EntidadeLimiteCredito) {
-	r.ID = m.EntidadeID	
+	r.ID = m.EntidadeID
 	r.Descricao = *m.Descricao
 	r.Valor = m.Valor
 	r.CreatedAt = m.CreatedAt

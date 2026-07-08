@@ -14,14 +14,16 @@ import (
 // RouteConfig contém todas as dependências para registrar rotas
 type RouteConfig struct {
 	// Handlers
-	AuthHandler              *handler.AuthHandler
-	EntidadeHandler          *handler.EntidadeHandler
-	EntidadeEnderecoHandler  *handler.EntidadeEnderecoHandler
-	EntidadeContatoHandler   *handler.EntidadeContatoHandler
+	AuthHandler                     *handler.AuthHandler
+	EntidadeHandler                 *handler.EntidadeHandler
+	EntidadeEnderecoHandler         *handler.EntidadeEnderecoHandler
+	EntidadeContatoHandler          *handler.EntidadeContatoHandler
 	EntidadeDocumentoHandler        *handler.EntidadeDocumentoHandler
 	ProdutoHandler                  *handler.ProdutoHandler
+	ProdutoGrupoHandler             *handler.ProdutoGrupoHandler
+	ProdutoSubgrupoHandler          *handler.ProdutoSubgrupoHandler
 	EntidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler
-	LimiteCreditoHandler            *handler.EntidadeLimiteCreditoHandler
+	EntidadeLimiteCreditoHandler    *handler.EntidadeLimiteCreditoHandler
 	JWTSecret                       string
 }
 
@@ -66,10 +68,13 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 		cfg.EntidadeContatoHandler,
 		cfg.EntidadeDocumentoHandler,
 		cfg.EntidadeRegimeTributarioHandler,
+		cfg.EntidadeLimiteCreditoHandler,
 	)
 
 	// Futuras rotas:
 	RegisterProdutoRoutes(api, cfg.ProdutoHandler)
+	RegisterProdutoGrupoRoutes(api, cfg.ProdutoGrupoHandler)
+	RegisterProdutoSubgrupoRoutes(api, cfg.ProdutoSubgrupoHandler)
 	// RegisterPedidoRoutes(api, cfg.PedidoHandler)
 	// RegisterUsuarioRoutes(api, cfg.UsuarioHandler)
 }

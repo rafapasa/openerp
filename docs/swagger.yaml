@@ -761,6 +761,362 @@ definitions:
       usuario:
         $ref: '#/definitions/dto.UsuarioInfo'
     type: object
+  dto.ProdutoGrupoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoGrupoRequest:
+    properties:
+      agenda:
+        type: integer
+      controle_lote:
+        type: integer
+      cor:
+        type: string
+      created_by:
+        description: |-
+          ============================================================
+          USUÁRIO (para auditoria)
+          ============================================================
+        type: integer
+      descricao:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: string
+      impressora_id:
+        type: integer
+      percentual_comissao:
+        type: number
+      situacao:
+        type: integer
+      updated_by:
+        type: integer
+      visivel_frente_caixa:
+        type: integer
+    required:
+    - descricao
+    type: object
+  dto.ProdutoGrupoResponse:
+    properties:
+      agenda:
+        type: integer
+      agenda_label:
+        type: string
+      controle_lote:
+        type: integer
+      controle_lote_label:
+        type: string
+      cor:
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      impressora_id:
+        type: integer
+      percentual_comissao:
+        type: number
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      visivel_frente_caixa:
+        type: integer
+      visivel_frente_caixa_label:
+        type: string
+    type: object
+  dto.ProdutoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoRequest:
+    properties:
+      altura:
+        type: number
+      codigo:
+        type: integer
+      codigo_barras:
+        type: string
+      comprimento:
+        type: number
+      created_by:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: integer
+      custo_compra:
+        type: number
+      desconto_maximo:
+        type: number
+      descricao:
+        type: string
+      empresa_filial_id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      especie_id:
+        type: integer
+      estoque_minimo:
+        description: |-
+          ============================================================
+          ESTOQUE
+          ============================================================
+        type: number
+      largura:
+        type: number
+      lote_economico:
+        type: number
+      marca_id:
+        type: integer
+      modelo_id:
+        type: integer
+      ncm_numero:
+        type: integer
+      nome:
+        type: string
+      peso_bruto:
+        description: |-
+          ============================================================
+          DIMENSÕES E PESOS
+          ============================================================
+        type: number
+      peso_liquido:
+        type: number
+      produto_grupo_id:
+        type: integer
+      produto_subgrupo_id:
+        type: integer
+      referencia:
+        description: |-
+          ============================================================
+          REFERÊNCIAS E DESCRIÇÃO
+          ============================================================
+        type: string
+      referencia2:
+        type: string
+      referencia3:
+        type: string
+      referencia4:
+        type: string
+      resumo:
+        type: string
+      serie_id:
+        type: integer
+      situacao:
+        description: 1-Ativo, 2-Inativo, 3-Bloqueado
+        type: integer
+      tipo_produto_id:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - codigo
+    - empresa_filial_id
+    - ncm_numero
+    - nome
+    - resumo
+    - tipo_produto_id
+    type: object
+  dto.ProdutoResponse:
+    properties:
+      altura:
+        type: number
+      codigo:
+        type: integer
+      codigo_barras:
+        type: string
+      comprimento:
+        type: number
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      custo_compra:
+        type: number
+      data_alteracao:
+        type: string
+      desconto_maximo:
+        type: number
+      descricao:
+        type: string
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      especie_id:
+        type: integer
+      especie_nome:
+        type: string
+      estoque_minimo:
+        description: |-
+          ============================================================
+          ESTOQUE
+          ============================================================
+        type: number
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      largura:
+        type: number
+      lote_economico:
+        type: number
+      marca_id:
+        type: integer
+      marca_nome:
+        type: string
+      modelo_id:
+        type: integer
+      modelo_nome:
+        type: string
+      ncm_descricao:
+        type: string
+      ncm_numero:
+        type: integer
+      nome:
+        type: string
+      peso_bruto:
+        description: |-
+          ============================================================
+          DIMENSÕES E PESOS
+          ============================================================
+        type: number
+      peso_liquido:
+        type: number
+      produto_grupo_id:
+        type: integer
+      produto_grupo_nome:
+        type: string
+      produto_subgrupo_id:
+        type: integer
+      produto_subgrupo_nome:
+        type: string
+      referencia:
+        description: |-
+          ============================================================
+          REFERÊNCIAS E DESCRIÇÃO
+          ============================================================
+        type: string
+      referencia2:
+        type: string
+      referencia3:
+        type: string
+      referencia4:
+        type: string
+      resumo:
+        type: string
+      saldo_estoque:
+        type: number
+      serie_id:
+        type: integer
+      serie_nome:
+        type: string
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      tipo_produto_id:
+        type: integer
+      tipo_produto_nome:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.ProdutoSubgrupoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoSubgrupoRequest:
+    properties:
+      descricao:
+        maxLength: 255
+        type: string
+      situacao:
+        type: integer
+    required:
+    - descricao
+    type: object
+  dto.ProdutoSubgrupoResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      id:
+        type: integer
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
   dto.RefreshTokenRequest:
     properties:
       refresh_token:
@@ -792,6 +1148,13 @@ definitions:
       login:
         type: string
       nome:
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
         type: string
     type: object
 host: localhost:8080
@@ -2368,6 +2731,446 @@ paths:
       summary: Atualiza um limite de crédito
       tags:
       - EntidadeLimiteCredito
+  /produto-grupos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de grupos de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      - description: Filtrar por visibilidade no PDV (1=Sim, 2=Não)
+        in: query
+        name: visivel_frente_caixa
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoListResponse'
+      summary: Lista os grupos de produto
+      tags:
+      - Produto - Grupos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo grupo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o grupo de produto
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo grupo de produto
+      tags:
+      - Produto - Grupos
+  /produto-grupos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um grupo de produto.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um grupo de produto
+      tags:
+      - Produto - Grupos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um grupo de produto específico.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "404":
+          description: Grupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um grupo de produto por ID
+      tags:
+      - Produto - Grupos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um grupo de produto existente.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o grupo de produto
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Grupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um grupo de produto
+      tags:
+      - Produto - Grupos
+  /produto-subgrupos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de subgrupos de produto, com suporte
+        a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoListResponse'
+      summary: Lista os subgrupos de produto
+      tags:
+      - Produto - Subgrupos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo subgrupo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o subgrupo de produto
+        in: body
+        name: subgrupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+  /produto-subgrupos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um subgrupo de produto.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um subgrupo de produto específico.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "404":
+          description: Subgrupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um subgrupo de produto por ID
+      tags:
+      - Produto - Subgrupos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um subgrupo de produto existente.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o subgrupo de produto
+        in: body
+        name: subgrupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Subgrupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+  /produtos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de produtos, com suporte a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por nome
+        in: query
+        name: nome
+        type: string
+      - description: Filtrar por código
+        in: query
+        name: codigo
+        type: integer
+      - description: Filtrar por referência
+        in: query
+        name: referencia
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoListResponse'
+      summary: Lista os produtos
+      tags:
+      - Produtos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o produto
+        in: body
+        name: produto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo produto
+      tags:
+      - Produtos
+  /produtos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um produto.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um produto
+      tags:
+      - Produtos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um produto específico.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoResponse'
+        "404":
+          description: Produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um produto por ID
+      tags:
+      - Produtos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um produto existente.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o produto
+        in: body
+        name: produto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um produto
+      tags:
+      - Produtos
 schemes:
 - http
 - https

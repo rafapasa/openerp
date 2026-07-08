@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -93,4 +95,126 @@ func CleanString(value string) string {
 	// Remove múltiplos espaços
 	re := regexp.MustCompile(`\s+`)
 	return re.ReplaceAllString(value, " ")
+}
+
+func ValidateMandatoryFields(structure any) error {
+	mandatoryFields := GetMandatoryFields(structure)
+	v := reflect.ValueOf(structure)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	for _, fieldName := range mandatoryFields {
+		field := v.FieldByName(fieldName)
+		if !field.IsValid() {
+			return fmt.Errorf("Campo obrigatório %s não encontrado na estrutura", fieldName)
+		}
+		if isEmptyValue(field) {
+			return fmt.Errorf("Campo obrigatório %s está vazio", fieldName)
+		}
+	}
+	return nil
+}
+
+func isEmptyValue(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.String:
+		return v.Len() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Ptr:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
+// GetMandatoryFields retorna uma lista de campos obrigatórios baseado no tipo (não ponteiro)
+// e também respeita a tag `mandatory:"true"` ou `binding:"required"`
+func GetMandatoryFields(structure any) []string {
+	var fields []string
+	v := reflect.ValueOf(structure)
+
+	// Se for ponteiro, obtém o valor apontado
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	// Se não for struct, retorna vazio
+	if v.Kind() != reflect.Struct {
+		return fields
+	}
+
+	t := v.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		fieldValue := v.Field(i)
+
+		// Verifica se o campo é obrigatório
+		if isFieldMandatory(field, fieldValue) {
+			fields = append(fields, field.Name)
+		}
+	}
+
+	return fields
+}
+
+func isFieldMandatory(field reflect.StructField, fieldValue reflect.Value) bool {
+	// 1. Verifica tag `mandatory:"true"`
+	if tag := field.Tag.Get("mandatory"); tag == "true" {
+		return true
+	}
+
+	// 2. Verifica tag `binding:"required"`
+	if tag := field.Tag.Get("binding"); strings.Contains(tag, "required") {
+		return true
+	}
+
+	// 3. Verifica tag `validate:"required"`
+	if tag := field.Tag.Get("validate"); strings.Contains(tag, "required") {
+		return true
+	}
+
+	// 4. Verifica pelo tipo (não ponteiro)
+	return isFieldMandatoryByType(fieldValue)
+}
+
+// isFieldMandatoryByType verifica se o campo é obrigatório baseado no tipo
+func isFieldMandatoryByType(fieldValue reflect.Value) bool {
+	// Campos que são ponteiros são opcionais
+	if fieldValue.Kind() == reflect.Ptr {
+		return false
+	}
+
+	// Campos que são interfaces são opcionais
+	if fieldValue.Kind() == reflect.Interface {
+		return false
+	}
+
+	// Campos que são slices, maps, arrays são opcionais (podem ser vazios)
+	if fieldValue.Kind() == reflect.Slice ||
+		fieldValue.Kind() == reflect.Map ||
+		fieldValue.Kind() == reflect.Array {
+		return false
+	}
+
+	// Tipos básicos são obrigatórios (não ponteiros)
+	switch fieldValue.Kind() {
+	case reflect.String,
+		reflect.Bool,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64,
+		reflect.Struct:
+		return true
+	default:
+		return false
+	}
 }

@@ -1,5 +1,7 @@
 package constants
 
+import "fmt"
+
 // ============================================================
 // CONSTANTES DE SITUAÇÃO (Status)
 // ============================================================
@@ -73,6 +75,13 @@ func (s Status) IsBlocked() bool {
 // IsCanceled verifica se o status é cancelado
 func (s Status) IsCanceled() bool {
 	return s == StatusCancelado
+}
+
+func (s Status) IsValid() error {
+	if s == StatusAtivo || s == StatusInativo || s == StatusBloqueado || s == StatusCancelado {
+		return nil
+	}
+	return fmt.Errorf("status inválido: %d. Valores válidos são 1 (Ativo), 2 (Inativo), 3 (Bloqueado), 9 (Cancelado)", s)
 }
 
 // ============================================================
@@ -477,3 +486,30 @@ func ModelosFiscaisPapel() []string {
 		MDFCodigo08,
 	}
 }
+
+type SimNao int
+
+const (
+	SimNaoSim SimNao = 1
+	SimNaoNao SimNao = 0
+)
+
+func (s SimNao) String() string {
+	switch s {
+	case SimNaoSim:
+		return "Sim"
+	case SimNaoNao:
+		return "Não"
+	default:
+		return "Desconhecido"
+	}
+}
+
+func (s SimNao) IsValid() error {
+	if s == SimNaoSim || s == SimNaoNao {
+		return nil
+	}
+	return fmt.Errorf("valor inválido: %d. Valores válidos são 0 (Não) ou 1 (Sim)", s)
+}
+
+// ==

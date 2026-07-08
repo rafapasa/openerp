@@ -36,41 +36,50 @@ func main() {
 	defer db.Close()
 	log.Println("✅ Conectado ao banco de dados!")
 
-	// 3. Inicializar serviços
+	// 4. Inicializar serviços
 	authService := service.NewAuthService(db.GetDB(), cfg)
 	entidadeService := service.NewEntidadeService(db.GetDB())
 	entidadeEnderecoService := service.NewEntidadeEnderecoService(db.GetDB())
 	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
 	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
 	entidadeRegimeTributarioService := service.NewEntidadeRegimeTributarioService(db.GetDB())
-	limiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
+	entidadeLimiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
 	// Futuros serviços:
 	produtoService := service.NewProdutoService(db.GetDB())
+	produtoGrupoService := service.NewProdutoGrupoService(db.GetDB())
+	produtoSubGrupoService := service.NewProdutoSubgrupoService(db.GetDB())
 	// pedidoService := service.NewPedidoService(db.GetDB())
 
-	// 4. Inicializar handlers
+	// 5. Inicializar handlers
 	authHandler := handler.NewAuthHandler(authService)
 	entidadeHandler := handler.NewEntidadeHandler(entidadeService)
 	entidadeEnderecoHandler := handler.NewEntidadeEnderecoHandler(entidadeEnderecoService)
 	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
 	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
 	entidadeRegimeTributarioHandler := handler.NewEntidadeRegimeTributarioHandler(entidadeRegimeTributarioService)
-	limiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(limiteCreditoService)
+	entidadelimiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(entidadeLimiteCreditoService)
+
 	// Futuros handlers:
 	produtoHandler := handler.NewProdutoHandler(produtoService)
+	produtoGrupoHandler := handler.NewProdutoGrupoHandler(produtoGrupoService)
+	produtoSubGrupoHandler := handler.NewProdutoSubgrupoHandler(produtoSubGrupoService)
+
 	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
 
 	// 5. Configurar router
-	router := setupRouter(cfg, 
-		db, 
-		authHandler, 
-		entidadeHandler, 
-		entidadeEnderecoHandler, 
-		entidadeContatoHandler, 
-		entidadeDocumentoHandler, 
-		entidadeRegimeTributarioHandler, 
-		limiteCreditoHandler, 
-		produtoHandler)
+	router := setupRouter(cfg,
+		db,
+		authHandler,
+		entidadeHandler,
+		entidadeEnderecoHandler,
+		entidadeContatoHandler,
+		entidadeDocumentoHandler,
+		entidadeRegimeTributarioHandler,
+		entidadelimiteCreditoHandler,
+		produtoHandler,
+		produtoGrupoHandler,
+		produtoSubGrupoHandler,
+	)
 
 	// 6. Iniciar servidor
 	port := cfg.APIPort
@@ -90,8 +99,10 @@ func setupRouter(
 	entidadeContatoHandler *handler.EntidadeContatoHandler,
 	entidadeDocumentoHandler *handler.EntidadeDocumentoHandler,
 	entidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler,
-	limiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
+	entidadeLimiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
 	produtoHandler *handler.ProdutoHandler,
+	produtoGrupoHandler *handler.ProdutoGrupoHandler,
+	produtoSubgrupoHandler *handler.ProdutoSubgrupoHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
@@ -119,13 +130,11 @@ func setupRouter(
 		EntidadeContatoHandler:          entidadeContatoHandler,
 		EntidadeDocumentoHandler:        entidadeDocumentoHandler,
 		EntidadeRegimeTributarioHandler: entidadeRegimeTributarioHandler,
-		LimiteCreditoHandler:            limiteCreditoHandler,
-		// Futuros handlers...
-		ProdutoHandler: produtoHandler,
-		// PedidoHandler:  pedidoHandler,
-
-		// Configurações
-		JWTSecret: cfg.JWTSecret,
+		EntidadeLimiteCreditoHandler:    entidadeLimiteCreditoHandler,
+		ProdutoHandler:                  produtoHandler,
+		ProdutoGrupoHandler:             produtoGrupoHandler,
+		ProdutoSubgrupoHandler:          produtoSubgrupoHandler,
+		JWTSecret:                       cfg.JWTSecret,
 	})
 
 	return router

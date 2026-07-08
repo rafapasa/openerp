@@ -1,0 +1,16 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API do sistema OpenERP.",
+        "title": "OpenERP API",
+        "contact": {},
+        "version": "0.1a"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {}
+}

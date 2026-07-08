@@ -8,7 +8,8 @@ import (
 func RegisterProdutoRoutes(router *gin.RouterGroup, produtoHandler *handler.ProdutoHandler) {
 	produtos := router.Group("/produtos")
 	{
-		produtos.POST("/", produtoHandler.Create)
+		produtos.POST("", produtoHandler.Create)
+		produtos.GET("", produtoHandler.List)
 		produtos.GET("/:id", produtoHandler.GetByID)
 		produtos.PUT("/:id", produtoHandler.Update)
 		produtos.DELETE("/:id", produtoHandler.Delete)

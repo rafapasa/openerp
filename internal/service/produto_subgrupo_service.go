@@ -1,0 +1,118 @@
+package service
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/openerp/backend/internal/dto"
+	"github.com/openerp/backend/internal/models"
+	"github.com/openerp/backend/internal/repository"
+	"gorm.io/gorm"
+)
+
+// ============================================================
+// TYPES
+// ============================================================
+
+type ProdutoSubgrupoService struct {
+	repo *repository.ProdutoSubgrupoRepository
+}
+
+// ============================================================
+// CONSTRUCTOR
+// ============================================================
+
+func NewProdutoSubgrupoService(db *gorm.DB) *ProdutoSubgrupoService {
+	return &ProdutoSubgrupoService{
+		repo: repository.NewProdutoSubgrupoRepository(db),
+	}
+}
+
+// ============================================================
+// MÉTODOS PRINCIPAIS (CRUD)
+// ============================================================
+
+// Create cria um novo subgrupo de produto.
+func (s *ProdutoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	descricao := strings.TrimSpace(req.Descricao)
+	exists, err := s.repo.ExistsByDescricao(descricao, 0)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+	}
+	if exists {
+		return nil, errors.New("já existe um subgrupo de produto com esta descrição")
+	}
+
+	subgrupo, err := req.ToModel()
+	if err != nil {
+		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+	}
+
+	if err := s.repo.Create(subgrupo); err != nil {
+		return nil, fmt.Errorf("erro ao criar subgrupo de produto: %w", err)
+	}
+
+	return subgrupo, nil
+}
+
+// GetByID busca um subgrupo de produto por ID.
+func (s *ProdutoSubgrupoService) GetByID(id int) (*models.ProdutoSubgrupo, error) {
+	return s.repo.FindByID(id)
+}
+
+// Update atualiza um subgrupo de produto.
+func (s *ProdutoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+	subgrupo, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	descricao := strings.TrimSpace(req.Descricao)
+	exists, err := s.repo.ExistsByDescricao(descricao, id)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+	}
+	if exists {
+		return nil, errors.New("já existe um subgrupo de produto com esta descrição")
+	}
+
+	subgrupo.Descricao = descricao
+	subgrupo.Situacao = req.Situacao
+	subgrupo.UpdatedBy = req.UpdatedBy
+
+	if err := s.repo.Update(id, subgrupo); err != nil {
+		return nil, fmt.Errorf("erro ao atualizar subgrupo de produto: %w", err)
+	}
+
+	return subgrupo, nil
+}
+
+// Delete exclui um subgrupo de produto.
+func (s *ProdutoSubgrupoService) Delete(id int) error {
+	if _, err := s.repo.FindByID(id); err != nil {
+		return err
+	}
+
+	// TODO: Adicionar verificação se o subgrupo está em uso por algum produto.
+	// count, err := s.produtoRepo.CountBySubgrupo(id)
+	// if err != nil { return err }
+	// if count > 0 { return errors.New("subgrupo em uso e não pode ser excluído") }
+
+	return s.repo.Delete(id)
+}
+
+// List lista todos os subgrupos de produto.
+func (s *ProdutoSubgrupoService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	return s.repo.List(limit, offset, filters)
+}

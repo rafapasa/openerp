@@ -14,6 +14,7 @@ func RegisterEntidadeRoutes(
 	contatoHandler *handler.EntidadeContatoHandler,
 	documentoHandler *handler.EntidadeDocumentoHandler,
 	regimeHandler *handler.EntidadeRegimeTributarioHandler,
+	limiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
 ) {
 	entidades := router.Group("/entidades")
 	{
@@ -58,11 +59,12 @@ func RegisterEntidadeRoutes(
 			documentos.DELETE("/:item", documentoHandler.Delete)
 			documentos.GET("/:item/download", documentoHandler.Download) // Download do arquivo
 		}
-		
+
 		// ============================================================
 		// SUB-RECURSOS: REGIMES TRIBUTÁRIOS
 		// ============================================================
 		RegisterEntidadeRegimeTributarioRoutes(entidades, regimeHandler)
+		RegisterEntidadeLimiteCreditoRoutes(entidades, limiteCreditoHandler) // Limites de crédito
 
 		// ============================================================
 		// ROTAS PRINCIPAIS (mais genéricas, por último)

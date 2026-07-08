@@ -8,6 +8,7 @@ package dto
 import (
 	"github.com/go-playground/validator/v10"
 
+	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 )
@@ -132,10 +133,10 @@ func (r *TipoProdutoResponse) FromModel(tipoProduto *models.TipoProduto) *TipoPr
 	}
 
 	// 2. Preencher campos calculados (labels)
-	r.ValidarFornecedorLabel = getSimNaoLabel(tipoProduto.ValidarFornecedor)
-	r.MovimentaEstoqueLabel = getSimNaoLabel(tipoProduto.MovimentaEstoque)
-	r.ProdutoPacoteLabel = getSimNaoLabel(tipoProduto.ProdutoPacote)
-	r.CombustivelLabel = getSimNaoLabel(tipoProduto.Combustivel)
+	r.ValidarFornecedorLabel = constants.SimNao(tipoProduto.ValidarFornecedor).String()
+	r.MovimentaEstoqueLabel = constants.SimNao(tipoProduto.MovimentaEstoque).String()
+	r.ProdutoPacoteLabel = constants.SimNao(tipoProduto.ProdutoPacote).String()
+	r.CombustivelLabel = constants.SimNao(tipoProduto.Combustivel).String()
 
 	// 3. Formatar datas (o mapper não faz isso)
 	r.CreatedAt = utils.FormatDateTime(tipoProduto.CreatedAt)
@@ -165,32 +166,16 @@ func (r *TipoProdutoResponse) fromModelFallback(tipoProduto *models.TipoProduto)
 	r.UpdatedBy = tipoProduto.UpdatedBy
 
 	// Labels
-	r.ValidarFornecedorLabel = getSimNaoLabel(tipoProduto.ValidarFornecedor)
-	r.MovimentaEstoqueLabel = getSimNaoLabel(tipoProduto.MovimentaEstoque)
-	r.ProdutoPacoteLabel = getSimNaoLabel(tipoProduto.ProdutoPacote)
-	r.CombustivelLabel = getSimNaoLabel(tipoProduto.Combustivel)
+	r.ValidarFornecedorLabel = constants.SimNao(tipoProduto.ValidarFornecedor).String()
+	r.MovimentaEstoqueLabel = constants.SimNao(tipoProduto.MovimentaEstoque).String()
+	r.ProdutoPacoteLabel = constants.SimNao(tipoProduto.ProdutoPacote).String()
+	r.CombustivelLabel = constants.SimNao(tipoProduto.Combustivel).String()
 
 	// Datas
 	r.CreatedAt = utils.FormatDateTime(tipoProduto.CreatedAt)
 	r.UpdatedAt = utils.FormatDateTime(tipoProduto.UpdatedAt)
 
 	return r
-}
-
-// ============================================================
-// FUNÇÕES AUXILIARES
-// ============================================================
-
-// getSimNaoLabel retorna o label para campos booleanos (0/1)
-func getSimNaoLabel(valor int) string {
-	switch valor {
-	case 1:
-		return "Sim"
-	case 0:
-		return "Não"
-	default:
-		return "Não"
-	}
 }
 
 // ============================================================
