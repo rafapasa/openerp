@@ -869,6 +869,94 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.ProdutoMarcaListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoMarcaRequest:
+    properties:
+      descricao:
+        maxLength: 255
+        type: string
+      situacao:
+        type: integer
+    required:
+    - descricao
+    type: object
+  dto.ProdutoMarcaResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      id:
+        type: integer
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.ProdutoModeloListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoModeloResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoModeloRequest:
+    properties:
+      descricao:
+        maxLength: 255
+        type: string
+      situacao:
+        type: integer
+    required:
+    - descricao
+    type: object
+  dto.ProdutoModeloResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      id:
+        type: integer
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
   dto.ProdutoRequest:
     properties:
       altura:
@@ -2878,6 +2966,292 @@ paths:
       summary: Atualiza um grupo de produto
       tags:
       - Produto - Grupos
+  /produto-marcas:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de marcas de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaListResponse'
+      summary: Lista as marcas de produto
+      tags:
+      - Produto - Marcas
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova marca de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar a marca de produto
+        in: body
+        name: marca
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria uma nova marca de produto
+      tags:
+      - Produto - Marcas
+  /produto-marcas/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de uma marca de produto.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui uma marca de produto
+      tags:
+      - Produto - Marcas
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de uma marca de produto específica.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "404":
+          description: Marca de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca uma marca de produto por ID
+      tags:
+      - Produto - Marcas
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma marca de produto existente.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar a marca de produto
+        in: body
+        name: marca
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Marca de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza uma marca de produto
+      tags:
+      - Produto - Marcas
+  /produto-modelos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de modelos de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloListResponse'
+      summary: Lista os modelos de produto
+      tags:
+      - Produto - Modelos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo modelo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o modelo de produto
+        in: body
+        name: modelo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoModeloRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo modelo de produto
+      tags:
+      - Produto - Modelos
+  /produto-modelos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um modelo de produto.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um modelo de produto
+      tags:
+      - Produto - Modelos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um modelo de produto específico.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "404":
+          description: Modelo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um modelo de produto por ID
+      tags:
+      - Produto - Modelos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um modelo de produto existente.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o modelo de produto
+        in: body
+        name: modelo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoModeloRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Modelo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um modelo de produto
+      tags:
+      - Produto - Modelos
   /produto-subgrupos:
     get:
       consumes:

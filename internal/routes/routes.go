@@ -22,6 +22,8 @@ type RouteConfig struct {
 	ProdutoHandler                  *handler.ProdutoHandler
 	ProdutoGrupoHandler             *handler.ProdutoGrupoHandler
 	ProdutoSubgrupoHandler          *handler.ProdutoSubgrupoHandler
+	ProdutoMarcaHandler             *handler.ProdutoMarcaHandler
+	ProdutoModeloHandler            *handler.ProdutoModeloHandler
 	EntidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler
 	EntidadeLimiteCreditoHandler    *handler.EntidadeLimiteCreditoHandler
 	JWTSecret                       string
@@ -75,6 +77,8 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 	RegisterProdutoRoutes(api, cfg.ProdutoHandler)
 	RegisterProdutoGrupoRoutes(api, cfg.ProdutoGrupoHandler)
 	RegisterProdutoSubgrupoRoutes(api, cfg.ProdutoSubgrupoHandler)
+	RegisterProdutoMarcaRoutes(api, cfg.ProdutoMarcaHandler)
+	RegisterProdutoModeloRoutes(api, cfg.ProdutoModeloHandler)
 	// RegisterPedidoRoutes(api, cfg.PedidoHandler)
 	// RegisterUsuarioRoutes(api, cfg.UsuarioHandler)
 }

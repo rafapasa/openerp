@@ -42,12 +42,14 @@ func main() {
 	entidadeEnderecoService := service.NewEntidadeEnderecoService(db.GetDB())
 	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
 	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
+	produtoMarcaService := service.NewProdutoMarcaService(db.GetDB())
+	produtoModeloService := service.NewProdutoModeloService(db.GetDB())
 	entidadeRegimeTributarioService := service.NewEntidadeRegimeTributarioService(db.GetDB())
 	entidadeLimiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
 	// Futuros serviços:
 	produtoService := service.NewProdutoService(db.GetDB())
 	produtoGrupoService := service.NewProdutoGrupoService(db.GetDB())
-	produtoSubGrupoService := service.NewProdutoSubgrupoService(db.GetDB())
+	produtoSubgrupoService := service.NewProdutoSubgrupoService(db.GetDB())
 	// pedidoService := service.NewPedidoService(db.GetDB())
 
 	// 5. Inicializar handlers
@@ -56,13 +58,15 @@ func main() {
 	entidadeEnderecoHandler := handler.NewEntidadeEnderecoHandler(entidadeEnderecoService)
 	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
 	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
+	produtoMarcaHandler := handler.NewProdutoMarcaHandler(produtoMarcaService)
+	produtoModeloHandler := handler.NewProdutoModeloHandler(produtoModeloService)
 	entidadeRegimeTributarioHandler := handler.NewEntidadeRegimeTributarioHandler(entidadeRegimeTributarioService)
 	entidadelimiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(entidadeLimiteCreditoService)
 
 	// Futuros handlers:
 	produtoHandler := handler.NewProdutoHandler(produtoService)
 	produtoGrupoHandler := handler.NewProdutoGrupoHandler(produtoGrupoService)
-	produtoSubGrupoHandler := handler.NewProdutoSubgrupoHandler(produtoSubGrupoService)
+	produtoSubgrupoHandler := handler.NewProdutoSubgrupoHandler(produtoSubgrupoService)
 
 	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
 
@@ -78,7 +82,9 @@ func main() {
 		entidadelimiteCreditoHandler,
 		produtoHandler,
 		produtoGrupoHandler,
-		produtoSubGrupoHandler,
+		produtoSubgrupoHandler,
+		produtoMarcaHandler,
+		produtoModeloHandler,
 	)
 
 	// 6. Iniciar servidor
@@ -103,6 +109,8 @@ func setupRouter(
 	produtoHandler *handler.ProdutoHandler,
 	produtoGrupoHandler *handler.ProdutoGrupoHandler,
 	produtoSubgrupoHandler *handler.ProdutoSubgrupoHandler,
+	produtoMarcaHandler *handler.ProdutoMarcaHandler,
+	produtoModeloHandler *handler.ProdutoModeloHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
@@ -134,6 +142,8 @@ func setupRouter(
 		ProdutoHandler:                  produtoHandler,
 		ProdutoGrupoHandler:             produtoGrupoHandler,
 		ProdutoSubgrupoHandler:          produtoSubgrupoHandler,
+		ProdutoMarcaHandler:             produtoMarcaHandler,
+		ProdutoModeloHandler:            produtoModeloHandler,
 		JWTSecret:                       cfg.JWTSecret,
 	})
 
