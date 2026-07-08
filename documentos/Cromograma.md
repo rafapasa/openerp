@@ -1,5 +1,5 @@
 🚀 Cronograma de Desenvolvimento Sugerido
-Fase 1: Base e Infraestrutura (Dias 1-2)
+# Fase 1: Base e Infraestrutura (Dias 1-2)
 •	Configurar ambiente de desenvolvimento
 •	Criar estrutura de pastas
 •	Configurar conexão com MySQL

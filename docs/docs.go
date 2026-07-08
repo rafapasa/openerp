@@ -3536,6 +3536,221 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tabelas-preco": {
+            "get": {
+                "description": "Retorna uma lista paginada de tabelas de preço, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Lista as tabelas de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova tabela de preço com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Cria uma nova tabela de preço",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a tabela de preço",
+                        "name": "tabela",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tabelas-preco/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma tabela de preço específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Busca uma tabela de preço por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tabela de preço não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma tabela de preço existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Atualiza uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a tabela de preço",
+                        "name": "tabela",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tabela de preço não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma tabela de preço.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Exclui uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -5155,6 +5370,103 @@ const docTemplate = `{
                 },
                 "token_type": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.TabelaPrecoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TabelaPrecoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TabelaPrecoRequest": {
+            "type": "object",
+            "required": [
+                "data_inicio",
+                "descricao"
+            ],
+            "properties": {
+                "data_fim": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "data_inicio": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "percentual": {
+                    "type": "number"
+                },
+                "percentual_servico": {
+                    "type": "number"
+                },
+                "tipo": {
+                    "type": "integer"
+                },
+                "tipo_servico": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TabelaPrecoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "type": "string"
+                },
+                "data_inicio": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "percentual": {
+                    "type": "number"
+                },
+                "percentual_servico": {
+                    "type": "number"
+                },
+                "tipo": {
+                    "type": "integer"
+                },
+                "tipo_servico": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
                 }
             }
         },

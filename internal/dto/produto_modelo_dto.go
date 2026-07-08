@@ -73,19 +73,9 @@ func (r *ProdutoModeloRequest) Validate() error {
 		return err
 	}
 
-	if err := validateSituacao(r.Situacao); err != nil {
+	if err := constants.Status(r.Situacao).IsValid(); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func validateSituacao(valor int) error {
-	if valor == 0 {
-		return nil // Opcional, será tratado como Ativo.
-	}
-	if err := constants.Status(valor).IsValid(); err != nil {
-		return err
-	}
 	return nil
 }
