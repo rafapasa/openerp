@@ -192,26 +192,6 @@ func (r *ProdutoGrupoResponse) fromModelFallback(grupo *models.ProdutoGrupo) *Pr
 }
 
 // ============================================================
-// FUNÇÕES AUXILIARES
-// ============================================================
-
-// getSituacaoLabel retorna o label da situação
-func getSituacaoLabel(valor int) string {
-	switch valor {
-	case 1:
-		return "Ativo"
-	case 2:
-		return "Inativo"
-	case 3:
-		return "Bloqueado"
-	case 9:
-		return "Cancelado"
-	default:
-		return "Desconhecido"
-	}
-}
-
-// ============================================================
 // MÉTODOS DE VALIDAÇÃO
 // ============================================================
 

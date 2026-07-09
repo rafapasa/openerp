@@ -45,6 +45,7 @@ func main() {
 	produtoMarcaService := service.NewProdutoMarcaService(db.GetDB())
 	produtoModeloService := service.NewProdutoModeloService(db.GetDB())
 	tabelaPrecoService := service.NewTabelaPrecoService(db.GetDB())
+	tabelaPrecoProdutoService := service.NewTabelaPrecoProdutoService(db.GetDB())
 	entidadeRegimeTributarioService := service.NewEntidadeRegimeTributarioService(db.GetDB())
 	entidadeLimiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
 	// Futuros serviços:
@@ -62,6 +63,7 @@ func main() {
 	produtoMarcaHandler := handler.NewProdutoMarcaHandler(produtoMarcaService)
 	produtoModeloHandler := handler.NewProdutoModeloHandler(produtoModeloService)
 	tabelaPrecoHandler := handler.NewTabelaPrecoHandler(tabelaPrecoService)
+	tabelaPrecoProdutoHandler := handler.NewTabelaPrecoProdutoHandler(tabelaPrecoProdutoService)
 	entidadeRegimeTributarioHandler := handler.NewEntidadeRegimeTributarioHandler(entidadeRegimeTributarioService)
 	entidadelimiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(entidadeLimiteCreditoService)
 
@@ -88,6 +90,7 @@ func main() {
 		produtoMarcaHandler,
 		produtoModeloHandler,
 		tabelaPrecoHandler,
+		tabelaPrecoProdutoHandler,
 	)
 
 	// 6. Iniciar servidor
@@ -115,6 +118,7 @@ func setupRouter(
 	produtoMarcaHandler *handler.ProdutoMarcaHandler,
 	produtoModeloHandler *handler.ProdutoModeloHandler,
 	tabelaPrecoHandler *handler.TabelaPrecoHandler,
+	tabelaPrecoProdutoHandler *handler.TabelaPrecoProdutoHandler,
 ) *gin.Engine {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
@@ -149,6 +153,7 @@ func setupRouter(
 		ProdutoMarcaHandler:             produtoMarcaHandler,
 		ProdutoModeloHandler:            produtoModeloHandler,
 		TabelaPrecoHandler:              tabelaPrecoHandler,
+		TabelaPrecoProdutoHandler:       tabelaPrecoProdutoHandler,
 		JWTSecret:                       cfg.JWTSecret,
 	})
 

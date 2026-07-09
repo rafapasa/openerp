@@ -22,7 +22,12 @@ func (r *TabelaPrecoRepository) Create(tabela *models.TabelaPreco) error {
 }
 
 func (r *TabelaPrecoRepository) Update(id int, tabela *models.TabelaPreco) error {
-	return r.db.Model(&models.TabelaPreco{}).Where("tbp_id = ?", id).Updates(tabela).Error
+	return r.db.
+		Omit("tabela_preco_produto").
+		Model(&models.TabelaPreco{}).
+		Where("tbp_id = ?", id).
+		Updates(tabela).
+		Error
 }
 
 func (r *TabelaPrecoRepository) Delete(id int) error {

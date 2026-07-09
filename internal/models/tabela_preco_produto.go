@@ -14,9 +14,9 @@ type TabelaPrecoProduto struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID                  int      `gorm:"column:tbpp_item;primaryKey;autoIncrement" json:"id"`
-	TabelaPrecoID       int      `gorm:"column:tbp_id;not null" json:"tabela_preco_id"`
-	ProdutoID           int      `gorm:"column:pro_id;not null" json:"produto_id"`
+	TabelaPrecoID       int      `gorm:"column:tbp_id;primaryKey;uniqueIndex:uk_tbp_pro,priority:1" json:"tabela_preco_id"`
+	Item                int      `gorm:"column:tbpp_item;primaryKey" json:"item"`
+	ProdutoID           int      `gorm:"column:pro_id;uniqueIndex:uk_tbp_pro,priority:2" json:"produto_id"`
 	ValorMinimo         float64  `gorm:"column:tbpp_valorminimo;type:decimal(15,4);not null" json:"valor_minimo"`
 	ValorPadrao         float64  `gorm:"column:tbpp_valorpadrao;type:decimal(15,4);not null" json:"valor_padrao"`
 	Situacao            int      `gorm:"column:tbpp_situacao;not null;default:1" json:"situacao"`

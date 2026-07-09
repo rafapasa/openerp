@@ -147,3 +147,7 @@ func GetQueryString(c *gin.Context, key string, defaultValue string) string {
 	}
 	return value
 }
+
+func CalculateTotalPages(total, limit int) int {
+	return (total + limit - 1) / limit
+}
