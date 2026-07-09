@@ -3751,6 +3751,244 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tabelas-preco/{tabela_id}/produtos": {
+            "get": {
+                "description": "Retorna uma lista paginada de produtos de uma tabela de preço.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Lista os produtos de uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "tabela_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome do produto",
+                        "name": "produto_nome",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adiciona um novo produto com seus valores a uma tabela de preço existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Adiciona um produto a uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "tabela_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do produto na tabela",
+                        "name": "produto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tabelas-preco/{tabela_id}/produtos/{item_id}": {
+            "get": {
+                "description": "Retorna os detalhes de um produto específico dentro de uma tabela de preço.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Busca um produto em uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "tabela_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Produto na Tabela)",
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um produto em uma tabela de preço.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Atualiza um produto em uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "tabela_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Produto na Tabela)",
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar",
+                        "name": "produto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TabelaPrecoProdutoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um produto de uma tabela de preço.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tabela de Preços"
+                ],
+                "summary": "Remove um produto de uma tabela de preço",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Tabela de Preço",
+                        "name": "tabela_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID do Item (Produto na Tabela)",
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -5393,6 +5631,118 @@ const docTemplate = `{
                 },
                 "total_pages": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.TabelaPrecoProdutoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TabelaPrecoProdutoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TabelaPrecoProdutoRequest": {
+            "type": "object",
+            "required": [
+                "produto_id",
+                "valor_minimo",
+                "valor_padrao"
+            ],
+            "properties": {
+                "margem_lucro": {
+                    "type": "number"
+                },
+                "perc_desconto_atacado": {
+                    "type": "number"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "quant_atacado": {
+                    "type": "number"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "valor_custo": {
+                    "type": "number"
+                },
+                "valor_minimo": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "valor_padrao": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "dto.TabelaPrecoProdutoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "item": {
+                    "type": "integer"
+                },
+                "margem_lucro": {
+                    "type": "number"
+                },
+                "perc_desconto_atacado": {
+                    "type": "number"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "produto_nome": {
+                    "type": "string"
+                },
+                "quant_atacado": {
+                    "type": "number"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                },
+                "valor_custo": {
+                    "type": "number"
+                },
+                "valor_minimo": {
+                    "type": "number"
+                },
+                "valor_padrao": {
+                    "type": "number"
                 }
             }
         },

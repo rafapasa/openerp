@@ -1236,6 +1236,81 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.TabelaPrecoProdutoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.TabelaPrecoProdutoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.TabelaPrecoProdutoRequest:
+    properties:
+      margem_lucro:
+        type: number
+      perc_desconto_atacado:
+        type: number
+      produto_id:
+        type: integer
+      quant_atacado:
+        type: number
+      situacao:
+        type: integer
+      valor_custo:
+        type: number
+      valor_minimo:
+        minimum: 0
+        type: number
+      valor_padrao:
+        minimum: 0
+        type: number
+    required:
+    - produto_id
+    - valor_minimo
+    - valor_padrao
+    type: object
+  dto.TabelaPrecoProdutoResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      item:
+        type: integer
+      margem_lucro:
+        type: number
+      perc_desconto_atacado:
+        type: number
+      produto_id:
+        type: integer
+      produto_nome:
+        type: string
+      quant_atacado:
+        type: number
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      tabela_preco_id:
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      valor_custo:
+        type: number
+      valor_minimo:
+        type: number
+      valor_padrao:
+        type: number
+    type: object
   dto.TabelaPrecoRequest:
     properties:
       data_fim:
@@ -3750,6 +3825,167 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Atualiza uma tabela de preço
+      tags:
+      - Produto - Tabela de Preços
+  /tabelas-preco/{tabela_id}/produtos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de produtos de uma tabela de preço.
+      parameters:
+      - description: ID da Tabela de Preço
+        in: path
+        name: tabela_id
+        required: true
+        type: integer
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por nome do produto
+        in: query
+        name: produto_nome
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TabelaPrecoProdutoListResponse'
+      summary: Lista os produtos de uma tabela de preço
+      tags:
+      - Produto - Tabela de Preços
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo produto com seus valores a uma tabela de preço
+        existente.
+      parameters:
+      - description: ID da Tabela de Preço
+        in: path
+        name: tabela_id
+        required: true
+        type: integer
+      - description: Dados do produto na tabela
+        in: body
+        name: produto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TabelaPrecoProdutoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.TabelaPrecoProdutoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Adiciona um produto a uma tabela de preço
+      tags:
+      - Produto - Tabela de Preços
+  /tabelas-preco/{tabela_id}/produtos/{item_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um produto de uma tabela de preço.
+      parameters:
+      - description: ID da Tabela de Preço
+        in: path
+        name: tabela_id
+        required: true
+        type: integer
+      - description: ID do Item (Produto na Tabela)
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Remove um produto de uma tabela de preço
+      tags:
+      - Produto - Tabela de Preços
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um produto específico dentro de uma tabela
+        de preço.
+      parameters:
+      - description: ID da Tabela de Preço
+        in: path
+        name: tabela_id
+        required: true
+        type: integer
+      - description: ID do Item (Produto na Tabela)
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TabelaPrecoProdutoResponse'
+        "404":
+          description: Item não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um produto em uma tabela de preço
+      tags:
+      - Produto - Tabela de Preços
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um produto em uma tabela de preço.
+      parameters:
+      - description: ID da Tabela de Preço
+        in: path
+        name: tabela_id
+        required: true
+        type: integer
+      - description: ID do Item (Produto na Tabela)
+        in: path
+        name: item_id
+        required: true
+        type: integer
+      - description: Dados para atualizar
+        in: body
+        name: produto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TabelaPrecoProdutoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TabelaPrecoProdutoResponse'
+        "400":
+          description: Erro de validação
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Item não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um produto em uma tabela de preço
       tags:
       - Produto - Tabela de Preços
 schemes:

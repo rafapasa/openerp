@@ -80,19 +80,19 @@ func (h *TabelaPrecoProdutoHandler) Create(c *gin.Context) {
 // @Failure      404        {object}  utils.ErrorResponse "Item não encontrado"
 // @Router       /tabelas-preco/{tabela_id}/produtos/{item_id} [get]
 func (h *TabelaPrecoProdutoHandler) GetByID(c *gin.Context) {
-	_, itemID, ok := h.getIDs(c)
+	tabelaID, item, ok := h.getIDs(c)
 	if !ok {
 		return
 	}
 
-	item, err := h.service.GetByID(itemID)
+	tabelaItem, err := h.service.GetByID(tabelaID, item)
 	if err != nil {
 		utils.RespondWithNotFoundError(c, err.Error())
 		return
 	}
 
 	var resp dto.TabelaPrecoProdutoResponse
-	resp.FromModel(item)
+	resp.FromModel(tabelaItem)
 	utils.RespondWithOK(c, resp)
 }
 
@@ -109,7 +109,7 @@ func (h *TabelaPrecoProdutoHandler) GetByID(c *gin.Context) {
 // @Failure      404        {object}  utils.ErrorResponse "Item não encontrado"
 // @Router       /tabelas-preco/{tabela_id}/produtos/{item_id} [put]
 func (h *TabelaPrecoProdutoHandler) Update(c *gin.Context) {
-	tabelaID, itemID, ok := h.getIDs(c)
+	tabelaID, item, ok := h.getIDs(c)
 	if !ok {
 		return
 	}
@@ -123,14 +123,14 @@ func (h *TabelaPrecoProdutoHandler) Update(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	req.UpdatedBy = &userID
 
-	item, err := h.service.Update(itemID, &req)
+	updateItem, err := h.service.Update(tabelaID, item, &req)
 	if err != nil {
 		utils.RespondWithValidationError(c, err.Error())
 		return
 	}
 
 	var resp dto.TabelaPrecoProdutoResponse
-	resp.FromModel(item)
+	resp.FromModel(updateItem)
 	utils.RespondWithOK(c, resp)
 }
 
@@ -145,12 +145,12 @@ func (h *TabelaPrecoProdutoHandler) Update(c *gin.Context) {
 // @Failure      400        {object}  utils.ErrorResponse "Erro ao excluir"
 // @Router       /tabelas-preco/{tabela_id}/produtos/{item_id} [delete]
 func (h *TabelaPrecoProdutoHandler) Delete(c *gin.Context) {
-	_, itemID, ok := h.getIDs(c)
+	tabelaID, item, ok := h.getIDs(c)
 	if !ok {
 		return
 	}
 
-	if err := h.service.Delete(itemID); err != nil {
+	if err := h.service.Delete(tabelaID, item); err != nil {
 		utils.RespondWithValidationError(c, err.Error())
 		return
 	}

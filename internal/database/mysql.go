@@ -18,7 +18,7 @@ type MySQL struct {
 }
 
 // NewMySQL cria uma nova conexão com o MySQL
-func NewMySQL(cfg *config.Config) (*MySQL, error) {
+func NewMySQL(cfg *config.Config, dsn ...string) (*MySQL, error) {
 	// Configurar o logger do GORM
 	logLevel := logger.Silent
 	if cfg.APIEnv == "development" {
@@ -35,7 +35,7 @@ func NewMySQL(cfg *config.Config) (*MySQL, error) {
 	}
 
 	// Abrir conexão
-	db, err := gorm.Open(mysql.Open(cfg.GetDSN()), gormConfig)
+	db, err := gorm.Open(mysql.Open(getConnectionString(cfg, dsn...)), gormConfig)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao conectar ao banco de dados: %w", err)
 	}
@@ -60,6 +60,14 @@ func NewMySQL(cfg *config.Config) (*MySQL, error) {
 	log.Printf("📊 Database: %s @ %s:%s", cfg.DBName, cfg.DBHost, cfg.DBPort)
 
 	return &MySQL{DB: db}, nil
+}
+
+func getConnectionString(cfg *config.Config, dsn ...string) string {
+	if len(dsn) > 0 && dsn[0] != "" {
+		return dsn[0]
+	} else {
+		return cfg.GetDSN()
+	}
 }
 
 // Close fecha a conexão com o banco de dados

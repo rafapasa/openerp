@@ -56,16 +56,16 @@ func (s *TabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (
 		return nil, errors.New("este produto já foi adicionado a esta tabela de preço")
 	}
 
-	item, err := req.ToModel()
+	createItem, err := req.ToModel()
 	if err != nil {
 		return nil, fmt.Errorf("erro ao converter dados: %w", err)
 	}
 
-	if err := s.repo.Create(item); err != nil {
+	if err := s.repo.Create(createItem); err != nil {
 		return nil, fmt.Errorf("erro ao adicionar produto à tabela de preço: %w", err)
 	}
 
-	return s.repo.FindByID(item.ID)
+	return s.repo.FindByID(createItem.TabelaPrecoID, createItem.Item)
 }
 
 func (s *TabelaPrecoProdutoService) GetByID(id, item int) (*models.TabelaPrecoProduto, error) {
@@ -77,11 +77,11 @@ func (s *TabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoPro
 		return nil, err
 	}
 
-	itemTab, err := s.GetByID(id, item)
+	updatedItem, err := s.GetByID(id, item)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if err := s.validateDependencies(req.TabelaPrecoID, req.ProdutoID); err != nil {
 		return nil, err
 	}
@@ -93,27 +93,30 @@ func (s *TabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoPro
 	if exists {
 		return nil, errors.New("este produto já foi adicionado a esta tabela de preço")
 	}
-	
-	utils.MapToModel(req, itemTab)
 
-	updatedItem, err := req.ToModel()
+	err = utils.MapToModel(req, updatedItem)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao converter dados: %w", err)
 	}
-	updatedItem.ID = id // Garantir que o ID não seja alterado
 
-	if err := s.repo.Update(id, updatedItem); err != nil {
+	updatedItem.TabelaPrecoID = id // Garantir que o ID não seja alterado
+	updatedItem.Item = item        // Garantir que o ID não seja alterado
+
+	if err := s.repo.Update(id, item, updatedItem); err != nil {
 		return nil, fmt.Errorf("erro ao atualizar produto na tabela de preço: %w", err)
 	}
 
-	return s.repo.FindByID(id)
+	return s.repo.FindByID(id, item)
 }
 
-func (s *TabelaPrecoProdutoService) Delete(id int) error {
-	if _, err := s.repo.FindByID(id); err != nil {
-		return err
+func (s *TabelaPrecoProdutoService) Delete(id, item int) error {
+	if id == 0 {
+		return errors.New("ID da tabela de preço inválido")
 	}
-	return s.repo.Delete(id)
+	if item == 0 {
+		return errors.New("item inválido")
+	}
+	return s.repo.Delete(id, item)
 }
 
 func (s *TabelaPrecoProdutoService) List(tabelaPrecoID, limit, offset int, filters map[string]interface{}) ([]models.TabelaPrecoProduto, int64, error) {
