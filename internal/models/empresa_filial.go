@@ -63,7 +63,7 @@ type EmpresaFilial struct {
 	// RELACIONAMENTOS
 	// ============================================================
 	Empresa  *Empresa  `gorm:"foreignKey:EmpresaID;references:emp_id" json:"empresa,omitempty"`
-	Entidade *Entidade `gorm:"foreignKey:EntidadeID;references:ent_id" json:"entidade,omitempty"`
+	// Entidade *Entidade `gorm:"foreignKey:EntidadeID;references:ent_id" json:"entidade,omitempty"`
 }
 
 // ============================================================

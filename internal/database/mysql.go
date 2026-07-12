@@ -25,13 +25,16 @@ func NewMySQL(cfg *config.Config, dsn ...string) (*MySQL, error) {
 		logLevel = logger.Info
 	}
 
+	isTest := len(dsn) > 0 && dsn[0] != ""
+
 	gormConfig := &gorm.Config{
 		Logger: logger.Default.LogMode(logLevel),
 		NowFunc: func() time.Time {
 			return time.Now().Local()
 		},
-		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
+		SkipDefaultTransaction:                   true,
+		PrepareStmt:                              true,
+		DisableForeignKeyConstraintWhenMigrating: isTest,
 	}
 
 	// Abrir conexão

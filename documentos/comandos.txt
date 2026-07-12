@@ -63,3 +63,6 @@ git log --oneline
 
 # Verificar se o .gitignore está funcionando
 git status --ignored    
+
+#testes
+go test -v ./internal/handler/ -run TestEntidadeSuite

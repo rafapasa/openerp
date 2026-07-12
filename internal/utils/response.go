@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	apperrors "github.com/openerp/backend/internal/erros"
 )
 
 // ============================================================
@@ -150,4 +151,35 @@ func GetQueryString(c *gin.Context, key string, defaultValue string) string {
 
 func CalculateTotalPages(total, limit int) int {
 	return (total + limit - 1) / limit
+}
+
+// RespondWithAppError envia uma resposta baseada no AppError
+func RespondWithAppError(c *gin.Context, err *apperrors.AppError) {
+	switch err.Code {
+	case http.StatusBadRequest:
+		RespondWithValidationError(c, err.Message)
+	case http.StatusConflict:
+		RespondWithConflictError(c, err.Message)
+	case http.StatusNotFound:
+		RespondWithNotFoundError(c, err.Message)
+	case http.StatusInternalServerError:
+		RespondWithInternalError(c, err.Message)
+	case http.StatusUnauthorized:
+		RespondWithUnauthorizedError(c, err.Message)
+	case http.StatusForbidden:
+		RespondWithForbiddenError(c, err.Message)
+	default:
+		// Caso não mapeado, responde com o código genérico
+		RespondWithError(c, err.Code, "error", err.Message)
+	}
+}
+
+// RespondWithErrorAny responde com qualquer erro, extraindo o código se for AppError
+func RespondWithErrorAny(c *gin.Context, err error) {
+	if appErr, ok := err.(*apperrors.AppError); ok {
+		RespondWithAppError(c, appErr)
+		return
+	}
+	// Fallback para erro interno
+	RespondWithInternalError(c, err.Error())
 }

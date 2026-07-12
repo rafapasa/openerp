@@ -24,41 +24,41 @@ type EntidadeRequest struct {
 	TabelaPrecoID      *int                 `json:"tabela_preco_id,omitempty"`
 	TabelaDescontoID   *int                 `json:"tabela_desconto_id,omitempty"`
 	HorarioID          *int                 `json:"horario_id,omitempty"`
-	Codigo             int                  `json:"codigo,omitempty"`
+	Codigo             *int                 `json:"codigo,omitempty"`
 	TipoPessoa         constants.TipoPessoa `json:"tipo_pessoa" binding:"required,min=1,max=2"`
 	RazaoSocial        string               `json:"razao_social" binding:"required"`
 	NomeFantasia       string               `json:"nome_fantasia,omitempty"`
 	InscricaoFederal   string               `json:"inscricao_federal" binding:"required"`
-	InscricaoEstadual  string               `json:"inscricao_estadual,omitempty"`
-	InscricaoProdutor  string               `json:"inscricao_produtor,omitempty"`
-	InscricaoMunicipal string               `json:"inscricao_municipal,omitempty"`
-	Suframa            string               `json:"suframa,omitempty"`
+	InscricaoEstadual  *string              `json:"inscricao_estadual,omitempty"`
+	InscricaoProdutor  *string              `json:"inscricao_produtor,omitempty"`
+	InscricaoMunicipal *string              `json:"inscricao_municipal,omitempty"`
+	Suframa            *string              `json:"suframa,omitempty"`
 	Situacao           constants.Status     `json:"situacao,omitempty"`
-	Classificacao      int                  `json:"classificacao,omitempty"`
-	Observacao         string               `json:"observacao,omitempty"`
+	Classificacao      *int                 `json:"classificacao,omitempty"`
+	Observacao         *string              `json:"observacao,omitempty"`
 
 	// ============================================================
 	// DADOS PESSOAIS
 	// ============================================================
-	DataNascimento string         `json:"data_nascimento,omitempty"`
-	NomeDaMae      string         `json:"nome_da_mae,omitempty"`
-	NomeDoPai      string         `json:"nome_do_pai,omitempty"`
-	Sexo           constants.Sexo `json:"sexo,omitempty"`
-	CasaPropria    int            `json:"casa_propria,omitempty"`
-	EstadoCivil    int            `json:"estado_civil,omitempty"`
-	ConjujeNome    string         `json:"conjuje_nome,omitempty"`
-	ConjujeCPF     string         `json:"conjuje_cpf,omitempty"`
-	ConjujeRenda   float64        `json:"conjuje_renda,omitempty"`
-	ConjujeRG      string         `json:"conjuje_rg,omitempty"`
-	QuantFilhos    int            `json:"quant_filhos,omitempty"`
+	DataNascimento string          `json:"data_nascimento,omitempty"`
+	NomeDaMae      *string         `json:"nome_da_mae,omitempty"`
+	NomeDoPai      *string         `json:"nome_do_pai,omitempty"`
+	Sexo           *constants.Sexo `json:"sexo,omitempty"`
+	CasaPropria    *int            `json:"casa_propria,omitempty"`
+	EstadoCivil    *int            `json:"estado_civil,omitempty"`
+	ConjujeNome    *string         `json:"conjuje_nome,omitempty"`
+	ConjujeCPF     *string         `json:"conjuje_cpf,omitempty"`
+	ConjujeRenda   *float64        `json:"conjuje_renda,omitempty"`
+	ConjujeRG      *string         `json:"conjuje_rg,omitempty"`
+	QuantFilhos    *int            `json:"quant_filhos,omitempty"`
 
 	// ============================================================
 	// DADOS COMERCIAIS
 	// ============================================================
 	DataCadastro       time.Time `json:"data_cadastro,omitempty"`
-	PercentualComissao float64   `json:"percentual_comissao,omitempty"`
-	TaxaEntrega        float64   `json:"taxa_entrega,omitempty"`
-	ArquivoImpDDV      string    `json:"arquivo_imp_ddv,omitempty"`
+	PercentualComissao *float64  `json:"percentual_comissao,omitempty"`
+	TaxaEntrega        *float64  `json:"taxa_entrega,omitempty"`
+	ArquivoImpDDV      *string   `json:"arquivo_imp_ddv,omitempty"`
 
 	// ============================================================
 	// USUÁRIO (para auditoria)
@@ -82,45 +82,45 @@ type EntidadeResponse struct {
 	TabelaPrecoID      *int                 `json:"tabela_preco_id,omitempty"`
 	TabelaDescontoID   *int                 `json:"tabela_desconto_id,omitempty"`
 	HorarioID          *int                 `json:"horario_id,omitempty"`
-	Codigo             int                  `json:"codigo"`
+	Codigo             *int                 `json:"codigo"`
 	TipoPessoa         constants.TipoPessoa `json:"tipo_pessoa"`
 	TipoPessoaLabel    string               `json:"tipo_pessoa_label"`
 	RazaoSocial        string               `json:"razao_social"`
 	NomeFantasia       string               `json:"nome_fantasia,omitempty"`
 	InscricaoFederal   string               `json:"inscricao_federal"`
-	InscricaoEstadual  string               `json:"inscricao_estadual,omitempty"`
-	InscricaoProdutor  string               `json:"inscricao_produtor,omitempty"`
-	InscricaoMunicipal string               `json:"inscricao_municipal,omitempty"`
-	Suframa            string               `json:"suframa,omitempty"`
+	InscricaoEstadual  *string              `json:"inscricao_estadual,omitempty"`
+	InscricaoProdutor  *string              `json:"inscricao_produtor,omitempty"`
+	InscricaoMunicipal *string              `json:"inscricao_municipal,omitempty"`
+	Suframa            *string              `json:"suframa,omitempty"`
 	Situacao           constants.Status     `json:"situacao"`
 	SituacaoLabel      string               `json:"situacao_label"`
-	Classificacao      int                  `json:"classificacao,omitempty"`
-	Observacao         string               `json:"observacao,omitempty"`
+	Classificacao      *int                 `json:"classificacao,omitempty"`
+	Observacao         *string              `json:"observacao,omitempty"`
 
 	// ============================================================
 	// DADOS PESSOAIS
 	// ============================================================
-	DataNascimento   string         `json:"data_nascimento,omitempty"`
-	NomeDaMae        string         `json:"nome_da_mae,omitempty"`
-	NomeDoPai        string         `json:"nome_do_pai,omitempty"`
-	Sexo             constants.Sexo `json:"sexo,omitempty"`
-	SexoLabel        string         `json:"sexo_label,omitempty"`
-	CasaPropria      int            `json:"casa_propria,omitempty"`
-	EstadoCivil      int            `json:"estado_civil,omitempty"`
-	EstadoCivilLabel string         `json:"estado_civil_label,omitempty"`
-	ConjujeNome      string         `json:"conjuje_nome,omitempty"`
-	ConjujeCPF       string         `json:"conjuje_cpf,omitempty"`
-	ConjujeRenda     float64        `json:"conjuje_renda,omitempty"`
-	ConjujeRG        string         `json:"conjuje_rg,omitempty"`
-	QuantFilhos      int            `json:"quant_filhos,omitempty"`
+	DataNascimento   string          `json:"data_nascimento,omitempty"`
+	NomeDaMae        *string         `json:"nome_da_mae,omitempty"`
+	NomeDoPai        *string         `json:"nome_do_pai,omitempty"`
+	Sexo             *constants.Sexo `json:"sexo,omitempty"`
+	SexoLabel        *string         `json:"sexo_label,omitempty"`
+	CasaPropria      *int            `json:"casa_propria,omitempty"`
+	EstadoCivil      *int            `json:"estado_civil,omitempty"`
+	EstadoCivilLabel *string         `json:"estado_civil_label,omitempty"`
+	ConjujeNome      *string         `json:"conjuje_nome,omitempty"`
+	ConjujeCPF       *string         `json:"conjuje_cpf,omitempty"`
+	ConjujeRenda     *float64        `json:"conjuje_renda,omitempty"`
+	ConjujeRG        *string         `json:"conjuje_rg,omitempty"`
+	QuantFilhos      *int            `json:"quant_filhos,omitempty"`
 
 	// ============================================================
 	// DADOS COMERCIAIS
 	// ============================================================
-	DataCadastro       string  `json:"data_cadastro,omitempty"`
-	PercentualComissao float64 `json:"percentual_comissao,omitempty"`
-	TaxaEntrega        float64 `json:"taxa_entrega,omitempty"`
-	ArquivoImpDDV      string  `json:"arquivo_imp_ddv,omitempty"`
+	DataCadastro       *string  `json:"data_cadastro,omitempty"`
+	PercentualComissao *float64 `json:"percentual_comissao,omitempty"`
+	TaxaEntrega        *float64 `json:"taxa_entrega,omitempty"`
+	ArquivoImpDDV      *string  `json:"arquivo_imp_ddv,omitempty"`
 
 	// ============================================================
 	// AUDITORIA
@@ -157,6 +157,7 @@ func (r *EntidadeRequest) ToModel() (*models.Entidade, error) {
 	entidade := &models.Entidade{}
 
 	// 1. Usar o mapper para copiar campos (mapeamento automático)
+	// 1. Usar o mapper para copiar campos (mapeamento automático)
 	if err := utils.MapToModel(r, entidade); err != nil {
 		return nil, err
 	}
@@ -169,8 +170,8 @@ func (r *EntidadeRequest) ToModel() (*models.Entidade, error) {
 	entidade.InscricaoFederal = utils.LimparDocumento(r.InscricaoFederal)
 
 	// Converter Sexo (int → constants.Sexo)
-	if r.Sexo > 0 {
-		entidade.Sexo = r.Sexo
+	if r.Sexo != nil && *r.Sexo > 0 {
+		entidade.Sexo = *r.Sexo
 	}
 
 	// Converter Situacao (se não informada, definir como ativo)
@@ -178,6 +179,7 @@ func (r *EntidadeRequest) ToModel() (*models.Entidade, error) {
 		entidade.Situacao = constants.StatusAtivo
 	}
 
+	entidade.DataNascimento = nil
 	// Converter DataNascimento (se for uma data válida e não for o valor zero de time.Time)
 	if r.DataNascimento != "" {
 		if data, err := time.Parse("2006-01-02", r.DataNascimento); err == nil {
@@ -207,15 +209,21 @@ func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeRespons
 		return r.fromModelFallback(entidade)
 	}
 
+	if entidade.Codigo != nil {
+		r.Codigo = entidade.Codigo
+	}
+
 	// 2. Preencher campos calculados (labels)
 	r.TipoPessoaLabel = constants.TipoPessoa(r.TipoPessoa).String()
 	r.SituacaoLabel = constants.Status(r.Situacao).String()
 
-	if entidade.Sexo > 0 {
-		r.SexoLabel = constants.Sexo(r.Sexo).String()
+	if r.Sexo != nil && *r.Sexo > 0 {
+		r.SexoLabel = utils.StringPtr((*r.Sexo).String())
 	}
 
-	r.EstadoCivilLabel = getEstadoCivilLabel(r.EstadoCivil)
+	if r.EstadoCivil != nil {
+		r.EstadoCivilLabel = utils.StringPtr(getEstadoCivilLabel(*r.EstadoCivil))
+	}
 
 	// 3. Formatar datas (o mapper não faz isso)
 	r.CreatedAt = utils.FormatDateTime(entidade.CreatedAt)
@@ -226,7 +234,7 @@ func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeRespons
 	}
 
 	if entidade.DataCadastro != nil {
-		r.DataCadastro = utils.FormatDateTime(*entidade.DataCadastro)
+		r.DataCadastro = utils.StringPtr(utils.FormatDateTime(*entidade.DataCadastro))
 	}
 
 	return r
@@ -246,43 +254,47 @@ func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *Entidad
 	r.TabelaPrecoID = entidade.TabelaPrecoID
 	r.TabelaDescontoID = entidade.TabelaDescontoID
 	r.HorarioID = entidade.HorarioID
-	r.Codigo = entidade.Codigo
+	if entidade.Codigo != nil {
+		r.Codigo = entidade.Codigo
+	}
 	r.TipoPessoa = entidade.TipoPessoa
 	r.RazaoSocial = entidade.RazaoSocial
 	r.NomeFantasia = utils.StringValue(entidade.NomeFantasia)
 	r.InscricaoFederal = entidade.InscricaoFederal
-	r.InscricaoEstadual = utils.StringValue(entidade.InscricaoEstadual)
-	r.InscricaoProdutor = utils.StringValue(entidade.InscricaoProdutor)
-	r.InscricaoMunicipal = utils.StringValue(entidade.InscricaoMunicipal)
-	r.Suframa = utils.StringValue(entidade.Suframa)
+	r.InscricaoEstadual = entidade.InscricaoEstadual
+	r.InscricaoProdutor = entidade.InscricaoProdutor
+	r.InscricaoMunicipal = entidade.InscricaoMunicipal
+	r.Suframa = entidade.Suframa
 	r.Situacao = entidade.Situacao
-	r.Classificacao = utils.IntValue(entidade.Classificacao)
-	r.Observacao = utils.StringValue(entidade.Observacao)
-	r.NomeDaMae = utils.StringValue(entidade.NomeDaMae)
-	r.NomeDoPai = utils.StringValue(entidade.NomeDoPai)
+	r.Classificacao = entidade.Classificacao
+	r.Observacao = entidade.Observacao
+	r.NomeDaMae = entidade.NomeDaMae
+	r.NomeDoPai = entidade.NomeDoPai
 	if entidade.Sexo > 0 {
-		r.Sexo = entidade.Sexo
+		r.Sexo = &entidade.Sexo
 	}
-	r.CasaPropria = utils.IntValue(entidade.CasaPropria)
-	r.EstadoCivil = utils.IntValue(entidade.EstadoCivil)
-	r.ConjujeNome = utils.StringValue(entidade.ConjujeNome)
-	r.ConjujeCPF = utils.StringValue(entidade.ConjujeCPF)
-	r.ConjujeRenda = utils.Float64Value(entidade.ConjujeRenda)
-	r.ConjujeRG = utils.StringValue(entidade.ConjujeRG)
-	r.QuantFilhos = utils.IntValue(entidade.QuantFilhos)
-	r.PercentualComissao = utils.Float64Value(entidade.PercentualComissao)
-	r.TaxaEntrega = utils.Float64Value(entidade.TaxaEntrega)
-	r.ArquivoImpDDV = utils.StringValue(entidade.ArquivoImpDDV)
+	r.CasaPropria = entidade.CasaPropria
+	r.EstadoCivil = entidade.EstadoCivil
+	r.ConjujeNome = entidade.ConjujeNome
+	r.ConjujeCPF = entidade.ConjujeCPF
+	r.ConjujeRenda = entidade.ConjujeRenda
+	r.ConjujeRG = entidade.ConjujeRG
+	r.QuantFilhos = entidade.QuantFilhos
+	r.PercentualComissao = entidade.PercentualComissao
+	r.TaxaEntrega = entidade.TaxaEntrega
+	r.ArquivoImpDDV = entidade.ArquivoImpDDV
 	r.CreatedBy = entidade.CreatedBy
 	r.UpdatedBy = entidade.UpdatedBy
 
 	// Labels
 	r.TipoPessoaLabel = constants.TipoPessoa(entidade.TipoPessoa).String()
 	r.SituacaoLabel = constants.Status(entidade.Situacao).String()
-	if entidade.Sexo > 0 {
-		r.SexoLabel = constants.Sexo(entidade.Sexo).String()
+	if entidade.Sexo > 0 { // Check if Sexo is set
+		r.SexoLabel = utils.StringPtr(constants.Sexo(entidade.Sexo).String())
 	}
-	r.EstadoCivilLabel = getEstadoCivilLabel(r.EstadoCivil)
+	if r.EstadoCivil != nil { // Check if EstadoCivil is set
+		r.EstadoCivilLabel = utils.StringPtr(getEstadoCivilLabel(*r.EstadoCivil))
+	}
 
 	// Datas
 	r.CreatedAt = utils.FormatDateTime(entidade.CreatedAt)
@@ -291,7 +303,7 @@ func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *Entidad
 		r.DataNascimento = utils.FormatDate(*entidade.DataNascimento)
 	}
 	if entidade.DataCadastro != nil {
-		r.DataCadastro = utils.FormatDateTime(*entidade.DataCadastro)
+		r.DataCadastro = utils.StringPtr(utils.FormatDateTime(*entidade.DataCadastro))
 	}
 
 	return r

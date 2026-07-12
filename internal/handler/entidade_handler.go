@@ -63,7 +63,7 @@ func (h *EntidadeHandler) Create(c *gin.Context) {
 
 	entidade, err := h.service.Create(&req)
 	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 

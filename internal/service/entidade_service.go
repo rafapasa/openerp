@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -43,7 +43,7 @@ func NewEntidadeService(db *gorm.DB) *EntidadeService {
 // isDataValid realiza as validações básicas de uma entidade
 func (s *EntidadeService) isDataValid(req *dto.EntidadeRequest) error {
 	// 1. Validar campos obrigatórios
-	if err := s.validateRequiredFields(req); err != nil {
+	if err := utils.ValidateMandatoryFields(req); err != nil {
 		return err
 	}
 
@@ -65,41 +65,16 @@ func (s *EntidadeService) isDataValid(req *dto.EntidadeRequest) error {
 	return nil
 }
 
-// validateRequiredFields valida campos obrigatórios
-func (s *EntidadeService) validateRequiredFields(req *dto.EntidadeRequest) error {
-	if strings.TrimSpace(req.RazaoSocial) == "" {
-		return errors.New("nome/razão social é obrigatório")
-	}
-
-	if strings.TrimSpace(req.InscricaoFederal) == "" {
-		return errors.New("CPF/CNPJ é obrigatório")
-	}
-
-	// Campo obrigatório para CREATE (mas pode ser opcional no UPDATE)
-	// Por isso, deixamos essa validação separada
-	return nil
-}
-
 // validateFieldLengths valida o tamanho dos campos
 func (s *EntidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
 	// Nome / Razão Social
 	if len(req.RazaoSocial) > maxLengthRazaoSocial {
-		return fmt.Errorf("nome/razão social deve ter no máximo %d caracteres", maxLengthRazaoSocial)
+		return apperrors.NewValidationError(fmt.Sprintf("nome/razão social deve ter no máximo %d caracteres", maxLengthRazaoSocial))
 	}
 
 	// Nome Fantasia (se informado)
 	if len(req.NomeFantasia) > maxLengthNomeFantasia {
-		return fmt.Errorf("nome fantasia deve ter no máximo %d caracteres", maxLengthNomeFantasia)
-	}
-
-	// Inscrição Estadual (se informada)
-	if len(req.InscricaoEstadual) > maxLengthInscricao {
-		return fmt.Errorf("inscrição estadual deve ter no máximo %d caracteres", maxLengthInscricao)
-	}
-
-	// Inscrição Municipal (se informada)
-	if len(req.InscricaoMunicipal) > maxLengthInscricao {
-		return fmt.Errorf("inscrição municipal deve ter no máximo %d caracteres", maxLengthInscricao)
+		return apperrors.NewValidationError(fmt.Sprintf("nome fantasia deve ter no máximo %d caracteres", maxLengthNomeFantasia))
 	}
 
 	return nil
@@ -110,14 +85,9 @@ func (s *EntidadeService) validateDocument(req *dto.EntidadeRequest) error {
 	// Remover caracteres especiais para validação
 	documentoLimpo := utils.LimparDocumento(req.InscricaoFederal)
 
-	// Validar tamanho mínimo
-	if len(documentoLimpo) < minLengthDocumento {
-		return fmt.Errorf("documento deve ter pelo menos %d dígitos", minLengthDocumento)
-	}
-
 	// Validar formato (CPF ou CNPJ)
 	if !utils.IsValidDocumento(documentoLimpo) {
-		return errors.New("documento inválido, deve ser um CPF ou CNPJ válido")
+		return apperrors.NewValidationError("documento inválido, deve ser um CPF ou CNPJ válido")
 	}
 
 	return nil
@@ -127,19 +97,8 @@ func (s *EntidadeService) validateDocument(req *dto.EntidadeRequest) error {
 func (s *EntidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 	// Verificar se o tipo de pessoa é válido (1-Física, 2-Jurídica)
 	if req.TipoPessoa != 1 && req.TipoPessoa != 2 {
-		return errors.New("tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica)")
+		return apperrors.NewValidationError("tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica)")
 	}
-
-	// Validação adicional: se for pessoa física, validar CPF (11 dígitos)
-	// se for jurídica, validar CNPJ (14 dígitos)
-	documentoLimpo := utils.LimparDocumento(req.InscricaoFederal)
-	if req.TipoPessoa == 1 && len(documentoLimpo) != 11 {
-		return errors.New("CPF deve ter 11 dígitos para pessoa física")
-	}
-	if req.TipoPessoa == 2 && len(documentoLimpo) != 14 {
-		return errors.New("CNPJ deve ter 14 dígitos para pessoa jurídica")
-	}
-
 	return nil
 }
 
@@ -147,10 +106,10 @@ func (s *EntidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 func (s *EntidadeService) validateUniqueDocument(documento string, excludeID int) error {
 	existe, err := s.entidadeRepo.ExistsByDocumento(documento, excludeID)
 	if err != nil {
-		return fmt.Errorf("erro ao verificar duplicidade de documento: %w", err)
+		return apperrors.NewInternalError("erro ao verificar duplicidade de documento", err)
 	}
 	if existe {
-		return fmt.Errorf("documento %s já está cadastrado", documento)
+		return apperrors.NewConflictError(fmt.Sprintf("documento %s já está cadastrado", utils.LimparDocumento(documento)))
 	}
 	return nil
 }

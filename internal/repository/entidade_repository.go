@@ -3,10 +3,12 @@ package repository
 import (
 	"errors"
 
-	"gorm.io/gorm"
+	"fmt"
 
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
+	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -65,6 +67,20 @@ func (r *EntidadeRepository) Delete(id int) error {
 	return r.Update(id, entidade)
 }
 
+func (r *EntidadeRepository) GetByID(id int) (*models.Entidade, error) {
+	var entidade models.Entidade
+	result := r.db.
+		Where("ent_id = ?", id).
+		First(&entidade)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("Entidade com ID %d não encontrada", id))
+		}
+		return nil, apperrors.NewInternalError("Erro buscando entidade", result.Error)
+	}
+	return &entidade, nil
+}
+
 // ============================================================
 // MÉTODOS DE BUSCA
 // ============================================================
@@ -79,15 +95,15 @@ func (r *EntidadeRepository) FindByID(id int) (*models.Entidade, error) {
 		Preload("TabelaDesconto").
 		Preload("Horario").
 		Preload("Enderecos").
-		// Preload("Contatos").
-		// Preload("Documentos").
-		// Preload("Regimes").
+		Preload("Contatos").
+		Preload("Documentos").
+		Preload("Regimes").
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		First(&entidade).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("entidade não encontrada")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("entidade com ID %d não encontrada", id))
 		}
 		return nil, err
 	}
@@ -189,7 +205,7 @@ func (r *EntidadeRepository) ExistsByDocumento(documento string, excludeID int) 
 
 	query := r.db.
 		Model(&models.Entidade{}).
-		Where("ent_inscricaofederal = ? AND deleted_at IS NULL", documento)
+		Where("ent_inscricaofederal = ? AND deleted_at IS NULL", utils.LimparDocumento(documento))
 
 	if excludeID > 0 {
 		query = query.Where("ent_id != ?", excludeID)

@@ -21,7 +21,7 @@ type Entidade struct {
 	TabelaPrecoID      *int                 `gorm:"column:tbp_id" json:"tabela_preco_id,omitempty"`
 	TabelaDescontoID   *int                 `gorm:"column:tdesc_id" json:"tabela_desconto_id,omitempty"`
 	HorarioID          *int                 `gorm:"column:hor_id" json:"horario_id,omitempty"`
-	Codigo             int                  `gorm:"column:ent_codigo;not null;unique" json:"codigo"`
+	Codigo             *int                 `gorm:"column:ent_codigo" json:"codigo,omitempty"`
 	TipoPessoa         constants.TipoPessoa `gorm:"column:ent_tipopessoa;not null" json:"tipo_pessoa"`
 	RazaoSocial        string               `gorm:"column:ent_razaosocial;type:varchar(100);not null" json:"razao_social"`
 	NomeFantasia       *string              `gorm:"column:ent_nomefantasia;type:varchar(100)" json:"nome_fantasia,omitempty"`

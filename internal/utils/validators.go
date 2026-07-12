@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/paemuri/brdoc"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 )
 
 // ============================================================
@@ -107,10 +109,10 @@ func ValidateMandatoryFields(structure any) error {
 	for _, fieldName := range mandatoryFields {
 		field := v.FieldByName(fieldName)
 		if !field.IsValid() {
-			return fmt.Errorf("Campo obrigatório %s não encontrado na estrutura", fieldName)
+			return apperrors.NewValidationError(fmt.Sprintf("Campo obrigatório %s não encontrado na estrutura", fieldName))
 		}
 		if isEmptyValue(field) {
-			return fmt.Errorf("Campo obrigatório %s está vazio", fieldName)
+			return apperrors.NewValidationError(fmt.Sprintf("Campo obrigatório %s está vazio", fieldName))
 		}
 	}
 	return nil
