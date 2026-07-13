@@ -19,13 +19,21 @@ type MySQL struct {
 
 // NewMySQL cria uma nova conexão com o MySQL
 func NewMySQL(cfg *config.Config, dsn ...string) (*MySQL, error) {
-	// Configurar o logger do GORM
-	logLevel := logger.Silent
-	if cfg.APIEnv == "development" {
-		logLevel = logger.Info
-	}
-
 	isTest := len(dsn) > 0 && dsn[0] != ""
+
+	var logLevel logger.LogLevel
+	switch cfg.APIEnv {
+	case "development":
+		if isTest {
+			logLevel = logger.Warn
+		} else {
+			logLevel = logger.Info
+		}
+	case "production":
+		logLevel = logger.Error
+	default:
+		logLevel = logger.Silent
+	}
 
 	gormConfig := &gorm.Config{
 		Logger: logger.Default.LogMode(logLevel),
