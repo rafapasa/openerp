@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -22,6 +23,31 @@ type FilterConfig struct {
 // ============================================================
 // FUNÇÕES
 // ============================================================
+
+func QueryParamsToFilters(c *gin.Context) map[string]any {
+	filters := make(map[string]any)
+
+	// Parâmetros que não são campos do model
+	excludedParams := map[string]bool{
+		"limit":  true,
+		"offset": true,
+		"page":   true,
+		"sort":   true,
+		"order":  true,
+	}
+
+	for key, values := range c.Request.URL.Query() {
+		if len(values) == 0 {
+			continue
+		}
+		// Opcional: pular parâmetros de paginação/ordenação
+		if excludedParams[key] {
+			continue
+		}
+		filters[key] = values[0]
+	}
+	return filters
+}
 
 // ApplyFilters aplica filtros dinamicamente a uma query usando reflection
 func ApplyFilters(query *gorm.DB, model interface{}, filters map[string]interface{}) *gorm.DB {
@@ -195,7 +221,7 @@ type FilterBuilder struct {
 }
 
 // NewFilterBuilder cria um novo builder de filtros
-func NewFilterBuilder() *FilterBuilder {
+func NewFilterBuilder(c *gin.Context) *FilterBuilder {
 	return &FilterBuilder{
 		filters: make(map[string]interface{}),
 	}

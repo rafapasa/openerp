@@ -11,3 +11,6 @@ run:
 
 dev: swagger
 	air
+
+builder: 
+	go build -o ./bin/openerp_api.exe .\cmd\api\main.go	

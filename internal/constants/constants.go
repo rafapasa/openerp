@@ -512,4 +512,9 @@ func (s SimNao) IsValid() error {
 	return fmt.Errorf("valor inválido: %d. Valores válidos são 0 (Não) ou 1 (Sim)", s)
 }
 
-// ==
+// Constantes para Tipo de Entrega
+const (
+	TipoEntregaRetirada = "RETIRADA"
+	TipoEntregaEntrega  = "ENTREGA"
+	TipoEntregaLocal    = "LOCAL"
+)

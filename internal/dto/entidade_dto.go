@@ -266,6 +266,7 @@ func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *Entidad
 	r.InscricaoMunicipal = entidade.InscricaoMunicipal
 	r.Suframa = entidade.Suframa
 	r.Situacao = entidade.Situacao
+	r.Situacao = entidade.Situacao
 	r.Classificacao = entidade.Classificacao
 	r.Observacao = entidade.Observacao
 	r.NomeDaMae = entidade.NomeDaMae

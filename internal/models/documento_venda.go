@@ -3,26 +3,8 @@ package models
 import (
 	"time"
 
+	"github.com/openerp/backend/internal/constants"
 	"gorm.io/gorm"
-)
-
-// ============================================================
-// CONSTANTES
-// ============================================================
-
-// Constantes para Tipo de Entrega
-const (
-	TipoEntregaRetirada = "RETIRADA"
-	TipoEntregaEntrega  = "ENTREGA"
-	TipoEntregaLocal    = "LOCAL"
-)
-
-// Constantes para Situação do Pedido
-const (
-	SituacaoPedidoAberto      = 1
-	SituacaoPedidoEmAtividade = 2
-	SituacaoPedidoFechado     = 3
-	SituacaoPedidoCancelado   = 9
 )
 
 // ============================================================
@@ -44,14 +26,14 @@ type DocumentoVenda struct {
 	// ============================================================
 	// CAMPOS DO DOCUMENTO
 	// ============================================================
-	Numero        int        `gorm:"column:ddv_numero;not null" json:"numero"`
-	TipoDocumento int        `gorm:"column:ddv_tipodocumeto;not null" json:"tipo_documento"` // 1-Orçamento, 2-Pedido
-	TipoOperacao  int        `gorm:"column:ddv_tipooperacao;not null" json:"tipo_operacao"`  // 0-Entrada, 1-Saída
-	DataDocumento time.Time  `gorm:"column:ddv_datadocumento;type:date;not null" json:"data_documento"`
-	DataValidade  *time.Time `gorm:"column:ddv_datavalidade;type:date" json:"data_validade,omitempty"`
-	DataPrevisao  *time.Time `gorm:"column:ddv_dataprevisao;type:date" json:"data_previsao,omitempty"`
-	DataExpedicao *time.Time `gorm:"column:ddv_dataexpedicao;type:date" json:"data_expedicao,omitempty"`
-	Situacao      int        `gorm:"column:ddv_situacao;not null;default:1" json:"situacao"`
+	Numero        int                      `gorm:"column:ddv_numero;not null" json:"numero"`
+	TipoDocumento int                      `gorm:"column:ddv_tipodocumeto;not null" json:"tipo_documento"` // 1-Orçamento, 2-Pedido
+	TipoOperacao  int                      `gorm:"column:ddv_tipooperacao;not null" json:"tipo_operacao"`  // 0-Entrada, 1-Saída
+	DataDocumento time.Time                `gorm:"column:ddv_datadocumento;type:date;not null" json:"data_documento"`
+	DataValidade  *time.Time               `gorm:"column:ddv_datavalidade;type:date" json:"data_validade,omitempty"`
+	DataPrevisao  *time.Time               `gorm:"column:ddv_dataprevisao;type:date" json:"data_previsao,omitempty"`
+	DataExpedicao *time.Time               `gorm:"column:ddv_dataexpedicao;type:date" json:"data_expedicao,omitempty"`
+	Situacao      constants.SituacaoPedido `gorm:"column:ddv_situacao;not null;default:1" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE VALORES (MONETÁRIOS)
@@ -173,8 +155,7 @@ func (d *DocumentoVenda) BeforeUpdate(tx *gorm.DB) error {
 
 // IsActive verifica se o pedido está ativo (aberto ou em atividade)
 func (d *DocumentoVenda) IsActive() bool {
-	return d.Situacao == SituacaoPedidoAberto ||
-		d.Situacao == SituacaoPedidoEmAtividade
+	return d.Situacao == constants.SituacaoPedidoAberto || d.Situacao == constants.SituacaoPedidoEmAtividade
 }
 
 // IsDeleted verifica se o pedido foi deletado logicamente
@@ -184,39 +165,39 @@ func (d *DocumentoVenda) IsDeleted() bool {
 
 // IsCancelado verifica se o pedido está cancelado
 func (d *DocumentoVenda) IsCancelado() bool {
-	return d.Situacao == SituacaoPedidoCancelado
+	return d.Situacao == constants.SituacaoPedidoCancelado
 }
 
 // IsFechado verifica se o pedido está fechado
 func (d *DocumentoVenda) IsFechado() bool {
-	return d.Situacao == SituacaoPedidoFechado
+	return d.Situacao == constants.SituacaoPedidoFechado
 }
 
 // IsEmAtividade verifica se o pedido está em atividade
 func (d *DocumentoVenda) IsEmAtividade() bool {
-	return d.Situacao == SituacaoPedidoEmAtividade
+	return d.Situacao == constants.SituacaoPedidoEmAtividade
 }
 
 // SoftDelete realiza a exclusão lógica (CORRIGIDO: nome correto)
 func (d *DocumentoVenda) SoftDelete() {
 	now := time.Now()
 	d.DeletedAt = &now
-	d.Situacao = SituacaoPedidoCancelado
+	d.Situacao = constants.SituacaoPedidoCancelado
 }
 
 // IsEntrega verifica se é entrega em domicílio
 func (d *DocumentoVenda) IsEntrega() bool {
-	return d.TipoEntrega == TipoEntregaEntrega
+	return d.TipoEntrega == constants.TipoEntregaEntrega
 }
 
 // IsRetirada verifica se é retirada no local
 func (d *DocumentoVenda) IsRetirada() bool {
-	return d.TipoEntrega == TipoEntregaRetirada
+	return d.TipoEntrega == constants.TipoEntregaRetirada
 }
 
 // IsLocal verifica se é consumo no local
 func (d *DocumentoVenda) IsLocal() bool {
-	return d.TipoEntrega == TipoEntregaLocal
+	return d.TipoEntrega == constants.TipoEntregaLocal
 }
 
 // GetTotalComDesconto retorna o total com desconto aplicado

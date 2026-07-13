@@ -8,6 +8,18 @@ definitions:
     x-enum-varnames:
     - SexoMasculino
     - SexoFeminino
+  constants.SituacaoPedido:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 9
+    type: integer
+    x-enum-varnames:
+    - SituacaoPedidoAberto
+    - SituacaoPedidoEmAtividade
+    - SituacaoPedidoFechado
+    - SituacaoPedidoCancelado
   constants.Status:
     enum:
     - 1
@@ -20,6 +32,22 @@ definitions:
     - StatusInativo
     - StatusBloqueado
     - StatusCancelado
+  constants.TipoDocumentoVenda:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - TipoDocumentoOrcamento
+    - TipoDocumentoPedido
+  constants.TipoOperacao:
+    enum:
+    - 0
+    - 1
+    type: integer
+    x-enum-varnames:
+    - TipoOperacaoEntrada
+    - TipoOperacaoSaida
   constants.TipoPessoa:
     enum:
     - 1
@@ -28,6 +56,244 @@ definitions:
     x-enum-varnames:
     - TipoPessoaFisica
     - TipoPessoaJuridica
+  dto.DocumentoVendaItemRequest:
+    properties:
+      descricao_produto:
+        type: string
+      id:
+        type: integer
+      percentual_desconto:
+        type: number
+      peso_bruto:
+        type: number
+      peso_liquido:
+        type: number
+      produto_id:
+        type: integer
+      quantidade:
+        type: number
+      valor_desconto:
+        type: number
+      valor_frete:
+        type: number
+      valor_unitario:
+        minimum: 0
+        type: number
+    required:
+    - produto_id
+    - quantidade
+    type: object
+  dto.DocumentoVendaItemResponse:
+    properties:
+      id:
+        type: integer
+      percentual_desconto:
+        type: number
+      peso_bruto:
+        type: number
+      peso_liquido:
+        type: number
+      produto_codigo:
+        type: integer
+      produto_id:
+        type: integer
+      produto_nome:
+        type: string
+      quantidade:
+        type: number
+      total_item:
+        type: number
+      total_item_com_frete:
+        type: number
+      valor_desconto:
+        type: number
+      valor_frete:
+        type: number
+      valor_unitario:
+        type: number
+    type: object
+  dto.DocumentoVendaListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.DocumentoVendaResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.DocumentoVendaRequest:
+    properties:
+      condicao_pagamento_id:
+        type: integer
+      created_by:
+        description: Auditoria
+        type: integer
+      data_previsao:
+        type: string
+      data_validade:
+        type: string
+      empresa_filial_id:
+        type: integer
+      entidade_id:
+        type: integer
+      itens:
+        description: Relacionamentos
+        items:
+          $ref: '#/definitions/dto.DocumentoVendaItemRequest'
+        minItems: 1
+        type: array
+      numero:
+        type: integer
+      observacoes_adm:
+        type: string
+      observacoes_cliente:
+        type: string
+      observacoes_interna:
+        type: string
+      tabela_preco_id:
+        type: integer
+      tipo_documento:
+        allOf:
+        - $ref: '#/definitions/constants.TipoDocumentoVenda'
+        description: 1-Orçamento, 2-Pedido
+      tipo_entrega:
+        description: RETIRADA, ENTREGA, LOCAL
+        type: string
+      tipo_operacao:
+        allOf:
+        - $ref: '#/definitions/constants.TipoOperacao'
+        description: 0-Entrada, 1-Saída
+      transportadora_id:
+        type: integer
+      updated_by:
+        type: integer
+      valor_desconto:
+        type: number
+      valor_frete:
+        type: number
+      vendedor_id:
+        type: integer
+    required:
+    - condicao_pagamento_id
+    - empresa_filial_id
+    - itens
+    - tabela_preco_id
+    - tipo_documento
+    - tipo_operacao
+    type: object
+  dto.DocumentoVendaResponse:
+    properties:
+      condicao_pagamento_descricao:
+        type: string
+      condicao_pagamento_id:
+        type: integer
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data_documento:
+        description: |-
+          ============================================================
+          DATAS
+          ============================================================
+        type: string
+      data_previsao:
+        type: string
+      data_validade:
+        type: string
+      empresa_filial_id:
+        type: integer
+      entidade_documento:
+        type: string
+      entidade_id:
+        type: integer
+      entidade_nome:
+        type: string
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      itens:
+        description: |-
+          ============================================================
+          RELACIONAMENTOS
+          ============================================================
+        items:
+          $ref: '#/definitions/dto.DocumentoVendaItemResponse'
+        type: array
+      numero:
+        type: integer
+      observacoes_adm:
+        type: string
+      observacoes_cliente:
+        type: string
+      observacoes_interna:
+        description: |-
+          ============================================================
+          OBSERVAÇÕES
+          ============================================================
+        type: string
+      situacao:
+        $ref: '#/definitions/constants.SituacaoPedido'
+      situacao_label:
+        type: string
+      tabela_preco_descricao:
+        type: string
+      tabela_preco_id:
+        type: integer
+      tipo_documento:
+        $ref: '#/definitions/constants.TipoDocumentoVenda'
+      tipo_documento_label:
+        type: string
+      tipo_entrega:
+        type: string
+      tipo_entrega_label:
+        type: string
+      tipo_operacao:
+        $ref: '#/definitions/constants.TipoOperacao'
+      tipo_operacao_label:
+        type: string
+      total_descontos:
+        type: number
+      total_frete:
+        type: number
+      total_liquido:
+        type: number
+      total_produtos:
+        description: |-
+          ============================================================
+          VALORES
+          ============================================================
+        type: number
+      transportadora_id:
+        type: integer
+      transportadora_nome:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      valor_desconto:
+        type: number
+      valor_frete:
+        type: number
+      vendedor_id:
+        type: integer
+      vendedor_nome:
+        type: string
+    type: object
   dto.EntidadeContatoListResponse:
     properties:
       items:
@@ -1484,6 +1750,157 @@ paths:
       summary: Renova o token de acesso
       tags:
       - Auth
+  /documentos-venda:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de documentos de venda, com suporte
+        a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: tipo
+        type: string
+      - description: Filtrar por situação
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DocumentoVendaListResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Lista os documentos de venda
+      tags:
+      - Documentos de Venda
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo documento de venda com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o documento de venda
+        in: body
+        name: documento
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DocumentoVendaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo documento de venda
+      tags:
+      - Documentos de Venda
+  /documentos-venda/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um documento de venda.
+      parameters:
+      - description: ID do Documento de Venda
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Documento de venda não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um documento de venda
+      tags:
+      - Documentos de Venda
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um documento de venda específico.
+      parameters:
+      - description: ID do Documento de Venda
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "404":
+          description: Documento de venda não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um documento de venda por ID
+      tags:
+      - Documentos de Venda
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um documento de venda existente.
+      parameters:
+      - description: ID do Documento de Venda
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o documento de venda
+        in: body
+        name: documento
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DocumentoVendaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Documento de venda não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um documento de venda
+      tags:
+      - Documentos de Venda
   /entidades:
     get:
       description: Retorna uma lista paginada de entidades

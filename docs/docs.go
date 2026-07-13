@@ -160,6 +160,233 @@ const docTemplate = `{
                 }
             }
         },
+        "/documentos-venda": {
+            "get": {
+                "description": "Retorna uma lista paginada de documentos de venda, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Lista os documentos de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por tipo",
+                        "name": "tipo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo documento de venda com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Cria um novo documento de venda",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o documento de venda",
+                        "name": "documento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos-venda/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Busca um documento de venda por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um documento de venda existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Atualiza um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o documento de venda",
+                        "name": "documento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um documento de venda.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Exclui um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/entidades": {
             "get": {
                 "security": [
@@ -4003,6 +4230,21 @@ const docTemplate = `{
                 "SexoFeminino"
             ]
         },
+        "constants.SituacaoPedido": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                9
+            ],
+            "x-enum-varnames": [
+                "SituacaoPedidoAberto",
+                "SituacaoPedidoEmAtividade",
+                "SituacaoPedidoFechado",
+                "SituacaoPedidoCancelado"
+            ]
+        },
         "constants.Status": {
             "type": "integer",
             "enum": [
@@ -4018,6 +4260,28 @@ const docTemplate = `{
                 "StatusCancelado"
             ]
         },
+        "constants.TipoDocumentoVenda": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "TipoDocumentoOrcamento",
+                "TipoDocumentoPedido"
+            ]
+        },
+        "constants.TipoOperacao": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "TipoOperacaoEntrada",
+                "TipoOperacaoSaida"
+            ]
+        },
         "constants.TipoPessoa": {
             "type": "integer",
             "enum": [
@@ -4028,6 +4292,334 @@ const docTemplate = `{
                 "TipoPessoaFisica",
                 "TipoPessoaJuridica"
             ]
+        },
+        "dto.DocumentoVendaItemRequest": {
+            "type": "object",
+            "required": [
+                "produto_id",
+                "quantidade"
+            ],
+            "properties": {
+                "descricao_produto": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "percentual_desconto": {
+                    "type": "number"
+                },
+                "peso_bruto": {
+                    "type": "number"
+                },
+                "peso_liquido": {
+                    "type": "number"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "quantidade": {
+                    "type": "number"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_frete": {
+                    "type": "number"
+                },
+                "valor_unitario": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "dto.DocumentoVendaItemResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "percentual_desconto": {
+                    "type": "number"
+                },
+                "peso_bruto": {
+                    "type": "number"
+                },
+                "peso_liquido": {
+                    "type": "number"
+                },
+                "produto_codigo": {
+                    "type": "integer"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "produto_nome": {
+                    "type": "string"
+                },
+                "quantidade": {
+                    "type": "number"
+                },
+                "total_item": {
+                    "type": "number"
+                },
+                "total_item_com_frete": {
+                    "type": "number"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_frete": {
+                    "type": "number"
+                },
+                "valor_unitario": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.DocumentoVendaListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DocumentoVendaRequest": {
+            "type": "object",
+            "required": [
+                "condicao_pagamento_id",
+                "empresa_filial_id",
+                "itens",
+                "tabela_preco_id",
+                "tipo_documento",
+                "tipo_operacao"
+            ],
+            "properties": {
+                "condicao_pagamento_id": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "description": "Auditoria",
+                    "type": "integer"
+                },
+                "data_previsao": {
+                    "type": "string"
+                },
+                "data_validade": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "entidade_id": {
+                    "type": "integer"
+                },
+                "itens": {
+                    "description": "Relacionamentos",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaItemRequest"
+                    }
+                },
+                "numero": {
+                    "type": "integer"
+                },
+                "observacoes_adm": {
+                    "type": "string"
+                },
+                "observacoes_cliente": {
+                    "type": "string"
+                },
+                "observacoes_interna": {
+                    "type": "string"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "tipo_documento": {
+                    "description": "1-Orçamento, 2-Pedido",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/constants.TipoDocumentoVenda"
+                        }
+                    ]
+                },
+                "tipo_entrega": {
+                    "description": "RETIRADA, ENTREGA, LOCAL",
+                    "type": "string"
+                },
+                "tipo_operacao": {
+                    "description": "0-Entrada, 1-Saída",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/constants.TipoOperacao"
+                        }
+                    ]
+                },
+                "transportadora_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_frete": {
+                    "type": "number"
+                },
+                "vendedor_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DocumentoVendaResponse": {
+            "type": "object",
+            "properties": {
+                "condicao_pagamento_descricao": {
+                    "type": "string"
+                },
+                "condicao_pagamento_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_documento": {
+                    "description": "============================================================\nDATAS\n============================================================",
+                    "type": "string"
+                },
+                "data_previsao": {
+                    "type": "string"
+                },
+                "data_validade": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "entidade_documento": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "type": "integer"
+                },
+                "entidade_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "itens": {
+                    "description": "============================================================\nRELACIONAMENTOS\n============================================================",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                    }
+                },
+                "numero": {
+                    "type": "integer"
+                },
+                "observacoes_adm": {
+                    "type": "string"
+                },
+                "observacoes_cliente": {
+                    "type": "string"
+                },
+                "observacoes_interna": {
+                    "description": "============================================================\nOBSERVAÇÕES\n============================================================",
+                    "type": "string"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.SituacaoPedido"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tabela_preco_descricao": {
+                    "type": "string"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "tipo_documento": {
+                    "$ref": "#/definitions/constants.TipoDocumentoVenda"
+                },
+                "tipo_documento_label": {
+                    "type": "string"
+                },
+                "tipo_entrega": {
+                    "type": "string"
+                },
+                "tipo_entrega_label": {
+                    "type": "string"
+                },
+                "tipo_operacao": {
+                    "$ref": "#/definitions/constants.TipoOperacao"
+                },
+                "tipo_operacao_label": {
+                    "type": "string"
+                },
+                "total_descontos": {
+                    "type": "number"
+                },
+                "total_frete": {
+                    "type": "number"
+                },
+                "total_liquido": {
+                    "type": "number"
+                },
+                "total_produtos": {
+                    "description": "============================================================\nVALORES\n============================================================",
+                    "type": "number"
+                },
+                "transportadora_id": {
+                    "type": "integer"
+                },
+                "transportadora_nome": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_frete": {
+                    "type": "number"
+                },
+                "vendedor_id": {
+                    "type": "integer"
+                },
+                "vendedor_nome": {
+                    "type": "string"
+                }
+            }
         },
         "dto.EntidadeContatoListResponse": {
             "type": "object",
