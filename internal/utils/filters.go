@@ -15,9 +15,9 @@ import (
 
 // FilterConfig define como um filtro deve ser aplicado
 type FilterConfig struct {
-	Column   string      // Nome da coluna no banco
-	Operator string      // Operador SQL: =, LIKE, >, <, etc.
-	Value    interface{} // Valor a ser filtrado
+	Column   string // Nome da coluna no banco
+	Operator string // Operador SQL: =, LIKE, >, <, etc.
+	Value    any    // Valor a ser filtrado
 }
 
 // ============================================================
