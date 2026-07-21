@@ -4,17 +4,8 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-)
 
-// ============================================================
-// CONSTANTES
-// ============================================================
-
-// Constantes para Tipo de Condição de Pagamento
-const (
-	TipoCondicaoAVista       = 0
-	TipoCondicaoAPrazo       = 1
-	TipoCondicaoSemPagamento = 9
+	"github.com/openerp/backend/internal/constants"
 )
 
 // ============================================================
@@ -31,16 +22,16 @@ type CondicaoPagamento struct {
 	TipoDocumentoID  int  `gorm:"column:tdoc_id;not null" json:"tipo_documento_id"`
 	FormaPagamentoID *int `gorm:"column:frmpgto_id" json:"forma_pagamento_id,omitempty"`
 
-	Descricao      string   `gorm:"column:codpgt_descricao;type:varchar(255);not null" json:"descricao"`
-	TipoCondicao   int      `gorm:"column:codpgt_tipocondicao;not null" json:"tipo_condicao"` // 0-À vista, 1-À prazo, 9-Sem pagamento
-	NumeroParcelas int      `gorm:"column:codpgt_numparcelas;not null" json:"numero_parcelas"`
-	DiasParcelas   *int     `gorm:"column:codpgt_diasparcelas" json:"dias_parcelas,omitempty"`
-	DiaPagamento   *int     `gorm:"column:codpgt_diapagamento" json:"dia_pagamento,omitempty"`
-	Entrada        int      `gorm:"column:codpgt_entrada;not null" json:"entrada"` // 0-Não, 1-Sim
-	Juros          *float64 `gorm:"column:codpgt_juros;type:decimal(5,2)" json:"juros,omitempty"`
-	Comissao       *float64 `gorm:"column:codpgt_comissao;type:decimal(5,2)" json:"comissao,omitempty"`
-	Desconto       *float64 `gorm:"column:codpgt_desconto;type:decimal(5,2);default:0.00" json:"desconto,omitempty"`
-	Situacao       int      `gorm:"column:codpgt_situacao;not null" json:"situacao"`
+	Descricao      string           `gorm:"column:codpgt_descricao;type:varchar(255);not null" json:"descricao"`
+	TipoCondicao   int              `gorm:"column:codpgt_tipocondicao;not null" json:"tipo_condicao"` // 0-À vista, 1-À prazo, 9-Sem pagamento
+	NumeroParcelas int              `gorm:"column:codpgt_numparcelas;not null" json:"numero_parcelas"`
+	DiasParcelas   *int             `gorm:"column:codpgt_diasparcelas" json:"dias_parcelas,omitempty"`
+	DiaPagamento   *int             `gorm:"column:codpgt_diapagamento" json:"dia_pagamento,omitempty"`
+	Entrada        constants.SimNao `gorm:"column:codpgt_entrada;not null" json:"entrada"` // 0-Não, 1-Sim
+	Juros          *float64         `gorm:"column:codpgt_juros;type:decimal(5,2)" json:"juros,omitempty"`
+	Comissao       *float64         `gorm:"column:codpgt_comissao;type:decimal(5,2)" json:"comissao,omitempty"`
+	Desconto       *float64         `gorm:"column:codpgt_desconto;type:decimal(5,2);default:0.00" json:"desconto,omitempty"`
+	Situacao       int              `gorm:"column:codpgt_situacao;not null" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA
@@ -93,12 +84,17 @@ func (c *CondicaoPagamento) BeforeUpdate(tx *gorm.DB) error {
 
 // IsAVista verifica se é à vista
 func (c *CondicaoPagamento) IsAVista() bool {
-	return c.TipoCondicao == TipoCondicaoAVista
+	return constants.TipoCondicao(c.TipoCondicao).IsAVista()
 }
 
 // IsAPrazo verifica se é a prazo
 func (c *CondicaoPagamento) IsAPrazo() bool {
-	return c.TipoCondicao == TipoCondicaoAPrazo
+	return constants.TipoCondicao(c.TipoCondicao).IsAPrazo()
+}
+
+// IsSemPagamento verifica se é sem pagamento
+func (c *CondicaoPagamento) IsSemPagamento() bool {
+	return constants.TipoCondicao(c.TipoCondicao).IsSemPagamento()
 }
 
 // GetNumeroParcelas retorna o número de parcelas
@@ -107,4 +103,31 @@ func (c *CondicaoPagamento) GetNumeroParcelas() int {
 		return 1
 	}
 	return c.NumeroParcelas
+}
+
+// IsAtivo verifica se a condição está ativa
+func (c *CondicaoPagamento) IsAtivo() bool {
+	return c.Situacao == int(constants.SituacaoCondicaoAtivo)
+}
+
+// IsInativo verifica se a condição está inativa
+func (c *CondicaoPagamento) IsInativo() bool {
+	return c.Situacao == int(constants.SituacaoCondicaoInativo)
+}
+
+// TemEntrada verifica se tem entrada
+func (c *CondicaoPagamento) TemEntrada() bool {
+	return c.Entrada == constants.CondicaoEntradaSim
+}
+
+// IsDeleted verifica se foi deletado logicamente
+func (c *CondicaoPagamento) IsDeleted() bool {
+	return c.DeletedAt != nil
+}
+
+// SoftDelete realiza a exclusão lógica
+func (c *CondicaoPagamento) SoftDelete() {
+	now := time.Now()
+	c.DeletedAt = &now
+	c.Situacao = int(constants.SituacaoCondicaoInativo)
 }

@@ -518,3 +518,136 @@ const (
 	TipoEntregaEntrega  = "ENTREGA"
 	TipoEntregaLocal    = "LOCAL"
 )
+
+
+// ============================================================
+// CONSTANTES DE CONDIÇÃO DE PAGAMENTO
+// ============================================================
+
+// TipoCondicao representa os tipos de condição de pagamento
+type TipoCondicao int
+
+const (
+	TipoCondicaoAVista       TipoCondicao = 0
+	TipoCondicaoAPrazo       TipoCondicao = 1
+	TipoCondicaoSemPagamento TipoCondicao = 9
+)
+
+func (t TipoCondicao) String() string {
+	switch t {
+	case TipoCondicaoAVista:
+		return "À Vista"
+	case TipoCondicaoAPrazo:
+		return "À Prazo"
+	case TipoCondicaoSemPagamento:
+		return "Sem Pagamento"
+	default:
+		return "Desconhecido"
+	}
+}
+
+func (t TipoCondicao) IsAVista() bool {
+	return t == TipoCondicaoAVista
+}
+
+func (t TipoCondicao) IsAPrazo() bool {
+	return t == TipoCondicaoAPrazo
+}
+
+func (t TipoCondicao) IsSemPagamento() bool {
+	return t == TipoCondicaoSemPagamento
+}
+
+func (t TipoCondicao) IsValid() error {
+	switch t {
+	case TipoCondicaoAVista, TipoCondicaoAPrazo, TipoCondicaoSemPagamento:
+		return nil
+	default:
+		return fmt.Errorf("tipo_condicao inválido: %d. Valores válidos são 0 (À Vista), 1 (À Prazo), 9 (Sem Pagamento)", t)
+	}
+}
+
+// ============================================================
+// SITUAÇÃO DA CONDIÇÃO DE PAGAMENTO
+// ============================================================
+
+// SituacaoCondicaoPagamento representa a situação da condição de pagamento
+type SituacaoCondicaoPagamento int
+
+const (
+	SituacaoCondicaoAtivo   SituacaoCondicaoPagamento = 1
+	SituacaoCondicaoInativo SituacaoCondicaoPagamento = 2
+)
+
+func (s SituacaoCondicaoPagamento) String() string {
+	switch s {
+	case SituacaoCondicaoAtivo:
+		return "Ativo"
+	case SituacaoCondicaoInativo:
+		return "Inativo"
+	default:
+		return "Desconhecido"
+	}
+}
+
+func (s SituacaoCondicaoPagamento) IsAtivo() bool {
+	return s == SituacaoCondicaoAtivo
+}
+
+func (s SituacaoCondicaoPagamento) IsInativo() bool {
+	return s == SituacaoCondicaoInativo
+}
+
+func (s SituacaoCondicaoPagamento) IsValid() error {
+	switch s {
+	case SituacaoCondicaoAtivo, SituacaoCondicaoInativo:
+		return nil
+	default:
+		return fmt.Errorf("situacao inválida: %d. Valores válidos são 1 (Ativo) ou 2 (Inativo)", s)
+	}
+}
+
+// ============================================================
+// CONSTANTES DE CONDIÇÃO DE PAGAMENTO (VALORES SIM/NAO)
+// ============================================================
+
+// Constantes para campo Entrada (0-Não, 1-Sim)
+const (
+	CondicaoEntradaNao = 0
+	CondicaoEntradaSim = 1
+)
+
+// ============================================================
+// CONSTANTES DE FORMA DE PAGAMENTO (ADICIONAR SE NECESSÁRIO)
+// ============================================================
+
+// FormaPagamento representa as formas de pagamento
+type FormaPagamento int
+
+const (
+	FormaPagamentoDinheiro FormaPagamento = 1
+	FormaPagamentoCartao   FormaPagamento = 2
+	FormaPagamentoBoleto   FormaPagamento = 3
+	FormaPagamentoCheque   FormaPagamento = 4
+	FormaPagamentoTransferencia FormaPagamento = 5
+	FormaPagamentoOutros   FormaPagamento = 9
+)
+
+func (f FormaPagamento) String() string {
+	switch f {
+	case FormaPagamentoDinheiro:
+		return "Dinheiro"
+	case FormaPagamentoCartao:
+		return "Cartão"
+	case FormaPagamentoBoleto:
+		return "Boleto"
+	case FormaPagamentoCheque:
+		return "Cheque"
+	case FormaPagamentoTransferencia:
+		return "Transferência"
+	case FormaPagamentoOutros:
+		return "Outros"
+	default:
+		return "Desconhecido"
+	}
+}

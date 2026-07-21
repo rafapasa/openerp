@@ -34,93 +34,71 @@ type DocumentoVendaItemRequest struct {
 	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
 }
 
-// Validate valida o item do documento
-func (r *DocumentoVendaItemRequest) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(r); err != nil {
-		return err
-	}
-
-	// Validar percentual de desconto (se informado)
-	if r.PercentualDesconto != nil && (*r.PercentualDesconto < 0 || *r.PercentualDesconto > 100) {
-		return fmt.Errorf("percentual_desconto deve estar entre 0 e 100, recebido: %.2f", *r.PercentualDesconto)
-	}
-
-	// Validar valor de desconto (se informado)
-	if r.ValorDesconto != nil && *r.ValorDesconto < 0 {
-		return fmt.Errorf("valor_desconto não pode ser negativo, recebido: %.2f", *r.ValorDesconto)
-	}
-
-	return nil
+// DocumentoVendaPagamentoRequest representa um pagamento no request
+type DocumentoVendaPagamentoRequest struct {
+	ID               int        `json:"id,omitempty"`
+	FormaPagamentoID int        `json:"forma_pagamento_id" binding:"required"`
+	Valor            float64    `json:"valor" binding:"required,gt=0"`
+	DataVencimento   *time.Time `json:"data_vencimento,omitempty"`
+	DataPagamento    *time.Time `json:"data_pagamento,omitempty"`
+	NumeroParcelas   int        `json:"numero_parcelas,omitempty"`
+	ParcelaAtual     int        `json:"parcela_atual,omitempty"`
+	ValorJuros       *float64   `json:"valor_juros,omitempty"`
+	ValorMulta       *float64   `json:"valor_multa,omitempty"`
+	ValorDesconto    *float64   `json:"valor_desconto,omitempty"`
+	Observacao       *string    `json:"observacao,omitempty"`
 }
 
 // DocumentoVendaRequest representa o request para criar/atualizar um documento de venda.
 type DocumentoVendaRequest struct {
-	EmpresaFilialID     int                          `json:"empresa_filial_id" binding:"required"`
-	EntidadeID          *int                         `json:"entidade_id"`
-	CondicaoPagamentoID int                          `json:"condicao_pagamento_id" binding:"required"`
-	TabelaPrecoID       int                          `json:"tabela_preco_id" binding:"required"`
-	TipoDocumento       constants.TipoDocumentoVenda `json:"tipo_documento" binding:"required"` // 1-Orçamento, 2-Pedido
-	TipoOperacao        constants.TipoOperacao       `json:"tipo_operacao" binding:"required"`  // 0-Entrada, 1-Saída
-	Numero              int                          `json:"numero,omitempty"`
-	DataValidade        *time.Time                   `json:"data_validade,omitempty"`
-	DataPrevisao        *time.Time                   `json:"data_previsao,omitempty"`
-	ValorFrete          *float64                     `json:"valor_frete,omitempty"`
-	ValorDesconto       *float64                     `json:"valor_desconto,omitempty"`
-	ObservacoesInterna  *string                      `json:"observacoes_interna,omitempty"`
-	ObservacoesADM      *string                      `json:"observacoes_adm,omitempty"`
-	ObservacoesCliente  *string                      `json:"observacoes_cliente,omitempty"`
-	VendedorID          *int                         `json:"vendedor_id,omitempty"`
-	TransportadoraID    *int                         `json:"transportadora_id,omitempty"`
-	TipoEntrega         *string                      `json:"tipo_entrega,omitempty"` // RETIRADA, ENTREGA, LOCAL
+	// ============================================================
+	// DADOS PRINCIPAIS
+	// ============================================================
+	EmpresaFilialID     int  `json:"empresa_filial_id" binding:"required"`
+	EntidadeID          *int `json:"entidade_id"`
+	CondicaoPagamentoID int  `json:"condicao_pagamento_id" binding:"required"`
+	TabelaPrecoID       int  `json:"tabela_preco_id" binding:"required"`
+	TipoDocumento       int  `json:"tipo_documento" binding:"required"` // 1-Orçamento, 2-Pedido
+	TipoOperacao        int  `json:"tipo_operacao" binding:"required"`  // 0-Entrada, 1-Saída
+	Numero              int  `json:"numero,omitempty"`
 
-	// Relacionamentos
-	Itens []DocumentoVendaItemRequest `json:"itens" binding:"required,min=1,dive"`
+	// ============================================================
+	// DATAS
+	// ============================================================
+	DataValidade *time.Time `json:"data_validade,omitempty"`
+	DataPrevisao *time.Time `json:"data_previsao,omitempty"`
 
-	// Auditoria
+	// ============================================================
+	// VALORES
+	// ============================================================
+	ValorFrete    *float64 `json:"valor_frete,omitempty"`
+	ValorDesconto *float64 `json:"valor_desconto,omitempty"`
+
+	// ============================================================
+	// OBSERVAÇÕES
+	// ============================================================
+	ObservacoesInterna *string `json:"observacoes_interna,omitempty"`
+	ObservacoesADM     *string `json:"observacoes_adm,omitempty"`
+	ObservacoesCliente *string `json:"observacoes_cliente,omitempty"`
+
+	// ============================================================
+	// RELACIONAMENTOS
+	// ============================================================
+	VendedorID       *int    `json:"vendedor_id,omitempty"`
+	TransportadoraID *int    `json:"transportadora_id,omitempty"`
+	TipoEntrega      *string `json:"tipo_entrega,omitempty"` // RETIRADA, ENTREGA, LOCAL
+
+	// ============================================================
+	// LISTAS
+	// ============================================================
+	Itens      []DocumentoVendaItemRequest      `json:"itens" binding:"required,min=1,dive"`
+	Pagamentos []DocumentoVendaPagamentoRequest `json:"pagamentos,omitempty"`
+
+	// ============================================================
+	// AUDITORIA
+	// ============================================================
 	CreatedBy *int `json:"created_by,omitempty"`
 	UpdatedBy *int `json:"updated_by,omitempty"`
-}
-
-// Validate valida o documento de venda
-func (r *DocumentoVendaRequest) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(r); err != nil {
-		return err
-	}
-
-	// 1. Validar TipoDocumento
-	if err := validateTipoDocumentoVenda(r.TipoDocumento); err != nil {
-		return err
-	}
-
-	// 2. Validar TipoOperacao
-	if err := validateTipoOperacao(r.TipoOperacao); err != nil {
-		return err
-	}
-
-	// 3. Validar TipoEntrega (se informado)
-	if r.TipoEntrega != nil {
-		if err := validateTipoEntrega(*r.TipoEntrega); err != nil {
-			return err
-		}
-	}
-
-	// 4. Validar itens
-	for i, item := range r.Itens {
-		if err := item.Validate(); err != nil {
-			return fmt.Errorf("item %d: %w", i+1, err)
-		}
-	}
-
-	// 5. Validar datas
-	if r.DataValidade != nil && r.DataPrevisao != nil {
-		if r.DataValidade.Before(*r.DataPrevisao) {
-			return fmt.Errorf("data_validade deve ser posterior a data_previsao")
-		}
-	}
-
-	return nil
 }
 
 // ============================================================
@@ -144,33 +122,54 @@ type DocumentoVendaItemResponse struct {
 	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
 }
 
+// DocumentoVendaPagamentoResponse representa a resposta de um pagamento
+type DocumentoVendaPagamentoResponse struct {
+	ID                 int      `json:"id"`
+	FormaPagamentoID   int      `json:"forma_pagamento_id"`
+	FormaPagamentoNome string   `json:"forma_pagamento_nome,omitempty"`
+	Valor              float64  `json:"valor"`
+	DataVencimento     string   `json:"data_vencimento,omitempty"`
+	DataPagamento      string   `json:"data_pagamento,omitempty"`
+	NumeroParcelas     int      `json:"numero_parcelas,omitempty"`
+	ParcelaAtual       int      `json:"parcela_atual,omitempty"`
+	ValorJuros         *float64 `json:"valor_juros,omitempty"`
+	ValorMulta         *float64 `json:"valor_multa,omitempty"`
+	ValorDesconto      *float64 `json:"valor_desconto,omitempty"`
+	Observacao         *string  `json:"observacao,omitempty"`
+	Status             int      `json:"status"`
+	StatusLabel        string   `json:"status_label,omitempty"`
+}
+
 // DocumentoVendaResponse representa a resposta de um documento de venda.
 type DocumentoVendaResponse struct {
 	// ============================================================
 	// DADOS PRINCIPAIS
 	// ============================================================
-	ID                         int                          `json:"id"`
-	EmpresaFilialID            int                          `json:"empresa_filial_id"`
-	EntidadeID                 *int                         `json:"entidade_id,omitempty"`
-	EntidadeNome               string                       `json:"entidade_nome,omitempty"`
-	EntidadeDocumento          string                       `json:"entidade_documento,omitempty"`
-	CondicaoPagamentoID        int                          `json:"condicao_pagamento_id"`
-	CondicaoPagamentoDescricao string                       `json:"condicao_pagamento_descricao,omitempty"`
-	TabelaPrecoID              int                          `json:"tabela_preco_id"`
-	TabelaPrecoDescricao       string                       `json:"tabela_preco_descricao,omitempty"`
-	Numero                     int                          `json:"numero"`
-	TipoDocumento              constants.TipoDocumentoVenda `json:"tipo_documento"`
-	TipoDocumentoLabel         string                       `json:"tipo_documento_label"`
-	TipoOperacao               constants.TipoOperacao       `json:"tipo_operacao"`
-	TipoOperacaoLabel          string                       `json:"tipo_operacao_label"`
-	Situacao                   constants.SituacaoPedido     `json:"situacao"`
-	SituacaoLabel              string                       `json:"situacao_label"`
-	VendedorID                 *int                         `json:"vendedor_id,omitempty"`
-	VendedorNome               string                       `json:"vendedor_nome,omitempty"`
-	TransportadoraID           *int                         `json:"transportadora_id,omitempty"`
-	TransportadoraNome         string                       `json:"transportadora_nome,omitempty"`
-	TipoEntrega                *string                      `json:"tipo_entrega,omitempty"`
-	TipoEntregaLabel           string                       `json:"tipo_entrega_label,omitempty"`
+	ID                         int    `json:"id"`
+	EmpresaFilialID            int    `json:"empresa_filial_id"`
+	EntidadeID                 *int   `json:"entidade_id,omitempty"`
+	EntidadeNome               string `json:"entidade_nome,omitempty"`
+	EntidadeDocumento          string `json:"entidade_documento,omitempty"`
+	CondicaoPagamentoID        int    `json:"condicao_pagamento_id"`
+	CondicaoPagamentoDescricao string `json:"condicao_pagamento_descricao,omitempty"`
+	TabelaPrecoID              int    `json:"tabela_preco_id"`
+	TabelaPrecoDescricao       string `json:"tabela_preco_descricao,omitempty"`
+	Numero                     int    `json:"numero"`
+	TipoDocumento              int    `json:"tipo_documento"`
+	TipoDocumentoLabel         string `json:"tipo_documento_label"`
+	TipoOperacao               int    `json:"tipo_operacao"`
+	TipoOperacaoLabel          string `json:"tipo_operacao_label"`
+	Situacao                   int    `json:"situacao"`
+	SituacaoLabel              string `json:"situacao_label"`
+
+	// ============================================================
+	// RELACIONAMENTOS
+	// ============================================================
+	VendedorID         *int    `json:"vendedor_id,omitempty"`
+	VendedorNome       string  `json:"vendedor_nome,omitempty"`
+	TransportadoraID   *int    `json:"transportadora_id,omitempty"`
+	TransportadoraNome string  `json:"transportadora_nome,omitempty"`
+	TipoEntrega        *string `json:"tipo_entrega,omitempty"`
 
 	// ============================================================
 	// DATAS
@@ -197,9 +196,10 @@ type DocumentoVendaResponse struct {
 	ObservacoesCliente *string `json:"observacoes_cliente,omitempty"`
 
 	// ============================================================
-	// RELACIONAMENTOS
+	// LISTAS
 	// ============================================================
-	Itens []DocumentoVendaItemResponse `json:"itens,omitempty"`
+	Itens      []DocumentoVendaItemResponse      `json:"itens,omitempty"`
+	Pagamentos []DocumentoVendaPagamentoResponse `json:"pagamentos,omitempty"`
 
 	// ============================================================
 	// AUDITORIA
@@ -210,9 +210,13 @@ type DocumentoVendaResponse struct {
 	UpdatedBy *int   `json:"updated_by,omitempty"`
 }
 
-// DocumentoVendaListResponse para listagem paginada.
+// ============================================================
+// RESPONSE LISTA
+// ============================================================
+
+// DocumentoVendaListResponse representa a resposta de listagem de documentos de venda
 type DocumentoVendaListResponse struct {
-	Documentos []DocumentoVendaResponse `json:"items"`
+	Items      []DocumentoVendaResponse `json:"items"`
 	Total      int64                    `json:"total"`
 	Page       int                      `json:"page"`
 	Limit      int                      `json:"limit"`
@@ -220,141 +224,94 @@ type DocumentoVendaListResponse struct {
 }
 
 // ============================================================
-// FUNÇÕES DE CONVERSÃO
+// MÉTODOS DE VALIDAÇÃO
 // ============================================================
 
-// ToModel converte DocumentoVendaRequest para models.DocumentoVenda
-func (r *DocumentoVendaRequest) ToModel() (*models.DocumentoVenda, error) {
-	if r == nil {
-		return nil, nil
+// Validate valida o DocumentoVendaRequest
+func (r *DocumentoVendaRequest) Validate() error {
+	// 1. Validação com go-playground/validator
+	validate := validator.New()
+	if err := validate.Struct(r); err != nil {
+		return err
 	}
 
-	doc := &models.DocumentoVenda{}
-
-	// 1. Usar o mapper para copiar campos
-	if err := utils.MapToModel(r, doc); err != nil {
-		return nil, err
+	// 2. Validar campos obrigatórios usando utils
+	if err := utils.ValidateMandatoryFields(r); err != nil {
+		return err
 	}
 
-	// 2. Tratamentos especiais
-	// Converter tipos para as constantes
-	doc.TipoDocumento = int(r.TipoDocumento)
-	doc.TipoOperacao = int(r.TipoOperacao)
-
-	// Definir situação padrão (Aberto)
-	if doc.Situacao == 0 {
-		doc.Situacao = constants.SituacaoPedidoAberto
+	// 3. Validar TipoDocumento usando constantes
+	if err := validateTipoDocumentoVenda(r.TipoDocumento); err != nil {
+		return err
 	}
 
-	return doc, nil
+	// 4. Validar TipoOperacao usando constantes
+	if err := validateTipoOperacao(r.TipoOperacao); err != nil {
+		return err
+	}
+
+	// 5. Validar TipoEntrega (se informado)
+	if r.TipoEntrega != nil {
+		if err := validateTipoEntrega(*r.TipoEntrega); err != nil {
+			return err
+		}
+	}
+
+	// 6. Validar itens
+	for i, item := range r.Itens {
+		if err := validateDocumentoVendaItem(&item); err != nil {
+			return fmt.Errorf("item %d: %w", i+1, err)
+		}
+	}
+
+	// 7. Validar pagamentos
+	for i, pagamento := range r.Pagamentos {
+		if err := validateDocumentoVendaPagamento(&pagamento); err != nil {
+			return fmt.Errorf("pagamento %d: %w", i+1, err)
+		}
+	}
+
+	// 8. Validar datas
+	if r.DataValidade != nil && r.DataPrevisao != nil {
+		if r.DataValidade.Before(*r.DataPrevisao) {
+			return fmt.Errorf("data_validade deve ser posterior a data_previsao")
+		}
+	}
+
+	return nil
 }
 
-// FromModel converte models.DocumentoVenda para DocumentoVendaResponse
-func (r *DocumentoVendaResponse) FromModel(doc *models.DocumentoVenda) (*DocumentoVendaResponse, error) {
-	if doc == nil {
-		return nil, nil
+// validateDocumentoVendaItem valida um item
+func validateDocumentoVendaItem(item *DocumentoVendaItemRequest) error {
+	// Validar percentual de desconto (se informado)
+	if item.PercentualDesconto != nil && (*item.PercentualDesconto < 0 || *item.PercentualDesconto > 100) {
+		return fmt.Errorf("percentual_desconto deve estar entre 0 e 100, recebido: %.2f", *item.PercentualDesconto)
 	}
 
-	// 1. Usar o mapper para copiar campos
-	if err := utils.MapToDTO(doc, r); err != nil {
-		return nil, err
+	// Validar valor de desconto (se informado)
+	if item.ValorDesconto != nil && *item.ValorDesconto < 0 {
+		return fmt.Errorf("valor_desconto não pode ser negativo, recebido: %.2f", *item.ValorDesconto)
 	}
 
-	// 2. Preencher campos calculados (labels)
-	r.TipoDocumentoLabel = constants.TipoDocumentoVenda(doc.TipoDocumento).String()
-	r.TipoOperacaoLabel = constants.TipoOperacao(doc.TipoOperacao).String()
-	r.SituacaoLabel = doc.Situacao.String()
+	return nil
+}
 
-	// 3. Label para TipoEntrega
-	if doc.TipoEntrega != "" {
-		r.TipoEntregaLabel = doc.TipoEntrega
+// validateDocumentoVendaPagamento valida um pagamento
+func validateDocumentoVendaPagamento(pagamento *DocumentoVendaPagamentoRequest) error {
+	// Validar número de parcelas
+	if pagamento.NumeroParcelas > 0 && pagamento.ParcelaAtual > pagamento.NumeroParcelas {
+		return fmt.Errorf("parcela_atual (%d) não pode ser maior que numero_parcelas (%d)",
+			pagamento.ParcelaAtual, pagamento.NumeroParcelas)
 	}
 
-	// 4. Formatar datas
-	r.DataDocumento = utils.FormatDateTime(doc.CreatedAt)
-	r.CreatedAt = utils.FormatDateTime(doc.CreatedAt)
-	r.UpdatedAt = utils.FormatDateTime(doc.UpdatedAt)
-
-	if doc.DataValidade != nil {
-		r.DataValidade = utils.FormatDate(*doc.DataValidade)
-	}
-
-	if doc.DataPrevisao != nil {
-		r.DataPrevisao = utils.FormatDate(*doc.DataPrevisao)
-	}
-
-	// 5. Calcular totais (se tiver itens)
-	if len(doc.Itens) > 0 {
-		var totalProdutos, totalDescontos, totalFrete float64
-
-		for _, item := range doc.Itens {
-			totalProdutos += item.ValorUnitario * item.Quantidade
-			if item.ValorDesconto != nil {
-				totalDescontos += *item.ValorDesconto
-			}
-			if item.ValorFrete != nil {
-				totalFrete += *item.ValorFrete
-			}
-		}
-
-		r.TotalProdutos = totalProdutos
-		r.TotalDescontos = totalDescontos
-		r.TotalFrete = totalFrete
-		r.TotalLiquido = totalProdutos - totalDescontos + totalFrete
-	}
-
-	// 6. Converter itens
-	if len(doc.Itens) > 0 {
-		itensResponse := make([]DocumentoVendaItemResponse, len(doc.Itens))
-		for i, item := range doc.Itens {
-			itemResp := DocumentoVendaItemResponse{
-				ID:            item.ID,
-				ProdutoID:     item.ProdutoID,
-				Quantidade:    item.Quantidade,
-				ValorUnitario: item.ValorUnitario,
-				TotalItem:     item.ValorUnitario * item.Quantidade,
-			}
-
-			if item.Produto != nil {
-				itemResp.ProdutoNome = item.Produto.Nome
-				itemResp.ProdutoCodigo = item.Produto.Codigo
-			}
-
-			if item.PercentualDesconto != nil {
-				itemResp.PercentualDesconto = item.PercentualDesconto
-			}
-
-			if item.ValorDesconto != nil {
-				itemResp.ValorDesconto = item.ValorDesconto
-				itemResp.TotalItem -= *item.ValorDesconto
-			}
-
-			if item.ValorFrete != nil {
-				itemResp.ValorFrete = item.ValorFrete
-				itemResp.TotalItemComFrete = itemResp.TotalItem + *item.ValorFrete
-			}
-
-			if item.PesoBruto >= 0 {
-				itemResp.PesoBruto = &item.PesoBruto
-			}
-
-			if item.PesoLiquido >= 0 {
-				itemResp.PesoLiquido = &item.PesoLiquido
-			}
-
-			itensResponse[i] = itemResp
-		}
-		r.Itens = itensResponse
-	}
-
-	return r, nil
+	return nil
 }
 
 // ============================================================
-// FUNÇÕES DE VALIDAÇÃO
+// FUNÇÕES DE VALIDAÇÃO DE CONSTANTES
 // ============================================================
 
-func validateTipoDocumentoVenda(valor constants.TipoDocumentoVenda) error {
+func validateTipoDocumentoVenda(valor int) error {
 	switch constants.TipoDocumentoVenda(valor) {
 	case constants.TipoDocumentoOrcamento, constants.TipoDocumentoPedido:
 		return nil
@@ -363,7 +320,7 @@ func validateTipoDocumentoVenda(valor constants.TipoDocumentoVenda) error {
 	}
 }
 
-func validateTipoOperacao(valor constants.TipoOperacao) error {
+func validateTipoOperacao(valor int) error {
 	switch constants.TipoOperacao(valor) {
 	case constants.TipoOperacaoEntrada, constants.TipoOperacaoSaida:
 		return nil
@@ -389,7 +346,208 @@ func validateTipoEntrega(valor string) error {
 }
 
 // ============================================================
-// FUNÇÕES AUXILIARES
+// MÉTODOS DE CONVERSÃO (TO MODEL)
+// ============================================================
+
+// ToModel converte DocumentoVendaRequest para models.DocumentoVenda
+func (r *DocumentoVendaRequest) ToModel() (*models.DocumentoVenda, error) {
+	if r == nil {
+		return nil, nil
+	}
+
+	doc := &models.DocumentoVenda{}
+
+	// 1. Usar o mapper para copiar campos
+	if err := utils.MapToModel(r, doc); err != nil {
+		return nil, err
+	}
+
+	// 2. Tratamentos especiais
+	// Converter tipos para as constantes
+	doc.TipoDocumento = constants.TipoDocumentoVenda(r.TipoDocumento)
+	doc.TipoOperacao = constants.TipoOperacao(r.TipoOperacao)
+
+	// Definir situação padrão (Aberto)
+	if doc.Situacao == 0 {
+		doc.Situacao = constants.SituacaoPedidoAberto
+	}
+
+	return doc, nil
+}
+
+// ============================================================
+// MÉTODOS DE CONVERSÃO (FROM MODEL)
+// ============================================================
+
+// FromModel converte models.DocumentoVenda para DocumentoVendaResponse
+func (r *DocumentoVendaResponse) FromModel(doc *models.DocumentoVenda) (*DocumentoVendaResponse, error) {
+	if doc == nil {
+		return nil, nil
+	}
+
+	// 1. Usar o mapper para copiar campos
+	if err := utils.MapToDTO(doc, r); err != nil {
+		return nil, err
+	}
+
+	// 2. Preencher campos calculados (labels)
+	r.TipoDocumentoLabel = constants.TipoDocumentoVenda(doc.TipoDocumento).String()
+	r.TipoOperacaoLabel = constants.TipoOperacao(doc.TipoOperacao).String()
+	r.SituacaoLabel = constants.SituacaoPedido(doc.Situacao).String()
+
+	// 4. Formatar datas
+	r.DataDocumento = utils.FormatDateTime(doc.CreatedAt)
+	r.CreatedAt = utils.FormatDateTime(doc.CreatedAt)
+	r.UpdatedAt = utils.FormatDateTime(doc.UpdatedAt)
+
+	if doc.DataValidade != nil {
+		r.DataValidade = utils.FormatDate(*doc.DataValidade)
+	}
+
+	if doc.DataPrevisao != nil {
+		r.DataPrevisao = utils.FormatDate(*doc.DataPrevisao)
+	}
+
+	// 5. Calcular totais
+	calculateTotals(r, doc)
+
+	// 6. Converter itens
+	convertItems(r, doc)
+
+	// 7. Converter pagamentos
+	convertPayments(r, doc)
+
+	return r, nil
+}
+
+// ============================================================
+// FUNÇÕES AUXILIARES DE CONVERSÃO
+// ============================================================
+
+func calculateTotals(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
+	if len(doc.Itens) == 0 {
+		return
+	}
+
+	var totalProdutos, totalDescontos, totalFrete float64
+
+	for _, item := range doc.Itens {
+		totalProdutos += item.ValorUnitario * item.Quantidade
+		if item.ValorDesconto != nil {
+			totalDescontos += *item.ValorDesconto
+		}
+		if item.ValorFrete != nil {
+			totalFrete += *item.ValorFrete
+		}
+	}
+
+	r.TotalProdutos = totalProdutos
+	r.TotalDescontos = totalDescontos
+	r.TotalFrete = totalFrete
+	r.TotalLiquido = totalProdutos - totalDescontos + totalFrete
+}
+
+func convertItems(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
+	if len(doc.Itens) == 0 {
+		return
+	}
+
+	itensResponse := make([]DocumentoVendaItemResponse, len(doc.Itens))
+	for i, item := range doc.Itens {
+		itemResp := DocumentoVendaItemResponse{
+			ID:            item.ID,
+			ProdutoID:     item.ProdutoID,
+			Quantidade:    item.Quantidade,
+			ValorUnitario: item.ValorUnitario,
+			TotalItem:     item.ValorUnitario * item.Quantidade,
+		}
+
+		if item.Produto != nil {
+			itemResp.ProdutoNome = item.Produto.Nome
+			itemResp.ProdutoCodigo = item.Produto.Codigo
+		}
+
+		if item.PercentualDesconto != nil {
+			itemResp.PercentualDesconto = item.PercentualDesconto
+		}
+
+		if item.ValorDesconto != nil {
+			itemResp.ValorDesconto = item.ValorDesconto
+			itemResp.TotalItem -= *item.ValorDesconto
+		}
+
+		if item.ValorFrete != nil {
+			itemResp.ValorFrete = item.ValorFrete
+			itemResp.TotalItemComFrete = itemResp.TotalItem + *item.ValorFrete
+		}
+
+		if &item.PesoBruto != nil {
+			itemResp.PesoBruto = &item.PesoBruto
+		}
+
+		if &item.PesoLiquido != nil {
+			itemResp.PesoLiquido = &item.PesoLiquido
+		}
+
+		itensResponse[i] = itemResp
+	}
+	r.Itens = itensResponse
+}
+
+func convertPayments(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
+	if len(doc.Pagamentos) == 0 {
+		return
+	}
+
+	pagamentosResponse := make([]DocumentoVendaPagamentoResponse, len(doc.Pagamentos))
+	for i, pagamento := range doc.Pagamentos {
+		pagResp := DocumentoVendaPagamentoResponse{
+			ID:               pagamento.ID,
+			FormaPagamentoID: pagamento.FormaPagamentoID,
+			Valor:            pagamento.Valor,
+			NumeroParcelas:   pagamento.NumeroParcelas,
+			ParcelaAtual:     pagamento.ParcelaAtual,
+			Status:           pagamento.Status,
+		}
+
+		if pagamento.FormaPagamento != nil {
+			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Nome
+		}
+
+		if pagamento.DataVencimento != nil {
+			pagResp.DataVencimento = utils.FormatDate(*pagamento.DataVencimento)
+		}
+
+		if pagamento.DataPagamento != nil {
+			pagResp.DataPagamento = utils.FormatDate(*pagamento.DataPagamento)
+		}
+
+		if pagamento.ValorJuros != nil {
+			pagResp.ValorJuros = pagamento.ValorJuros
+		}
+
+		if pagamento.ValorMulta != nil {
+			pagResp.ValorMulta = pagamento.ValorMulta
+		}
+
+		if pagamento.ValorDesconto != nil {
+			pagResp.ValorDesconto = pagamento.ValorDesconto
+		}
+
+		if pagamento.Observacao != nil {
+			pagResp.Observacao = pagamento.Observacao
+		}
+
+		// Status label - usando constantes existentes
+		pagResp.StatusLabel = getStatusPagamentoLabel(pagamento.Status)
+
+		pagamentosResponse[i] = pagResp
+	}
+	r.Pagamentos = pagamentosResponse
+}
+
+// ============================================================
+// FUNÇÕES AUXILIARES DE LABELS
 // ============================================================
 
 func getTipoEntregaLabel(valor string) string {
@@ -400,6 +558,19 @@ func getTipoEntregaLabel(valor string) string {
 		return "Entrega"
 	case constants.TipoEntregaLocal:
 		return "Local"
+	default:
+		return "Desconhecido"
+	}
+}
+
+func getStatusPagamentoLabel(valor int) string {
+	switch valor {
+	case constants.SituacaoTituloAberto:
+		return "Aberto"
+	case constants.SituacaoTituloLiquidado:
+		return "Liquidado"
+	case constants.SituacaoTituloCancelado:
+		return "Cancelado"
 	default:
 		return "Desconhecido"
 	}

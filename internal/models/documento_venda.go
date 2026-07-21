@@ -26,14 +26,14 @@ type DocumentoVenda struct {
 	// ============================================================
 	// CAMPOS DO DOCUMENTO
 	// ============================================================
-	Numero        int                      `gorm:"column:ddv_numero;not null" json:"numero"`
-	TipoDocumento int                      `gorm:"column:ddv_tipodocumeto;not null" json:"tipo_documento"` // 1-Orçamento, 2-Pedido
-	TipoOperacao  int                      `gorm:"column:ddv_tipooperacao;not null" json:"tipo_operacao"`  // 0-Entrada, 1-Saída
-	DataDocumento time.Time                `gorm:"column:ddv_datadocumento;type:date;not null" json:"data_documento"`
-	DataValidade  *time.Time               `gorm:"column:ddv_datavalidade;type:date" json:"data_validade,omitempty"`
-	DataPrevisao  *time.Time               `gorm:"column:ddv_dataprevisao;type:date" json:"data_previsao,omitempty"`
-	DataExpedicao *time.Time               `gorm:"column:ddv_dataexpedicao;type:date" json:"data_expedicao,omitempty"`
-	Situacao      constants.SituacaoPedido `gorm:"column:ddv_situacao;not null;default:1" json:"situacao"`
+	Numero        int                          `gorm:"column:ddv_numero;not null" json:"numero"`
+	TipoDocumento constants.TipoDocumentoVenda `gorm:"column:ddv_tipodocumento;not null;default:1" json:"tipo_documento"` //                     `gorm:"column:ddv_tipodocumeto;not null" json:"tipo_documento"` // 1-Orçamento, 2-Pedido
+	TipoOperacao  constants.TipoOperacao       `gorm:"column:ddv_tipooperacao;not null" json:"tipo_operacao"`             // 0-Entrada, 1-Saída
+	DataDocumento time.Time                    `gorm:"column:ddv_datadocumento;type:date;not null" json:"data_documento"`
+	DataValidade  *time.Time                   `gorm:"column:ddv_datavalidade;type:date" json:"data_validade,omitempty"`
+	DataPrevisao  *time.Time                   `gorm:"column:ddv_dataprevisao;type:date" json:"data_previsao,omitempty"`
+	DataExpedicao *time.Time                   `gorm:"column:ddv_dataexpedicao;type:date" json:"data_expedicao,omitempty"`
+	Situacao      constants.SituacaoPedido     `gorm:"column:ddv_situacao;not null;default:1" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE VALORES (MONETÁRIOS)
