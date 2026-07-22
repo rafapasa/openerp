@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// ============================================================
+// =====================================================d=======
 // MODEL: DocumentoVendaPagamento
 // ============================================================
 
@@ -14,8 +14,8 @@ type DocumentoVendaPagamento struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID               int  `gorm:"column:dvp_item;primaryKey;autoIncrement" json:"id"`
-	DocumentoVendaID int  `gorm:"column:ddv_id;not null" json:"documento_venda_id"`
+	DocumentoVendaID int  `gorm:"column:ddv_id;primaryKey" json:"documento_venda_id"`
+	Item             int  `gorm:"column:dvp_item;primaryKey" json:"item"`
 	PortadorID       int  `gorm:"column:por_id;not null" json:"portador_id"`
 	TipoDocumentoID  int  `gorm:"column:tdoc_id;not null" json:"tipo_documento_id"`
 	FormaPagamentoID *int `gorm:"column:frmpgto_id" json:"forma_pagamento_id,omitempty"`

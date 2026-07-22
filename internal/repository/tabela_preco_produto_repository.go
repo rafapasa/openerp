@@ -51,6 +51,22 @@ func (r *TabelaPrecoProdutoRepository) Delete(id, item int) error {
 	return r.Update(id, item, deleteItem)
 }
 
+func (r *TabelaPrecoProdutoRepository) FindByProduto(tbpId, proId int) (*models.TabelaPrecoProduto, error) {
+	var tabItem models.TabelaPrecoProduto
+	err := r.db.
+		Preload("Produto").
+		Where("pro_id = ? AND tbp_id = ? AND deleted_at IS NULL", proId, tbpId).
+		First(&tabItem).
+		Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("Produto da tabela de preço não encontrado")
+		}
+		return nil, err
+	}
+	return &tabItem, nil
+}
+
 func (r *TabelaPrecoProdutoRepository) FindByID(id, item int) (*models.TabelaPrecoProduto, error) {
 	var tabItem models.TabelaPrecoProduto
 	err := r.db.Preload("Produto").

@@ -14,8 +14,8 @@ type DocumentoVendaItem struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID               int  `gorm:"column:dvi_item;primaryKey;autoIncrement" json:"id"`
-	DocumentoVendaID int  `gorm:"column:ddv_id;not null" json:"documento_venda_id"`
+	DocumentoVendaID int  `gorm:"column:ddv_id;primaryKey" json:"documento_venda_id"`
+	Item             int  `gorm:"column:dvi_item;primaryKey" json:"id"`
 	ProdutoID        int  `gorm:"column:pro_id;not null" json:"produto_id"`
 	OperacaoFiscalID int  `gorm:"column:opf_id;not null" json:"operacao_fiscal_id"`
 	CSTICMSID        int  `gorm:"column:csticms_id;not null" json:"cst_icms_id"`
@@ -133,4 +133,13 @@ func (d *DocumentoVendaItem) GetMargemLucro() float64 {
 		return 0
 	}
 	return ((d.ValorUnitario - d.CustoUnitario) / d.ValorUnitario) * 100
+}
+
+func (d *DocumentoVendaItem) IsDeleted() bool {
+	return !d.DeletedAt.IsZero()
+}
+
+func (d *DocumentoVendaItem) SoftDelete() {
+	now := time.Now()
+	d.DeletedAt = &now
 }

@@ -22,7 +22,7 @@ import (
 
 // DocumentoVendaItemRequest representa um item no request de um documento de venda.
 type DocumentoVendaItemRequest struct {
-	ID                 int      `json:"id,omitempty"`
+	DocumentoVendaID   int      `json:"id,omitempty"`
 	ProdutoID          int      `json:"produto_id" binding:"required"`
 	Quantidade         float64  `json:"quantidade" binding:"required,gt=0"`
 	ValorUnitario      float64  `json:"valor_unitario" binding:"gte=0"`
@@ -36,7 +36,7 @@ type DocumentoVendaItemRequest struct {
 
 // DocumentoVendaPagamentoRequest representa um pagamento no request
 type DocumentoVendaPagamentoRequest struct {
-	ID               int        `json:"id,omitempty"`
+	DocumentoVendaID int        `json:"id,omitempty"`
 	FormaPagamentoID int        `json:"forma_pagamento_id" binding:"required"`
 	Valor            float64    `json:"valor" binding:"required,gt=0"`
 	DataVencimento   *time.Time `json:"data_vencimento,omitempty"`
@@ -107,7 +107,8 @@ type DocumentoVendaRequest struct {
 
 // DocumentoVendaItemResponse representa a resposta de um item de documento.
 type DocumentoVendaItemResponse struct {
-	ID                 int      `json:"id"`
+	DocumentoVendaID   int      `json:"documento_venda_id"`
+	Item               int      `json:"item"`
 	ProdutoID          int      `json:"produto_id"`
 	ProdutoNome        string   `json:"produto_nome,omitempty"`
 	ProdutoCodigo      int      `json:"produto_codigo,omitempty"`
@@ -124,7 +125,8 @@ type DocumentoVendaItemResponse struct {
 
 // DocumentoVendaPagamentoResponse representa a resposta de um pagamento
 type DocumentoVendaPagamentoResponse struct {
-	ID                 int      `json:"id"`
+	DocumentoVendaID   int      `json:"documento_venda_id"`
+	Item               int      `json:"item"`
 	FormaPagamentoID   int      `json:"forma_pagamento_id"`
 	FormaPagamentoNome string   `json:"forma_pagamento_nome,omitempty"`
 	Valor              float64  `json:"valor"`
@@ -455,40 +457,23 @@ func convertItems(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
 	itensResponse := make([]DocumentoVendaItemResponse, len(doc.Itens))
 	for i, item := range doc.Itens {
 		itemResp := DocumentoVendaItemResponse{
-			ID:            item.ID,
-			ProdutoID:     item.ProdutoID,
-			Quantidade:    item.Quantidade,
-			ValorUnitario: item.ValorUnitario,
-			TotalItem:     item.ValorUnitario * item.Quantidade,
+			DocumentoVendaID:   item.DocumentoVendaID,
+			Item:               item.Item,
+			ProdutoID:          item.ProdutoID,
+			Quantidade:         item.Quantidade,
+			ValorUnitario:      item.ValorUnitario,
+			TotalItem:          item.ValorUnitario * item.Quantidade,
+			PesoBruto:          utils.Float64Ptr(item.PesoBruto),
+			PesoLiquido:        utils.Float64Ptr(item.PesoLiquido),
+			PercentualDesconto: item.PercentualDesconto,
+			ValorDesconto:      item.ValorDesconto,
+			ValorFrete:         item.ValorFrete,
 		}
 
 		if item.Produto != nil {
 			itemResp.ProdutoNome = item.Produto.Nome
 			itemResp.ProdutoCodigo = item.Produto.Codigo
 		}
-
-		if item.PercentualDesconto != nil {
-			itemResp.PercentualDesconto = item.PercentualDesconto
-		}
-
-		if item.ValorDesconto != nil {
-			itemResp.ValorDesconto = item.ValorDesconto
-			itemResp.TotalItem -= *item.ValorDesconto
-		}
-
-		if item.ValorFrete != nil {
-			itemResp.ValorFrete = item.ValorFrete
-			itemResp.TotalItemComFrete = itemResp.TotalItem + *item.ValorFrete
-		}
-
-		if &item.PesoBruto != nil {
-			itemResp.PesoBruto = &item.PesoBruto
-		}
-
-		if &item.PesoLiquido != nil {
-			itemResp.PesoLiquido = &item.PesoLiquido
-		}
-
 		itensResponse[i] = itemResp
 	}
 	r.Itens = itensResponse
@@ -502,44 +487,41 @@ func convertPayments(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
 	pagamentosResponse := make([]DocumentoVendaPagamentoResponse, len(doc.Pagamentos))
 	for i, pagamento := range doc.Pagamentos {
 		pagResp := DocumentoVendaPagamentoResponse{
-			ID:               pagamento.ID,
-			FormaPagamentoID: pagamento.FormaPagamentoID,
+			DocumentoVendaID: pagamento.DocumentoVendaID,
+			Item:             pagamento.Item,
+			FormaPagamentoID: *pagamento.FormaPagamentoID,
 			Valor:            pagamento.Valor,
-			NumeroParcelas:   pagamento.NumeroParcelas,
-			ParcelaAtual:     pagamento.ParcelaAtual,
-			Status:           pagamento.Status,
+			// NumeroParcelas:   pagamento.NumeroParcelas,
+			// ParcelaAtual:     pagamento.ParcelaAtual,
+			// Status:           pagamento.Status,
 		}
 
 		if pagamento.FormaPagamento != nil {
-			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Nome
+			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Descricao
 		}
 
-		if pagamento.DataVencimento != nil {
-			pagResp.DataVencimento = utils.FormatDate(*pagamento.DataVencimento)
+		if !pagamento.DataVencimento.IsZero() {
+			pagResp.DataVencimento = utils.FormatDate(pagamento.DataVencimento)
 		}
 
-		if pagamento.DataPagamento != nil {
-			pagResp.DataPagamento = utils.FormatDate(*pagamento.DataPagamento)
-		}
+		// if pagamento.ValorJuros != nil {
+		// 	pagResp.ValorJuros = pagamento.ValorJuros
+		// }
 
-		if pagamento.ValorJuros != nil {
-			pagResp.ValorJuros = pagamento.ValorJuros
-		}
+		// if pagamento.ValorMulta != nil {
+		// 	pagResp.ValorMulta = pagamento.ValorMulta
+		// }
 
-		if pagamento.ValorMulta != nil {
-			pagResp.ValorMulta = pagamento.ValorMulta
-		}
+		// if pagamento.ValorDesconto != nil {
+		// 	pagResp.ValorDesconto = pagamento.ValorDesconto
+		// }
 
-		if pagamento.ValorDesconto != nil {
-			pagResp.ValorDesconto = pagamento.ValorDesconto
-		}
-
-		if pagamento.Observacao != nil {
-			pagResp.Observacao = pagamento.Observacao
-		}
+		// if pagamento.Observacao != nil {
+		// 	pagResp.Observacao = pagamento.Observacao
+		// }
 
 		// Status label - usando constantes existentes
-		pagResp.StatusLabel = getStatusPagamentoLabel(pagamento.Status)
+		// pagResp.StatusLabel = getStatusPagamentoLabel(pagamento.Status)
 
 		pagamentosResponse[i] = pagResp
 	}

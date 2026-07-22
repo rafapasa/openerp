@@ -134,7 +134,7 @@ func (h *DocumentoVendaHandler) List(c *gin.Context) {
 	}
 
 	response := dto.DocumentoVendaListResponse{
-		Documentos: respDocs,
+		Items:      respDocs,
 		Total:      total,
 		Page:       offset/limit + 1,
 		Limit:      limit,

@@ -11,6 +11,7 @@ import (
 
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -19,7 +20,7 @@ import (
 type ProdutoService struct {
 	produtoRepo *repository.ProdutoRepository
 	// Repositórios para validação de dependências
-	// produtoPrecoRepo   *repository.ProdutoPrecoRepository
+	tabelaPrecoProdutoRepo *repository.TabelaPrecoProdutoRepository
 	// estoqueRepo        *repository.EstoqueRepository
 	// documentoVendaItemRepo *repository.DocumentoVendaItemRepository
 }
@@ -39,7 +40,8 @@ const (
 
 func NewProdutoService(db *gorm.DB) *ProdutoService {
 	return &ProdutoService{
-		produtoRepo: repository.NewProdutoRepository(db),
+		produtoRepo:            repository.NewProdutoRepository(db),
+		tabelaPrecoProdutoRepo: repository.NewTabelaPrecoProdutoRepository(db),
 	}
 }
 
@@ -500,4 +502,25 @@ func (s *ProdutoService) Deactivate(id int) error {
 
 	produto.Situacao = constants.StatusInativo
 	return s.produtoRepo.Update(produto)
+}
+
+func (s *ProdutoService) FindById(id int) (*models.Produto, error) {
+	if id <= 0 {
+		return nil, apperrors.NewValidationError("O 'id' é obrigatório.")
+	}
+	return s.produtoRepo.FindByID(id)
+}
+
+func (s *ProdutoService) GetValorUnitario(tbpId, proId int) (float64, error) {
+	if tbpId <= 0 {
+		return 0, apperrors.NewValidationError("O 'tabela_preco_id' é obrigatório.")
+	}
+	if proId <= 0 {
+		return 0, apperrors.NewValidationError("O 'produto_id' é obrigatório.")
+	}
+	itemTabPreco, err := s.tabelaPrecoProdutoRepo.FindByProduto(tbpId, proId)
+	if err != nil {
+		return 0, err
+	}
+	return itemTabPreco.ValorPadrao, nil
 }

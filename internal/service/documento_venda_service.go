@@ -206,3 +206,4 @@ func (s *DocumentoVendaService) Delete(id int) error {
 
 	return s.docRepo.Delete(id)
 }
+

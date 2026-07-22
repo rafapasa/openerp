@@ -128,3 +128,7 @@ func (s *TabelaPrecoProdutoService) List(tabelaPrecoID, limit, offset int, filte
 	}
 	return s.repo.List(tabelaPrecoID, limit, offset, filters)
 }
+
+func (s *TabelaPrecoProdutoService) GetByProduto(tbpId, proId int) (*models.TabelaPrecoProduto, error) {
+	return s.repo.FindByProduto(tbpId, proId)
+}
