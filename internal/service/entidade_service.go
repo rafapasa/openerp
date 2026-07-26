@@ -25,8 +25,6 @@ type EntidadeService struct {
 const (
 	maxLengthRazaoSocial  = 100
 	maxLengthNomeFantasia = 100
-	maxLengthInscricao    = 20
-	minLengthDocumento    = 11 // CPF tem 11 dígitos
 )
 
 func NewEntidadeService(db *gorm.DB) *EntidadeService {

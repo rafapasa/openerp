@@ -99,3 +99,13 @@ func (d *DocumentoVendaPagamento) IsParcelado() bool {
 func (d *DocumentoVendaPagamento) GetValorFormatado() string {
 	return string(rune(d.Valor)) // TODO: Formatar corretamente
 }
+
+func (d *DocumentoVendaPagamento) IsDeleted() bool {
+	return d.DeletedAt != nil
+}
+
+func (d *DocumentoVendaPagamento) SoftDelete() {
+	d.DeletedAt = new(time.Time)
+	*d.DeletedAt = time.Now()
+
+}

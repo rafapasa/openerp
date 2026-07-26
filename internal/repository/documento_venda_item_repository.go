@@ -60,3 +60,44 @@ func (r *DocumentoVendaItemRepository) FindByID(ddvId, dviItem int) (*models.Doc
 		First(&item).Error
 	return &item, err
 }
+
+func (s *DocumentoVendaItemRepository) GetByID(ddvId, dviItem int) (*models.DocumentoVendaItem, error) {
+	var item models.DocumentoVendaItem
+	err := s.db.
+		Model(&item).
+		Where("ddv_id = ? and dvi_item = ? AND deleted_at IS NULL", ddvId, dviItem).
+		First(&item).
+		Error
+	return &item, err
+
+}
+
+func (s *DocumentoVendaItemRepository) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaItem, int64, error) {
+	var items []models.DocumentoVendaItem
+	var total int64
+
+	query := s.db.
+		Model(&models.DocumentoVendaItem{}).
+		Where("ddv_id = ? AND deleted_at IS NULL", ddvId)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Preload("produto").
+		Preload("operacaofiscal").
+		Preload("cst_icms").
+		Preload("cst_ipi").
+		Preload("cst_pis_cofins").
+		Where("ddv_id = ? AND deleted_at IS NULL", ddvId).
+		Limit(limit).
+		Offset(offset).
+		Order("dvi_item ASC").
+		Find(&items).
+		Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return items, total, nil
+}

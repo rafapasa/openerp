@@ -527,33 +527,3 @@ func convertPayments(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
 	}
 	r.Pagamentos = pagamentosResponse
 }
-
-// ============================================================
-// FUNÇÕES AUXILIARES DE LABELS
-// ============================================================
-
-func getTipoEntregaLabel(valor string) string {
-	switch valor {
-	case constants.TipoEntregaRetirada:
-		return "Retirada"
-	case constants.TipoEntregaEntrega:
-		return "Entrega"
-	case constants.TipoEntregaLocal:
-		return "Local"
-	default:
-		return "Desconhecido"
-	}
-}
-
-func getStatusPagamentoLabel(valor int) string {
-	switch valor {
-	case constants.SituacaoTituloAberto:
-		return "Aberto"
-	case constants.SituacaoTituloLiquidado:
-		return "Liquidado"
-	case constants.SituacaoTituloCancelado:
-		return "Cancelado"
-	default:
-		return "Desconhecido"
-	}
-}

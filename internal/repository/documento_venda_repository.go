@@ -44,6 +44,19 @@ func (r *DocumentoVendaRepository) FindByID(id int) (*models.DocumentoVenda, err
 	return &doc, nil
 }
 
+// FindByID busca um documento de venda pelo ID, sem incluir seus relacionamentos
+func (r *DocumentoVendaRepository) GetByID(id int) (*models.DocumentoVenda, error) {
+	var ddv models.DocumentoVenda
+	err := r.db.First(&ddv, id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("documento de venda com ID %d não encontrado", id)
+		}
+		return nil, err
+	}
+	return &ddv, nil
+}
+
 // Update atualiza um documento de venda existente no banco de dados
 func (r *DocumentoVendaRepository) Update(doc *models.DocumentoVenda) error {
 	return r.db.Save(doc).Error
