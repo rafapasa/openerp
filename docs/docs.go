@@ -4230,21 +4230,6 @@ const docTemplate = `{
                 "SexoFeminino"
             ]
         },
-        "constants.SituacaoPedido": {
-            "type": "integer",
-            "enum": [
-                1,
-                2,
-                3,
-                9
-            ],
-            "x-enum-varnames": [
-                "SituacaoPedidoAberto",
-                "SituacaoPedidoEmAtividade",
-                "SituacaoPedidoFechado",
-                "SituacaoPedidoCancelado"
-            ]
-        },
         "constants.Status": {
             "type": "integer",
             "enum": [
@@ -4258,28 +4243,6 @@ const docTemplate = `{
                 "StatusInativo",
                 "StatusBloqueado",
                 "StatusCancelado"
-            ]
-        },
-        "constants.TipoDocumentoVenda": {
-            "type": "integer",
-            "enum": [
-                1,
-                2
-            ],
-            "x-enum-varnames": [
-                "TipoDocumentoOrcamento",
-                "TipoDocumentoPedido"
-            ]
-        },
-        "constants.TipoOperacao": {
-            "type": "integer",
-            "enum": [
-                0,
-                1
-            ],
-            "x-enum-varnames": [
-                "TipoOperacaoEntrada",
-                "TipoOperacaoSaida"
             ]
         },
         "constants.TipoPessoa": {
@@ -4336,7 +4299,10 @@ const docTemplate = `{
         "dto.DocumentoVendaItemResponse": {
             "type": "object",
             "properties": {
-                "id": {
+                "documento_venda_id": {
+                    "type": "integer"
+                },
+                "item": {
                     "type": "integer"
                 },
                 "percentual_desconto": {
@@ -4400,6 +4366,98 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DocumentoVendaPagamentoRequest": {
+            "type": "object",
+            "required": [
+                "forma_pagamento_id",
+                "valor"
+            ],
+            "properties": {
+                "data_pagamento": {
+                    "type": "string"
+                },
+                "data_vencimento": {
+                    "type": "string"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "parcela_atual": {
+                    "type": "integer"
+                },
+                "valor": {
+                    "type": "number"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_juros": {
+                    "type": "number"
+                },
+                "valor_multa": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.DocumentoVendaPagamentoResponse": {
+            "type": "object",
+            "properties": {
+                "data_pagamento": {
+                    "type": "string"
+                },
+                "data_vencimento": {
+                    "type": "string"
+                },
+                "documento_venda_id": {
+                    "type": "integer"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "forma_pagamento_nome": {
+                    "type": "string"
+                },
+                "item": {
+                    "type": "integer"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "parcela_atual": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "status_label": {
+                    "type": "string"
+                },
+                "valor": {
+                    "type": "number"
+                },
+                "valor_desconto": {
+                    "type": "number"
+                },
+                "valor_juros": {
+                    "type": "number"
+                },
+                "valor_multa": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.DocumentoVendaRequest": {
             "type": "object",
             "required": [
@@ -4415,23 +4473,25 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "created_by": {
-                    "description": "Auditoria",
+                    "description": "============================================================\nAUDITORIA\n============================================================",
                     "type": "integer"
                 },
                 "data_previsao": {
                     "type": "string"
                 },
                 "data_validade": {
+                    "description": "============================================================\nDATAS\n============================================================",
                     "type": "string"
                 },
                 "empresa_filial_id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
                     "type": "integer"
                 },
                 "entidade_id": {
                     "type": "integer"
                 },
                 "itens": {
-                    "description": "Relacionamentos",
+                    "description": "============================================================\nLISTAS\n============================================================",
                     "type": "array",
                     "minItems": 1,
                     "items": {
@@ -4448,18 +4508,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "observacoes_interna": {
+                    "description": "============================================================\nOBSERVAÇÕES\n============================================================",
                     "type": "string"
+                },
+                "pagamentos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaPagamentoRequest"
+                    }
                 },
                 "tabela_preco_id": {
                     "type": "integer"
                 },
                 "tipo_documento": {
                     "description": "1-Orçamento, 2-Pedido",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/constants.TipoDocumentoVenda"
-                        }
-                    ]
+                    "type": "integer"
                 },
                 "tipo_entrega": {
                     "description": "RETIRADA, ENTREGA, LOCAL",
@@ -4467,11 +4530,7 @@ const docTemplate = `{
                 },
                 "tipo_operacao": {
                     "description": "0-Entrada, 1-Saída",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/constants.TipoOperacao"
-                        }
-                    ]
+                    "type": "integer"
                 },
                 "transportadora_id": {
                     "type": "integer"
@@ -4483,9 +4542,11 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "valor_frete": {
+                    "description": "============================================================\nVALORES\n============================================================",
                     "type": "number"
                 },
                 "vendedor_id": {
+                    "description": "============================================================\nRELACIONAMENTOS\n============================================================",
                     "type": "integer"
                 }
             }
@@ -4533,7 +4594,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "itens": {
-                    "description": "============================================================\nRELACIONAMENTOS\n============================================================",
+                    "description": "============================================================\nLISTAS\n============================================================",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
@@ -4552,8 +4613,14 @@ const docTemplate = `{
                     "description": "============================================================\nOBSERVAÇÕES\n============================================================",
                     "type": "string"
                 },
+                "pagamentos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
+                    }
+                },
                 "situacao": {
-                    "$ref": "#/definitions/constants.SituacaoPedido"
+                    "type": "integer"
                 },
                 "situacao_label": {
                     "type": "string"
@@ -4565,7 +4632,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "tipo_documento": {
-                    "$ref": "#/definitions/constants.TipoDocumentoVenda"
+                    "type": "integer"
                 },
                 "tipo_documento_label": {
                     "type": "string"
@@ -4573,11 +4640,8 @@ const docTemplate = `{
                 "tipo_entrega": {
                     "type": "string"
                 },
-                "tipo_entrega_label": {
-                    "type": "string"
-                },
                 "tipo_operacao": {
-                    "$ref": "#/definitions/constants.TipoOperacao"
+                    "type": "integer"
                 },
                 "tipo_operacao_label": {
                     "type": "string"
@@ -4614,6 +4678,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "vendedor_id": {
+                    "description": "============================================================\nRELACIONAMENTOS\n============================================================",
                     "type": "integer"
                 },
                 "vendedor_nome": {

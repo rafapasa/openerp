@@ -8,18 +8,6 @@ definitions:
     x-enum-varnames:
     - SexoMasculino
     - SexoFeminino
-  constants.SituacaoPedido:
-    enum:
-    - 1
-    - 2
-    - 3
-    - 9
-    type: integer
-    x-enum-varnames:
-    - SituacaoPedidoAberto
-    - SituacaoPedidoEmAtividade
-    - SituacaoPedidoFechado
-    - SituacaoPedidoCancelado
   constants.Status:
     enum:
     - 1
@@ -32,22 +20,6 @@ definitions:
     - StatusInativo
     - StatusBloqueado
     - StatusCancelado
-  constants.TipoDocumentoVenda:
-    enum:
-    - 1
-    - 2
-    type: integer
-    x-enum-varnames:
-    - TipoDocumentoOrcamento
-    - TipoDocumentoPedido
-  constants.TipoOperacao:
-    enum:
-    - 0
-    - 1
-    type: integer
-    x-enum-varnames:
-    - TipoOperacaoEntrada
-    - TipoOperacaoSaida
   constants.TipoPessoa:
     enum:
     - 1
@@ -85,7 +57,9 @@ definitions:
     type: object
   dto.DocumentoVendaItemResponse:
     properties:
-      id:
+      documento_venda_id:
+        type: integer
+      item:
         type: integer
       percentual_desconto:
         type: number
@@ -127,23 +101,98 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.DocumentoVendaPagamentoRequest:
+    properties:
+      data_pagamento:
+        type: string
+      data_vencimento:
+        type: string
+      forma_pagamento_id:
+        type: integer
+      id:
+        type: integer
+      numero_parcelas:
+        type: integer
+      observacao:
+        type: string
+      parcela_atual:
+        type: integer
+      valor:
+        type: number
+      valor_desconto:
+        type: number
+      valor_juros:
+        type: number
+      valor_multa:
+        type: number
+    required:
+    - forma_pagamento_id
+    - valor
+    type: object
+  dto.DocumentoVendaPagamentoResponse:
+    properties:
+      data_pagamento:
+        type: string
+      data_vencimento:
+        type: string
+      documento_venda_id:
+        type: integer
+      forma_pagamento_id:
+        type: integer
+      forma_pagamento_nome:
+        type: string
+      item:
+        type: integer
+      numero_parcelas:
+        type: integer
+      observacao:
+        type: string
+      parcela_atual:
+        type: integer
+      status:
+        type: integer
+      status_label:
+        type: string
+      valor:
+        type: number
+      valor_desconto:
+        type: number
+      valor_juros:
+        type: number
+      valor_multa:
+        type: number
+    type: object
   dto.DocumentoVendaRequest:
     properties:
       condicao_pagamento_id:
         type: integer
       created_by:
-        description: Auditoria
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
         type: integer
       data_previsao:
         type: string
       data_validade:
+        description: |-
+          ============================================================
+          DATAS
+          ============================================================
         type: string
       empresa_filial_id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
         type: integer
       entidade_id:
         type: integer
       itens:
-        description: Relacionamentos
+        description: |-
+          ============================================================
+          LISTAS
+          ============================================================
         items:
           $ref: '#/definitions/dto.DocumentoVendaItemRequest'
         minItems: 1
@@ -155,20 +204,26 @@ definitions:
       observacoes_cliente:
         type: string
       observacoes_interna:
+        description: |-
+          ============================================================
+          OBSERVAÇÕES
+          ============================================================
         type: string
+      pagamentos:
+        items:
+          $ref: '#/definitions/dto.DocumentoVendaPagamentoRequest'
+        type: array
       tabela_preco_id:
         type: integer
       tipo_documento:
-        allOf:
-        - $ref: '#/definitions/constants.TipoDocumentoVenda'
         description: 1-Orçamento, 2-Pedido
+        type: integer
       tipo_entrega:
         description: RETIRADA, ENTREGA, LOCAL
         type: string
       tipo_operacao:
-        allOf:
-        - $ref: '#/definitions/constants.TipoOperacao'
         description: 0-Entrada, 1-Saída
+        type: integer
       transportadora_id:
         type: integer
       updated_by:
@@ -176,8 +231,16 @@ definitions:
       valor_desconto:
         type: number
       valor_frete:
+        description: |-
+          ============================================================
+          VALORES
+          ============================================================
         type: number
       vendedor_id:
+        description: |-
+          ============================================================
+          RELACIONAMENTOS
+          ============================================================
         type: integer
     required:
     - condicao_pagamento_id
@@ -228,7 +291,7 @@ definitions:
       itens:
         description: |-
           ============================================================
-          RELACIONAMENTOS
+          LISTAS
           ============================================================
         items:
           $ref: '#/definitions/dto.DocumentoVendaItemResponse'
@@ -245,8 +308,12 @@ definitions:
           OBSERVAÇÕES
           ============================================================
         type: string
+      pagamentos:
+        items:
+          $ref: '#/definitions/dto.DocumentoVendaPagamentoResponse'
+        type: array
       situacao:
-        $ref: '#/definitions/constants.SituacaoPedido'
+        type: integer
       situacao_label:
         type: string
       tabela_preco_descricao:
@@ -254,15 +321,13 @@ definitions:
       tabela_preco_id:
         type: integer
       tipo_documento:
-        $ref: '#/definitions/constants.TipoDocumentoVenda'
+        type: integer
       tipo_documento_label:
         type: string
       tipo_entrega:
         type: string
-      tipo_entrega_label:
-        type: string
       tipo_operacao:
-        $ref: '#/definitions/constants.TipoOperacao'
+        type: integer
       tipo_operacao_label:
         type: string
       total_descontos:
@@ -290,6 +355,10 @@ definitions:
       valor_frete:
         type: number
       vendedor_id:
+        description: |-
+          ============================================================
+          RELACIONAMENTOS
+          ============================================================
         type: integer
       vendedor_nome:
         type: string
