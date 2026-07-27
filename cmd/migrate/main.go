@@ -37,6 +37,7 @@ func main() {
 		&models.Entidade{},
 		&models.EntidadeEndereco{},
 		&models.EntidadeContato{},
+		&models.ProdutoVariacao{}, // Adicionado para migração
 		&models.Municipio{},
 		&models.Estado{},
 	)

@@ -16,6 +16,7 @@ type ProdutoCor struct {
 	// ============================================================
 	ID              int    `gorm:"column:cor_id;primaryKey;autoIncrement" json:"id"`
 	EmpresaFilialID int    `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
+	Sigla           string `gorm:"column:cor_sigla;type:varchar(20);not null" json:"sigla"` // Adicionado Sigla
 	Nome            string `gorm:"column:cor_nome;type:varchar(255);not null" json:"nome"`
 
 	// ============================================================

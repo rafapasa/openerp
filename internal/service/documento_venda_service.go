@@ -353,24 +353,27 @@ func (s *DocumentoVendaService) executarOperacaoPagamento(
 		return nil, apperrors.NewInternalError("Erro ao commitar transação.", err)
 	}
 
-	return s.ddvRepo.FindByID(docVendaID)
 	return doc, nil
 }
 
 func (s *DocumentoVendaService) AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoPagamento(reqAddPagamento.DocumentoVendaID, func(dvpService *DocumentoVendaPagamentoService) error {
-		return dvpService.Create(reqAddPagamento)
-	})
+	return s.executarOperacaoPagamento(
+		reqAddPagamento.DocumentoVendaID,
+		func(dvpService *DocumentoVendaPagamentoService) error {
+			return dvpService.Create(reqAddPagamento)
+		})
 }
 
 func (s *DocumentoVendaService) EditPagamento(ddvId, dvpItem int, reqPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoPagamento(ddvId, func(dvpService *DocumentoVendaPagamentoService) error {
-		return dvpService.Update(ddvId, dvpItem, reqPagamento)
-	})
+	return s.executarOperacaoPagamento(ddvId,
+		func(dvpService *DocumentoVendaPagamentoService) error {
+			return dvpService.Update(ddvId, dvpItem, reqPagamento)
+		})
 }
 
 func (s *DocumentoVendaService) DeletePagamento(ddvId, dvpItem int) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoPagamento(ddvId, func(dvpService *DocumentoVendaPagamentoService) error {
-		return dvpService.Delete(ddvId, dvpItem)
-	})
+	return s.executarOperacaoPagamento(ddvId,
+		func(dvpService *DocumentoVendaPagamentoService) error {
+			return dvpService.Delete(ddvId, dvpItem)
+		})
 }

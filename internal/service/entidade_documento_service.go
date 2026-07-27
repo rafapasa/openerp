@@ -120,7 +120,7 @@ func (s *EntidadeDocumentoService) isUpdateValid(entidadeID, item int, req *dto.
 
 	// 3. Validar se o documento existe
 	if _, err := s.documentoRepo.FindByID(entidadeID, item); err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %w", err))
+		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
 	}
 
 	return nil
@@ -140,12 +140,12 @@ func (s *EntidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*m
 	// 2. Converter DTO para Model
 	documento, err := req.ToModel()
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao converter dados: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao converter dados: %v", err))
 	}
 
 	// 3. Salvar (o repository cuida do sequencial do Item)
 	if err := s.documentoRepo.Create(documento); err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao criar documento: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao criar documento: %v", err))
 	}
 
 	return documento, nil
@@ -155,7 +155,7 @@ func (s *EntidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*m
 func (s *EntidadeDocumentoService) GetByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
 	}
 	return documento, nil
 }
@@ -169,7 +169,7 @@ func (s *EntidadeDocumentoService) GetByEntidadeID(entidadeID int) ([]models.Ent
 
 	documentos, err := s.documentoRepo.FindByEntidadeID(entidadeID)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao buscar documentos: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao buscar documentos: %v", err))
 	}
 
 	return documentos, nil
@@ -185,7 +185,7 @@ func (s *EntidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 	// 2. Buscar documento existente
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
 	}
 
 	// 3. Atualizar campos
@@ -201,7 +201,7 @@ func (s *EntidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 		if data, err := base64Decode(req.Arquivo); err == nil {
 			documento.Arquivo = data
 		} else {
-			return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao decodificar arquivo: %w", err))
+			return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao decodificar arquivo: %v", err))
 		}
 	}
 
@@ -219,7 +219,7 @@ func (s *EntidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 
 	// 7. Salvar
 	if err := s.documentoRepo.Update(documento); err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao atualizar documento: %w", err))
+		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao atualizar documento: %v", err))
 	}
 
 	return documento, nil
@@ -230,7 +230,7 @@ func (s *EntidadeDocumentoService) Delete(entidadeID, item int) error {
 	// 1. Validar se o documento existe
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %w", err))
+		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
 	}
 
 	// 2. Verificar se já foi deletado
@@ -242,7 +242,7 @@ func (s *EntidadeDocumentoService) Delete(entidadeID, item int) error {
 
 	// 4. Excluir
 	if err := s.documentoRepo.Delete(entidadeID, item); err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("erro ao excluir documento: %w", err))
+		return apperrors.NewValidationError(fmt.Sprintf("erro ao excluir documento: %v", err))
 	}
 
 	return nil
@@ -260,7 +260,7 @@ func (s *EntidadeDocumentoService) List(limit, offset int, filters map[string]in
 
 	documentos, total, err := s.documentoRepo.List(limit, offset, filters)
 	if err != nil {
-		return nil, 0, apperrors.NewValidationError(fmt.Sprintf("erro ao listar documentos: %w", err))
+		return nil, 0, apperrors.NewValidationError(fmt.Sprintf("erro ao listar documentos: %v", err))
 	}
 
 	return documentos, total, nil
