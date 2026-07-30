@@ -1,11 +1,10 @@
 package service
 
 import (
-	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 )
@@ -45,11 +44,11 @@ func NewGrupoEntidadeService(gpeRepo repository.GrupoEntidadeRepository) GrupoEn
 func (s *grupoEntidadeService) Create(req *dto.GrupoEntidadeRequest) (*models.GrupoEntidade, error) {
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.gpeRepo.ExistsByDescricao(descricao, 0)
-	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar nome: %w", err)
+	if err != nil { //
+		return nil, apperrors.NewInternalError("Erro ao verificar nome.", err) //
 	}
 	if exists {
-		return nil, errors.New("já existe um grupo de entidade com este nome")
+		return nil, apperrors.NewConflictError("Já existe um grupo de entidade com este nome.") //
 	}
 
 	grupo := &models.GrupoEntidade{
@@ -59,38 +58,37 @@ func (s *grupoEntidadeService) Create(req *dto.GrupoEntidadeRequest) (*models.Gr
 	}
 
 	if err := s.gpeRepo.Create(grupo); err != nil {
-		return nil, fmt.Errorf("erro ao criar grupo de entidade: %w", err)
+		return nil, apperrors.NewInternalError("erro ao criar grupo de entidade: %w", err)
 	}
-
 	return grupo, nil
 }
 
 // GetByID busca um grupo de entidade por ID
 func (s *grupoEntidadeService) GetByID(id int) (*models.GrupoEntidade, error) {
-	return s.gpeRepo.FindByID(id)
+	return s.gpeRepo.FindByID(id) //
 }
 
 // Update atualiza um grupo de entidade
 func (s *grupoEntidadeService) Update(id int, req *dto.GrupoEntidadeRequest) (*models.GrupoEntidade, error) {
 	grupo, err := s.gpeRepo.FindByID(id)
 	if err != nil {
-		return nil, err
+		return nil, err //
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.gpeRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar nome: %w", err)
+		return nil, err //
 	}
 	if exists {
-		return nil, errors.New("já existe um grupo de entidade com este nome")
+		return nil, apperrors.NewConflictError("já existe um grupo de entidade com este nome")
 	}
 
 	grupo.Descricao = descricao
 	grupo.UpdatedBy = req.UpdatedBy
 
 	if err := s.gpeRepo.Update(id, grupo); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar grupo de entidade: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar grupo de entidade.", err) //
 	}
 
 	return grupo, nil
@@ -98,8 +96,7 @@ func (s *grupoEntidadeService) Update(id int, req *dto.GrupoEntidadeRequest) (*m
 
 // Delete exclui um grupo de entidade
 func (s *grupoEntidadeService) Delete(id int) error {
-	_, err := s.gpeRepo.FindByID(id)
-	if err != nil {
+	if _, err := s.gpeRepo.FindByID(id); err != nil { //
 		return err
 	}
 

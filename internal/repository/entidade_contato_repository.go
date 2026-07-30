@@ -3,9 +3,11 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 )
 
@@ -54,24 +56,38 @@ func NewEntidadeContatoRepository(db *gorm.DB) EntidadeContatoRepository {
 
 // Create salva um novo contato com sequencial manual
 func (r *entidadeContatoRepository) Create(contato *models.EntidadeContato) error {
-	return r.db.Create(contato).Error
+	err := r.db.Create(contato).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro criando contato: ", err)
+	}
+
+	return nil
 }
 
 // Update atualiza um contato existente
 func (r *entidadeContatoRepository) Update(contato *models.EntidadeContato) error {
-	return r.db.
+	err := r.db.
 		Omit("FormaContato", "created_at", "deleted_at").
 		Model(&models.EntidadeContato{}).
 		Where("ent_id = ? AND efc_item = ?", contato.EntidadeID, contato.Item).
 		Updates(contato).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro atualizando contato: ", err)
+	}
+	return nil
+
 }
 
 // Delete realiza exclusão lógica de um contato
 func (r *entidadeContatoRepository) Delete(entidadeID, item int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.EntidadeContato{}).
 		Where("ent_id = ? AND efc_item = ?", entidadeID, item).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro deletando contato: ", err)
+	}
+	return nil
 }
 
 // ============================================================
@@ -88,9 +104,9 @@ func (r *entidadeContatoRepository) FindByID(entidadeID, item int) (*models.Enti
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("contato não encontrado")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("Contato para entidade %d item %d não encontrado", entidadeID, item))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 	return &contato, nil
 }
@@ -105,7 +121,7 @@ func (r *entidadeContatoRepository) FindByEntidadeID(entidadeID int) ([]models.E
 		Find(&contatos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 	return contatos, nil
 }
@@ -120,7 +136,7 @@ func (r *entidadeContatoRepository) FindByEntidadeIDAndTipo(entidadeID, formaCon
 		Find(&contatos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 	return contatos, nil
 }
@@ -138,7 +154,7 @@ func (r *entidadeContatoRepository) List(limit, offset int, filters map[string]i
 	query = r.applyFilters(query, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 
 	err := query.
@@ -149,7 +165,7 @@ func (r *entidadeContatoRepository) List(limit, offset int, filters map[string]i
 		Find(&contatos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 
 	return contatos, total, nil
@@ -167,7 +183,7 @@ func (r *entidadeContatoRepository) GetNextItemNumber(entidadeID int) (int, erro
 		Select("COALESCE(MAX(efc_item), 0) + 1").
 		Scan(&maxItem).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro gerando novo proximo item: ", err)
 	}
 	return maxItem, nil
 }
@@ -179,7 +195,7 @@ func (r *entidadeContatoRepository) CountByEntidadeID(entidadeID int) (int64, er
 		Where("ent_id = ? AND deleted_at IS NULL", entidadeID).
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 	return count, nil
 }
@@ -195,7 +211,7 @@ func (r *entidadeContatoRepository) ExistsByEntidadeTipo(entidadeID, formaContat
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando contato: ", err)
 	}
 	return count > 0, nil
 }

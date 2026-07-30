@@ -1,9 +1,10 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
@@ -37,26 +38,26 @@ func (s *tabelaPrecoService) Create(req *dto.TabelaPrecoRequest) (*models.Tabela
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.tbpRepo.ExistsByDescricao(descricao, 0)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, err
 	}
 	if exists {
-		return nil, errors.New("já existe uma tabela de preço com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe uma tabela de preço com esta descrição.") //
 	}
 
 	tabela, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
 	if err := s.tbpRepo.Create(tabela); err != nil {
-		return nil, fmt.Errorf("erro ao criar tabela de preço: %w", err)
+		return nil, err
 	}
 
 	return tabela, nil
 }
 
 func (s *tabelaPrecoService) GetByID(id int) (*models.TabelaPreco, error) {
-	return s.tbpRepo.FindByID(id)
+	return s.tbpRepo.FindByID(id) //
 }
 
 func (s *tabelaPrecoService) Update(id int, req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error) {
@@ -72,33 +73,33 @@ func (s *tabelaPrecoService) Update(id int, req *dto.TabelaPrecoRequest) (*model
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.tbpRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, err
 	}
 	if exists {
-		return nil, errors.New("já existe uma tabela de preço com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe uma tabela de preço com esta descrição.") //
 	}
 
 	tabela.Descricao = descricao
 	tabela.UpdatedBy = req.UpdatedBy
 
 	if err := s.tbpRepo.Update(id, tabela); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar tabela de preço: %w", err)
+		return nil, err
 	}
 
 	return tabela, nil
 }
 
 func (s *tabelaPrecoService) Delete(id int) error {
-	if _, err := s.tbpRepo.FindByID(id); err != nil {
+	if _, err := s.tbpRepo.FindByID(id); err != nil { //
 		return err
 	}
 
 	count, err := s.tbpRepo.CountProdutosByTabela(id)
 	if err != nil {
-		return fmt.Errorf("erro ao verificar uso da tabela de preço: %w", err)
+		return err
 	}
 	if count > 0 {
-		return fmt.Errorf("tabela de preço está em uso por %d documento(s) e não pode ser excluída", count)
+		return apperrors.NewConflictError(fmt.Sprintf("Tabela de preço está em uso por %d documento(s) e não pode ser excluída.", count)) //
 	}
 
 	return s.tbpRepo.Delete(id)

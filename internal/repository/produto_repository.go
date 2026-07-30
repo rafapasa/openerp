@@ -121,7 +121,7 @@ func (r *produtoRepository) FindByID(id int) (*models.Produto, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("produto com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro ao buscar produto.", err)
 	}
 	return &produto, nil
 }
@@ -159,7 +159,7 @@ func (r *produtoRepository) FindByCodigo(codigo int) (*models.Produto, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("produto com código %d não encontrado", codigo))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro ao buscar produto.", err)
 	}
 	return &produto, nil
 }
@@ -225,7 +225,7 @@ func (r *produtoRepository) FindByCodigoBarras(codigoBarras string) (*models.Pro
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("produto com código de barras %s não encontrado", codigoBarras))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro ao buscar produto.", err)
 	}
 	return &produto, nil
 }
@@ -379,7 +379,7 @@ func (r *produtoRepository) List(limit, offset int, filters map[string]interface
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro ao listar produtos.", err)
 	}
 
 	return produtos, total, nil
@@ -513,7 +513,7 @@ func (r *produtoRepository) ExistsByID(id int) (bool, error) {
 		Where("pro_id = ? AND deleted_at IS NULL", id).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro ao buscar produto.", err)
 	}
 	return count > 0, nil
 }

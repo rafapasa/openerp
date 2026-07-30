@@ -1,14 +1,13 @@
 package service
 
 import (
-	"errors"
-	"fmt"
 	"strings"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
-	"gorm.io/gorm"
 )
 
 // ProdutoSubgrupoService define os métodos públicos para o serviço de subgrupo de produto.
@@ -25,16 +24,16 @@ type ProdutoSubgrupoService interface {
 // ============================================================
 
 type produtoSubgrupoService struct {
-	repo *repository.ProdutoSubgrupoRepository
+	prosgRepo repository.ProdutoSubgrupoRepository
 }
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
 
-func NewProdutoSubgrupoService(db *gorm.DB) ProdutoSubgrupoService {
+func NewProdutoSubgrupoService(prosgRepo repository.ProdutoSubgrupoRepository) ProdutoSubgrupoService {
 	return &produtoSubgrupoService{
-		repo: repository.NewProdutoSubgrupoRepository(db),
+		prosgRepo: prosgRepo,
 	}
 }
 
@@ -49,21 +48,21 @@ func (s *produtoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*model
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, 0)
+	exists, err := s.prosgRepo.ExistsByDescricao(descricao, 0)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao verificar descrição.", err) //
 	}
 	if exists {
-		return nil, errors.New("já existe um subgrupo de produto com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um subgrupo de produto com esta descrição.") //
 	}
 
 	subgrupo, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
-	if err := s.repo.Create(subgrupo); err != nil {
-		return nil, fmt.Errorf("erro ao criar subgrupo de produto: %w", err)
+	if err := s.prosgRepo.Create(subgrupo); err != nil {
+		return nil, apperrors.NewInternalError("Erro ao criar subgrupo de produto.", err) //
 	}
 
 	return subgrupo, nil
@@ -71,31 +70,31 @@ func (s *produtoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*model
 
 // GetByID busca um subgrupo de produto por ID.
 func (s *produtoSubgrupoService) GetByID(id int) (*models.ProdutoSubgrupo, error) {
-	return s.repo.FindByID(id)
+	return s.prosgRepo.FindByID(id) //
 }
 
 // Update atualiza um subgrupo de produto.
 func (s *produtoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
-	subgrupo, err := s.repo.FindByID(id)
+	subgrupo, err := s.prosgRepo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, id)
+	exists, err := s.prosgRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, err
 	}
 	if exists {
-		return nil, errors.New("já existe um subgrupo de produto com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um subgrupo de produto com esta descrição.") //
 	}
 
 	subgrupo.Descricao = descricao
 	subgrupo.Situacao = req.Situacao
 	subgrupo.UpdatedBy = req.UpdatedBy
 
-	if err := s.repo.Update(id, subgrupo); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar subgrupo de produto: %w", err)
+	if err := s.prosgRepo.Update(id, subgrupo); err != nil {
+		return nil, err
 	}
 
 	return subgrupo, nil
@@ -103,7 +102,7 @@ func (s *produtoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest)
 
 // Delete exclui um subgrupo de produto.
 func (s *produtoSubgrupoService) Delete(id int) error {
-	if _, err := s.repo.FindByID(id); err != nil {
+	if _, err := s.prosgRepo.FindByID(id); err != nil {
 		return err
 	}
 
@@ -112,7 +111,7 @@ func (s *produtoSubgrupoService) Delete(id int) error {
 	// if err != nil { return err }
 	// if count > 0 { return errors.New("subgrupo em uso e não pode ser excluído") }
 
-	return s.repo.Delete(id)
+	return s.prosgRepo.Delete(id)
 }
 
 // List lista todos os subgrupos de produto.
@@ -123,5 +122,5 @@ func (s *produtoSubgrupoService) List(limit, offset int, filters map[string]inte
 	if offset < 0 {
 		offset = 0
 	}
-	return s.repo.List(limit, offset, filters)
+	return s.prosgRepo.List(limit, offset, filters)
 }

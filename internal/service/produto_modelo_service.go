@@ -1,14 +1,13 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
-	"gorm.io/gorm"
 )
 
 // ProdutoModeloService define os métodos públicos para o serviço de modelo de produto.
@@ -21,12 +20,12 @@ type ProdutoModeloService interface {
 }
 
 type produtoModeloService struct {
-	repo *repository.ProdutoModeloRepository
+	promRepo repository.ProdutoModeloRepository
 }
 
-func NewProdutoModeloService(db *gorm.DB) ProdutoModeloService {
+func NewProdutoModeloService(promRepo repository.ProdutoModeloRepository) ProdutoModeloService {
 	return &produtoModeloService{
-		repo: repository.NewProdutoModeloRepository(db),
+		promRepo: promRepo,
 	}
 }
 
@@ -36,28 +35,28 @@ func (s *produtoModeloService) Create(req *dto.ProdutoModeloRequest) (*models.Pr
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, 0)
+	exists, err := s.promRepo.ExistsByDescricao(descricao, 0)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, err
 	}
 	if exists {
-		return nil, errors.New("já existe um modelo de produto com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um modelo de produto com esta descrição.") //
 	}
 
 	modelo, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
-	if err := s.repo.Create(modelo); err != nil {
-		return nil, fmt.Errorf("erro ao criar modelo de produto: %w", err)
+	if err := s.promRepo.Create(modelo); err != nil {
+		return nil, err
 	}
 
 	return modelo, nil
 }
 
 func (s *produtoModeloService) GetByID(id int) (*models.ProdutoModelo, error) {
-	return s.repo.FindByID(id)
+	return s.promRepo.FindByID(id) //
 }
 
 func (s *produtoModeloService) Update(id int, req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error) {
@@ -65,50 +64,50 @@ func (s *produtoModeloService) Update(id int, req *dto.ProdutoModeloRequest) (*m
 		return nil, err
 	}
 
-	modelo, err := s.repo.FindByID(id)
+	modelo, err := s.promRepo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, id)
+	exists, err := s.promRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, err
 	}
 	if exists {
-		return nil, errors.New("já existe um modelo de produto com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um modelo de produto com esta descrição.") //
 	}
 
 	modelo.Descricao = descricao
 	modelo.Situacao = req.Situacao
 	modelo.UpdatedBy = req.UpdatedBy
 
-	if err := s.repo.Update(id, modelo); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar modelo de produto: %w", err)
+	if err := s.promRepo.Update(id, modelo); err != nil {
+		return nil, err
 	}
 
 	return modelo, nil
 }
 
 func (s *produtoModeloService) Delete(id int) error {
-	if _, err := s.repo.FindByID(id); err != nil {
+	if _, err := s.promRepo.FindByID(id); err != nil { //
 		return err
 	}
 
-	count, err := s.repo.CountByModelo(id)
+	count, err := s.promRepo.CountProdutosByModelo(id)
 	if err != nil {
-		return fmt.Errorf("erro ao verificar uso do modelo: %w", err)
+		return err
 	}
 	if count > 0 {
-		return fmt.Errorf("modelo está em uso por %d produto(s) e não pode ser excluído", count)
+		return apperrors.NewConflictError(fmt.Sprintf("Modelo está em uso por %d produto(s) e não pode ser excluído.", count)) //
 	}
 
-	return s.repo.Delete(id)
+	return s.promRepo.Delete(id)
 }
 
 func (s *produtoModeloService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoModelo, int64, error) {
 	if limit <= 0 {
 		limit = 10
 	}
-	return s.repo.List(limit, offset, filters)
+	return s.promRepo.List(limit, offset, filters)
 }

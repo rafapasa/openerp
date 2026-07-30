@@ -69,24 +69,36 @@ func NewProdutoSubgrupoRepository(db *gorm.DB) ProdutoSubgrupoRepository {
 
 // Create salva um novo subgrupo de produto
 func (r *produtoSubgrupoRepository) Create(subgrupo *models.ProdutoSubgrupo) error {
-	return r.db.Create(subgrupo).Error
+	err := r.db.Create(subgrupo).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao criar subgrupo de produto.", err)
+	}
+	return nil
 }
 
 // Update atualiza um subgrupo de produto existente
 func (r *produtoSubgrupoRepository) Update(id int, subgrupo *models.ProdutoSubgrupo) error {
-	return r.db.
+	err := r.db.
 		Omit("Produtos", "created_at", "deleted_at").
 		Model(&models.ProdutoSubgrupo{}).
 		Where("prosg_id = ?", id).
 		Updates(subgrupo).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar subgrupo de produtos", err)
+	}
+	return nil
 }
 
 // Delete realiza exclusão lógica
 func (r *produtoSubgrupoRepository) Delete(id int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.ProdutoSubgrupo{}).
 		Where("prosg_id = ?", id).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir subgrupo de produtos", err)
+	}
+	return nil
 }
 
 // FindByID busca um subgrupo de produto pelo ID com relacionamentos
@@ -101,7 +113,7 @@ func (r *produtoSubgrupoRepository) FindByID(id int) (*models.ProdutoSubgrupo, e
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("subgrupo de produto com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando sub-grupo de produtos", err)
 	}
 	return &subgrupo, nil
 }
@@ -117,7 +129,7 @@ func (r *produtoSubgrupoRepository) GetByID(id int) (*models.ProdutoSubgrupo, er
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("subgrupo de produto com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 	return &subgrupo, nil
 }
@@ -136,7 +148,7 @@ func (r *produtoSubgrupoRepository) FindByDescricao(descricao string, limit int)
 		Find(&subgrupos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 	return subgrupos, nil
 }
@@ -150,7 +162,7 @@ func (r *produtoSubgrupoRepository) FindBySituacao(situacao int) ([]models.Produ
 		Find(&subgrupos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 	return subgrupos, nil
 }
@@ -164,7 +176,7 @@ func (r *produtoSubgrupoRepository) FindActive() ([]models.ProdutoSubgrupo, erro
 		Find(&subgrupos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 	return subgrupos, nil
 }
@@ -182,7 +194,7 @@ func (r *produtoSubgrupoRepository) List(limit, offset int, filters map[string]i
 	query = utils.ApplyFilters(query, models.ProdutoSubgrupo{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 
 	err := query.
@@ -192,7 +204,7 @@ func (r *produtoSubgrupoRepository) List(limit, offset int, filters map[string]i
 		Find(&subgrupos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 
 	return subgrupos, total, nil
@@ -207,7 +219,7 @@ func (r *produtoSubgrupoRepository) ListWithProdutos(limit, offset int, filters 
 	query = utils.ApplyFilters(query, models.ProdutoSubgrupo{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 
 	err := query.
@@ -226,7 +238,7 @@ func (r *produtoSubgrupoRepository) ListWithProdutos(limit, offset int, filters 
 		Find(&subgrupos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 
 	return subgrupos, total, nil
@@ -240,7 +252,7 @@ func (r *produtoSubgrupoRepository) FindAll() ([]models.ProdutoSubgrupo, error) 
 		Order("prosg_descricao ASC").
 		Find(&subgrupos).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro o buscar subgrupo de produtos.", err)
 	}
 	return subgrupos, nil
 }
@@ -264,7 +276,7 @@ func (r *produtoSubgrupoRepository) ExistsByDescricao(descricao string, excludeI
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro ao verificar descrição.", err)
 	}
 	return count > 0, nil
 }
@@ -276,7 +288,7 @@ func (r *produtoSubgrupoRepository) ExistsByID(id int) (bool, error) {
 		Where("prosg_id = ? AND deleted_at IS NULL", id).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro ao buscando subgrupo de produto.", err)
 	}
 	return count > 0, nil
 }
@@ -288,7 +300,7 @@ func (r *produtoSubgrupoRepository) Count() (int64, error) {
 		Where("deleted_at IS NULL").
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro ao buscando subgrupo de produto.", err)
 	}
 	return count, nil
 }
@@ -300,7 +312,7 @@ func (r *produtoSubgrupoRepository) CountProdutosBySubgrupo(subgrupoID int) (int
 		Where("prosg_id = ? AND deleted_at IS NULL", subgrupoID).
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro ao buscando subgrupo de produto.", err)
 	}
 	return count, nil
 }
@@ -311,16 +323,24 @@ func (r *produtoSubgrupoRepository) CountProdutosBySubgrupo(subgrupoID int) (int
 
 // BulkUpdateStatus atualiza a situação de múltiplos subgrupos
 func (r *produtoSubgrupoRepository) BulkUpdateStatus(ids []int, situacao int) error {
-	return r.db.Model(&models.ProdutoSubgrupo{}).
+	err := r.db.Model(&models.ProdutoSubgrupo{}).
 		Where("prosg_id IN ? AND deleted_at IS NULL", ids).
 		Update("prosg_situacao", situacao).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar subgrupo de produto.", err)
+	}
+	return nil
 }
 
 // BulkDelete realiza exclusão lógica de múltiplos subgrupos
 func (r *produtoSubgrupoRepository) BulkDelete(ids []int) error {
-	return r.db.Model(&models.ProdutoSubgrupo{}).
+	err := r.db.Model(&models.ProdutoSubgrupo{}).
 		Where("prosg_id IN ? AND deleted_at IS NULL", ids).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir subgrupo de produto.", err)
+	}
+	return nil
 }
 
 // ============================================================

@@ -1,9 +1,7 @@
 package service
 
 import (
-	"errors"
-	"fmt"
-
+	apperrors "github.com/openerp/backend/internal/erros"
 	"gorm.io/gorm"
 
 	"github.com/openerp/backend/internal/dto"
@@ -50,7 +48,7 @@ func NewEntidadeRegimeTributarioService(db *gorm.DB, entidadeService EntidadeSer
 func (s *entidadeRegimeTributarioService) validateEntidadeExists(entidadeID int) error {
 	_, err := s.entidadeService.GetByID(entidadeID)
 	if err != nil {
-		return fmt.Errorf("entidade com ID %d não encontrada", entidadeID)
+		return err
 	}
 
 	return nil
@@ -61,18 +59,18 @@ func (s *entidadeRegimeTributarioService) validateEntidadeExists(entidadeID int)
 // ============================================================
 
 // Create cria um novo regime para uma entidade. (Receiver changed)
-func (s *entidadeRegimeTributarioService) Create(req *dto.EntidadeRegimeTributarioRequest) (*models.EntidadeRegimeTributario, error) {
+func (s *entidadeRegimeTributarioService) Create(req *dto.EntidadeRegimeTributarioRequest) (*models.EntidadeRegimeTributario, error) { //
 	if err := s.validateEntidadeExists(req.EntidadeID); err != nil {
 		return nil, err
 	}
 
 	regime, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
 	if err := s.regimeRepo.Create(regime); err != nil {
-		return nil, fmt.Errorf("erro ao criar regime tributário: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao criar regime tributário.", err) //
 	}
 
 	return regime, nil
@@ -101,7 +99,7 @@ func (s *entidadeRegimeTributarioService) Update(entidadeID, item int, req *dto.
 	// Converte o DTO para um novo modelo para pegar os dados atualizados
 	updatedModel, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados da requisição: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados da requisição.", err) //
 	}
 
 	// Atualiza os campos do modelo existente
@@ -114,21 +112,20 @@ func (s *entidadeRegimeTributarioService) Update(entidadeID, item int, req *dto.
 	regime.UpdatedBy = req.UpdatedBy
 
 	if err := s.regimeRepo.Update(regime); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar regime tributário: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar regime tributário.", err) //
 	}
 
 	return regime, nil
 }
 
 // Delete exclui logicamente um regime tributário.
-func (s *entidadeRegimeTributarioService) Delete(entidadeID, item int) error {
-	_, err := s.regimeRepo.FindByID(entidadeID, item)
-	if err != nil {
+func (s *entidadeRegimeTributarioService) Delete(entidadeID, item int) error { 
+	if _, err := s.regimeRepo.FindByID(entidadeID, item); err != nil { 
 		return err
 	}
 
 	if err := s.regimeRepo.Delete(entidadeID, item); err != nil {
-		return fmt.Errorf("erro ao excluir regime tributário: %w", err)
+		return apperrors.NewInternalError("Erro ao excluir regime tributário.", err) //
 	}
 
 	return nil
@@ -136,8 +133,8 @@ func (s *entidadeRegimeTributarioService) Delete(entidadeID, item int) error {
 
 // List lista regimes com paginação e filtros.
 func (s *entidadeRegimeTributarioService) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeRegimeTributario, int64, error) {
-	if _, ok := filters["ent_id"]; !ok {
-		return nil, 0, errors.New("o filtro 'ent_id' é obrigatório")
+	if _, ok := filters["ent_id"]; !ok { //
+		return nil, 0, apperrors.NewValidationError("O filtro 'ent_id' é obrigatório.") //
 	}
 
 	if limit <= 0 {

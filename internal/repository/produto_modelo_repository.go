@@ -69,24 +69,37 @@ func NewProdutoModeloRepository(db *gorm.DB) ProdutoModeloRepository {
 
 // Create salva um novo modelo de produto
 func (r *produtoModeloRepository) Create(modelo *models.ProdutoModelo) error {
-	return r.db.Create(modelo).Error
+	err := r.db.Create(modelo).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao criar modelo de produto.", err)
+	}
+	return nil
 }
 
 // Update atualiza um modelo de produto existente
 func (r *produtoModeloRepository) Update(id int, modelo *models.ProdutoModelo) error {
-	return r.db.
+	err := r.db.
 		Omit("Produtos", "created_at", "deleted_at").
 		Model(&models.ProdutoModelo{}).
 		Where("prom_id = ?", id).
 		Updates(modelo).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar modelo de produto.", err)
+	}
+	return nil
+
 }
 
 // Delete realiza exclusão lógica
 func (r *produtoModeloRepository) Delete(id int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.ProdutoModelo{}).
 		Where("prom_id = ?", id).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir modelo de produto.", err)
+	}
+	return nil
 }
 
 // FindByID busca um modelo de produto pelo ID com relacionamentos
@@ -101,7 +114,7 @@ func (r *produtoModeloRepository) FindByID(id int) (*models.ProdutoModelo, error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("modelo de produto com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return &modelo, nil
 }
@@ -117,7 +130,7 @@ func (r *produtoModeloRepository) GetByID(id int) (*models.ProdutoModelo, error)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("modelo de produto com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return &modelo, nil
 }
@@ -136,7 +149,7 @@ func (r *produtoModeloRepository) FindByDescricao(descricao string, limit int) (
 		Find(&modelos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return modelos, nil
 }
@@ -150,7 +163,7 @@ func (r *produtoModeloRepository) FindBySituacao(situacao int) ([]models.Produto
 		Find(&modelos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return modelos, nil
 }
@@ -164,7 +177,7 @@ func (r *produtoModeloRepository) FindActive() ([]models.ProdutoModelo, error) {
 		Find(&modelos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return modelos, nil
 }
@@ -182,7 +195,7 @@ func (r *produtoModeloRepository) List(limit, offset int, filters map[string]int
 	query = utils.ApplyFilters(query, models.ProdutoModelo{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 
 	err := query.
@@ -192,7 +205,7 @@ func (r *produtoModeloRepository) List(limit, offset int, filters map[string]int
 		Find(&modelos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 
 	return modelos, total, nil
@@ -207,7 +220,7 @@ func (r *produtoModeloRepository) ListWithProdutos(limit, offset int, filters ma
 	query = utils.ApplyFilters(query, models.ProdutoModelo{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 
 	err := query.
@@ -226,7 +239,7 @@ func (r *produtoModeloRepository) ListWithProdutos(limit, offset int, filters ma
 		Find(&modelos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 
 	return modelos, total, nil
@@ -240,7 +253,7 @@ func (r *produtoModeloRepository) FindAll() ([]models.ProdutoModelo, error) {
 		Order("prom_descricao ASC").
 		Find(&modelos).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return modelos, nil
 }
@@ -264,7 +277,7 @@ func (r *produtoModeloRepository) ExistsByDescricao(descricao string, excludeID 
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return count > 0, nil
 }
@@ -276,7 +289,7 @@ func (r *produtoModeloRepository) ExistsByID(id int) (bool, error) {
 		Where("prom_id = ? AND deleted_at IS NULL", id).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return count > 0, nil
 }
@@ -288,7 +301,7 @@ func (r *produtoModeloRepository) Count() (int64, error) {
 		Where("deleted_at IS NULL").
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return count, nil
 }
@@ -300,7 +313,7 @@ func (r *produtoModeloRepository) CountProdutosByModelo(modeloID int) (int64, er
 		Where("prom_id = ? AND deleted_at IS NULL", modeloID).
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando marca de produtos.", err)
 	}
 	return count, nil
 }
@@ -311,16 +324,25 @@ func (r *produtoModeloRepository) CountProdutosByModelo(modeloID int) (int64, er
 
 // BulkUpdateStatus atualiza a situação de múltiplos modelos
 func (r *produtoModeloRepository) BulkUpdateStatus(ids []int, situacao int) error {
-	return r.db.Model(&models.ProdutoModelo{}).
+	err := r.db.Model(&models.ProdutoModelo{}).
 		Where("prom_id IN ? AND deleted_at IS NULL", ids).
 		Update("prom_situacao", situacao).Error
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 // BulkDelete realiza exclusão lógica de múltiplos modelos
 func (r *produtoModeloRepository) BulkDelete(ids []int) error {
-	return r.db.Model(&models.ProdutoModelo{}).
+	err := r.db.Model(&models.ProdutoModelo{}).
 		Where("prom_id IN ? AND deleted_at IS NULL", ids).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ============================================================

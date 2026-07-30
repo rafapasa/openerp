@@ -70,24 +70,36 @@ func NewTabelaPrecoRepository(db *gorm.DB) TabelaPrecoRepository {
 
 // Create salva uma nova tabela de preço
 func (r *tabelaPrecoRepository) Create(tabela *models.TabelaPreco) error {
-	return r.db.Create(tabela).Error
+	err := r.db.Create(tabela).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao criar tabela de preço", err)
+	}
+	return nil
 }
 
 // Update atualiza uma tabela de preço existente
 func (r *tabelaPrecoRepository) Update(id int, tabela *models.TabelaPreco) error {
-	return r.db.
+	err := r.db.
 		Omit("Produtos", "created_at", "deleted_at").
 		Model(&models.TabelaPreco{}).
 		Where("tbp_id = ?", id).
 		Updates(tabela).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar tabela de preço", err)
+	}
+	return nil
 }
 
 // Delete realiza exclusão lógica
 func (r *tabelaPrecoRepository) Delete(id int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.TabelaPreco{}).
 		Where("tbp_id = ?", id).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir tabela de preço", err)
+	}
+	return nil
 }
 
 // FindByID busca uma tabela de preço pelo ID com relacionamentos
@@ -103,7 +115,7 @@ func (r *tabelaPrecoRepository) FindByID(id int) (*models.TabelaPreco, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("tabela de preço com ID %d não encontrada", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return &tabela, nil
 }
@@ -119,7 +131,7 @@ func (r *tabelaPrecoRepository) GetByID(id int) (*models.TabelaPreco, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("tabela de preço com ID %d não encontrada", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return &tabela, nil
 }
@@ -138,7 +150,7 @@ func (r *tabelaPrecoRepository) FindByDescricao(descricao string, limit int) ([]
 		Find(&tabelas).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return tabelas, nil
 }
@@ -158,7 +170,7 @@ func (r *tabelaPrecoRepository) FindActive() ([]models.TabelaPreco, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tabelas, nil
+	return tabelas, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 }
 
 // FindActiveByDate busca tabelas de preço ativas em uma data específica
@@ -172,7 +184,7 @@ func (r *tabelaPrecoRepository) FindActiveByDate(data time.Time) ([]models.Tabel
 		Find(&tabelas).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return tabelas, nil
 }
@@ -186,7 +198,7 @@ func (r *tabelaPrecoRepository) FindByTipo(tipo int) ([]models.TabelaPreco, erro
 		Find(&tabelas).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return tabelas, nil
 }
@@ -204,7 +216,7 @@ func (r *tabelaPrecoRepository) List(limit, offset int, filters map[string]inter
 	query = utils.ApplyFilters(query, models.TabelaPreco{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 
 	err := query.
@@ -214,7 +226,7 @@ func (r *tabelaPrecoRepository) List(limit, offset int, filters map[string]inter
 		Find(&tabelas).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 
 	return tabelas, total, nil
@@ -229,7 +241,7 @@ func (r *tabelaPrecoRepository) ListWithProdutos(limit, offset int, filters map[
 	query = utils.ApplyFilters(query, models.TabelaPreco{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 
 	err := query.
@@ -248,7 +260,7 @@ func (r *tabelaPrecoRepository) ListWithProdutos(limit, offset int, filters map[
 		Find(&tabelas).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 
 	return tabelas, total, nil
@@ -262,7 +274,7 @@ func (r *tabelaPrecoRepository) FindAll() ([]models.TabelaPreco, error) {
 		Order("tbp_descricao ASC").
 		Find(&tabelas).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return tabelas, nil
 }
@@ -286,7 +298,7 @@ func (r *tabelaPrecoRepository) ExistsByDescricao(descricao string, excludeID in
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return count > 0, nil
 }
@@ -298,7 +310,7 @@ func (r *tabelaPrecoRepository) ExistsByID(id int) (bool, error) {
 		Where("tbp_id = ? AND deleted_at IS NULL", id).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return count > 0, nil
 }
@@ -310,7 +322,7 @@ func (r *tabelaPrecoRepository) Count() (int64, error) {
 		Where("deleted_at IS NULL").
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return count, nil
 }
@@ -322,7 +334,7 @@ func (r *tabelaPrecoRepository) CountProdutosByTabela(tabelaID int) (int64, erro
 		Where("tbp_id = ? AND deleted_at IS NULL", tabelaID).
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando Tabela de Preço", err)
 	}
 	return count, nil
 }
@@ -333,9 +345,13 @@ func (r *tabelaPrecoRepository) CountProdutosByTabela(tabelaID int) (int64, erro
 
 // BulkDelete realiza exclusão lógica de múltiplas tabelas
 func (r *tabelaPrecoRepository) BulkDelete(ids []int) error {
-	return r.db.Model(&models.TabelaPreco{}).
+	err := r.db.Model(&models.TabelaPreco{}).
 		Where("tbp_id IN ? AND deleted_at IS NULL", ids).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir tabelas de preço", err)
+	}
+	return nil
 }
 
 // ============================================================

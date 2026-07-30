@@ -3,9 +3,11 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 )
 
@@ -78,7 +80,7 @@ func (r *documentoVendaPagamentoRepository) FindByID(ddvId, dvpItem int) (*model
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("pagamento não encontrado")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("Pagamento %d do documento %d não encontrado.", dvpItem, ddvId))
 		}
 		return nil, err
 	}

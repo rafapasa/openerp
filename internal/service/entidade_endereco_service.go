@@ -1,9 +1,10 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 
 	"gorm.io/gorm"
 
@@ -71,23 +72,23 @@ func (s *entidadeEnderecoService) isDataValid(req *dto.EntidadeEnderecoRequest) 
 // validateRequiredFields valida campos obrigatórios
 func (s *entidadeEnderecoService) validateRequiredFields(req *dto.EntidadeEnderecoRequest) error {
 	if strings.TrimSpace(req.Logradouro) == "" {
-		return errors.New("logradouro é obrigatório")
+		return apperrors.NewValidationError("Logradouro é obrigatório.") //
 	}
 
 	if strings.TrimSpace(req.Numero) == "" {
-		return errors.New("número é obrigatório")
+		return apperrors.NewValidationError("Número é obrigatório.") //
 	}
 
 	if strings.TrimSpace(req.Bairro) == "" {
-		return errors.New("bairro é obrigatório")
+		return apperrors.NewValidationError("Bairro é obrigatório.") //
 	}
 
 	if strings.TrimSpace(req.CEP) == "" {
-		return errors.New("CEP é obrigatório")
+		return apperrors.NewValidationError("CEP é obrigatório.") //
 	}
 
 	if strings.TrimSpace(req.DataIni) == "" {
-		return errors.New("data inicial é obrigatória")
+		return apperrors.NewValidationError("Data inicial é obrigatória.") //
 	}
 
 	return nil
@@ -96,7 +97,7 @@ func (s *entidadeEnderecoService) validateRequiredFields(req *dto.EntidadeEndere
 // validateTipoEndereco valida o tipo de endereço
 func (s *entidadeEnderecoService) validateTipoEndereco(req *dto.EntidadeEnderecoRequest) error {
 	if req.Tipo < 1 || req.Tipo > 4 {
-		return errors.New("tipo de endereço inválido, deve ser 1 (Cobrança), 2 (Entrega), 3 (Comercial) ou 4 (Residencial)")
+		return apperrors.NewValidationError("Tipo de endereço inválido, deve ser 1 (Cobrança), 2 (Entrega), 3 (Comercial) ou 4 (Residencial).") //
 	}
 	return nil
 }
@@ -105,15 +106,15 @@ func (s *entidadeEnderecoService) validateTipoEndereco(req *dto.EntidadeEndereco
 func (s *entidadeEnderecoService) validateDates(req *dto.EntidadeEnderecoRequest) error {
 	// Validar formato da data inicial
 	if req.DataIni != "" {
-		if _, err := utils.ParseDate(req.DataIni); err != nil {
-			return fmt.Errorf("data inicial inválida: %w", err)
+		if _, err := utils.ParseDate(req.DataIni); err != nil { //
+			return apperrors.NewValidationError(fmt.Sprintf("Data inicial inválida: %v", err)) //
 		}
 	}
 
 	// Validar formato da data final (se informada)
 	if req.DataFim != "" {
-		if _, err := utils.ParseDate(req.DataFim); err != nil {
-			return fmt.Errorf("data final inválida: %w", err)
+		if _, err := utils.ParseDate(req.DataFim); err != nil { //
+			return apperrors.NewValidationError(fmt.Sprintf("Data final inválida: %v", err)) //
 		}
 	}
 
@@ -123,8 +124,8 @@ func (s *entidadeEnderecoService) validateDates(req *dto.EntidadeEnderecoRequest
 // validateEntidadeExists verifica se a entidade existe
 func (s *entidadeEnderecoService) validateEntidadeExists(entidadeID int) error {
 	_, err := s.entidadeRepo.FindByID(entidadeID)
-	if err != nil {
-		return fmt.Errorf("entidade não encontrada: %w", err)
+	if err != nil { //
+		return apperrors.NewNotFoundError(fmt.Sprintf("Entidade com ID %d não encontrada.", entidadeID)) //
 	}
 	return nil
 }
@@ -163,11 +164,11 @@ func (s *entidadeEnderecoService) isUpdateValid(entidadeID, item int, req *dto.E
 	// 2. Validar se a entidade existe
 	if err := s.validateEntidadeExists(entidadeID); err != nil {
 		return err
-	}
+	} //
 
 	// 3. Validar se o endereço existe
 	if _, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item); err != nil {
-		return fmt.Errorf("endereço não encontrado: %w", err)
+		return apperrors.NewNotFoundError(fmt.Sprintf("Endereço %d da entidade %d não encontrado.", item, entidadeID)) //
 	}
 
 	return nil
@@ -187,12 +188,12 @@ func (s *entidadeEnderecoService) Create(req *dto.EntidadeEnderecoRequest) (*mod
 	// 2. Converter DTO para Model
 	endereco, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
 	// 3. Salvar
 	if err := s.entidadeEnderecoRepo.Create(endereco); err != nil {
-		return nil, fmt.Errorf("erro ao criar endereço: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao criar endereço.", err) //
 	}
 
 	return endereco, nil
@@ -201,8 +202,8 @@ func (s *entidadeEnderecoService) Create(req *dto.EntidadeEnderecoRequest) (*mod
 // GetByID busca um endereço específico
 func (s *entidadeEnderecoService) GetByID(entidadeID, item int) (*models.EntidadeEndereco, error) {
 	endereco, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item)
-	if err != nil {
-		return nil, fmt.Errorf("endereço não encontrado: %w", err)
+	if err != nil { //
+		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Endereço %d da entidade %d não encontrado.", item, entidadeID)) //
 	}
 	return endereco, nil
 }
@@ -216,7 +217,7 @@ func (s *entidadeEnderecoService) GetByEntidadeID(entidadeID int) ([]models.Enti
 
 	enderecos, err := s.entidadeEnderecoRepo.FindByEntidadeID(entidadeID)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar endereços: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao buscar endereços.", err) //
 	}
 
 	return enderecos, nil
@@ -236,7 +237,7 @@ func (s *entidadeEnderecoService) GetByEntidadeIDAndTipo(entidadeID, tipo int) (
 
 	enderecos, err := s.entidadeEnderecoRepo.FindByEntidadeIDAndTipo(entidadeID, tipo)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar endereços: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao buscar endereços.", err) //
 	}
 
 	return enderecos, nil
@@ -252,7 +253,7 @@ func (s *entidadeEnderecoService) Update(entidadeID, item int, req *dto.Entidade
 	// 2. Buscar endereço existente
 	endereco, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return nil, fmt.Errorf("endereço não encontrado: %w", err)
+		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Endereço %d da entidade %d não encontrado.", item, entidadeID)) //
 	}
 
 	// 3. Atualizar campos
@@ -292,7 +293,7 @@ func (s *entidadeEnderecoService) Update(entidadeID, item int, req *dto.Entidade
 
 	// 7. Salvar
 	if err := s.entidadeEnderecoRepo.Update(endereco); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar endereço: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar endereço.", err) //
 	}
 
 	return endereco, nil
@@ -302,13 +303,13 @@ func (s *entidadeEnderecoService) Update(entidadeID, item int, req *dto.Entidade
 func (s *entidadeEnderecoService) Delete(entidadeID, item int) error {
 	// 1. Validar se o endereço existe
 	endereco, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item)
-	if err != nil {
-		return fmt.Errorf("endereço não encontrado: %w", err)
+	if err != nil { //
+		return apperrors.NewNotFoundError(fmt.Sprintf("Endereço %d da entidade %d não encontrado.", item, entidadeID)) //
 	}
 
 	// 2. Verificar se já foi deletado
-	if endereco.IsDeleted() {
-		return errors.New("endereço já foi deletado")
+	if endereco.IsDeleted() { //
+		return apperrors.NewConflictError("Endereço já foi deletado.") //
 	}
 
 	// 3. TODO: Verificar se o endereço está sendo usado em algum lugar
@@ -316,7 +317,7 @@ func (s *entidadeEnderecoService) Delete(entidadeID, item int) error {
 
 	// 4. Excluir
 	if err := s.entidadeEnderecoRepo.Delete(entidadeID, item); err != nil {
-		return fmt.Errorf("erro ao excluir endereço: %w", err)
+		return apperrors.NewInternalError("Erro ao excluir endereço.", err) //
 	}
 
 	return nil
@@ -334,7 +335,7 @@ func (s *entidadeEnderecoService) List(limit, offset int, filters map[string]int
 
 	enderecos, total, err := s.entidadeEnderecoRepo.List(limit, offset, filters)
 	if err != nil {
-		return nil, 0, fmt.Errorf("erro ao listar endereços: %w", err)
+		return nil, 0, apperrors.NewInternalError("Erro ao listar endereços.", err) //
 	}
 
 	return enderecos, total, nil

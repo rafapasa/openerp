@@ -1,9 +1,8 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -38,8 +37,8 @@ func (s *produtoGrupoService) GetByID(id int) (*models.ProdutoGrupo, error) {
 
 func (s *produtoGrupoService) Create(req *dto.ProdutoGrupoRequest) (*models.ProdutoGrupo, error) {
 	produtoGrupo, err := req.ToModel()
-	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados do grupo de produto: %w", err)
+	if err != nil { //
+		return nil, apperrors.NewInternalError("Erro ao converter dados do grupo de produto.", err) //
 	}
 
 	// Validar o modelo antes de persistir
@@ -49,7 +48,7 @@ func (s *produtoGrupoService) Create(req *dto.ProdutoGrupoRequest) (*models.Prod
 
 	result := s.progRepo.Create(produtoGrupo)
 	if result != nil {
-		return nil, fmt.Errorf("erro ao criar grupo de produto: %w", result)
+		return nil, apperrors.NewInternalError("Erro ao criar grupo de produto.", result) //
 	}
 
 	return produtoGrupo, nil
@@ -57,8 +56,8 @@ func (s *produtoGrupoService) Create(req *dto.ProdutoGrupoRequest) (*models.Prod
 
 func (s *produtoGrupoService) Update(id int, req *dto.ProdutoGrupoRequest) (*models.ProdutoGrupo, error) {
 	produtoGrupo, err := req.ToModel()
-	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados do grupo de produto: %w", err)
+	if err != nil { //
+		return nil, apperrors.NewInternalError("Erro ao converter dados do grupo de produto.", err) //
 	}
 
 	if err := s.validateProdutoGrupo(req); err != nil {
@@ -66,7 +65,7 @@ func (s *produtoGrupoService) Update(id int, req *dto.ProdutoGrupoRequest) (*mod
 	}
 	result := s.progRepo.Update(id, produtoGrupo)
 	if result != nil {
-		return nil, fmt.Errorf("erro ao atualizar grupo de produto: %w", result)
+		return nil, apperrors.NewInternalError("Erro ao atualizar grupo de produto.", result) //
 	}
 	return produtoGrupo, nil
 }

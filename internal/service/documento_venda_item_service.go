@@ -9,13 +9,55 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
+	"gorm.io/gorm"
 )
+
+// DocumentoVendaItemServiceFactory é uma fábrica para criar instâncias do service
+type DocumentoVendaItemServiceFactory interface {
+	// CreateWithTx cria uma instância com um DB transacional
+	CreateWithTx(tx *gorm.DB) DocumentoVendaItemService
+}
 
 // DocumentoVendaItemServiceInterface define os métodos públicos para o serviço de itens de documento de venda.
 type DocumentoVendaItemService interface {
 	Create(req *dto.DocumentoVendaItemRequest) error
 	Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error
 	Delete(ddvId, dviItem int) error
+}
+
+// documentoVendaItemServiceFactory implementa a fábrica
+type documentoVendaItemServiceFactory struct {
+	// Dependências fixas (não mudam com a transação)
+	proService    ProdutoService
+	prcService    ProcessoService
+	configService ConfiguracaoService
+}
+
+// NewDocumentoVendaItemServiceFactory cria a fábrica com as dependências injetadas
+func NewDocumentoVendaItemServiceFactory(
+	proService ProdutoService,
+	prcService ProcessoService,
+	configService ConfiguracaoService,
+) DocumentoVendaItemServiceFactory {
+	return &documentoVendaItemServiceFactory{
+		proService:    proService,
+		prcService:    prcService,
+		configService: configService,
+	}
+}
+
+// CreateWithTx cria uma nova instância com DB transacional
+func (f *documentoVendaItemServiceFactory) CreateWithTx(tx *gorm.DB) DocumentoVendaItemService {
+	// Cria o repositório com o DB transacional
+	dviRepo := repository.NewDocumentoVendaItemRepository(tx)
+
+	// Cria o service com as dependências fixas + repositório transacional
+	return &documentoVendaItemService{
+		dviRepo:       dviRepo,
+		proService:    f.proService,
+		prcService:    f.prcService,
+		configService: f.configService,
+	}
 }
 
 // documentoVendaItemService é a implementação concreta de DocumentoVendaItemServiceInterface.
@@ -134,11 +176,11 @@ func (s *documentoVendaItemService) isDataValid(req *dto.DocumentoVendaItemReque
 	}
 
 	produto, err := s.proService.FindById(req.ProdutoID)
-	if err != nil {
-		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado.", req.ProdutoID))
+	if err != nil { //
+		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado.", req.ProdutoID)) //
 	}
 	if !produto.IsActive() {
-		return apperrors.NewValidationError(fmt.Sprintf("O produto '%s' não está ativo.", produto.GetNomeCompleto()))
+		return apperrors.NewValidationError(fmt.Sprintf("O produto '%s' não está ativo.", produto.GetNomeCompleto())) //
 	}
 	return nil
 }

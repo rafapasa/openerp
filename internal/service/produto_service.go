@@ -91,27 +91,27 @@ func (s *produtoService) isDataValid(req *dto.ProdutoRequest) error {
 // validateRequiredFields valida campos obrigatórios
 func (s *produtoService) validateRequiredFields(req *dto.ProdutoRequest) error {
 	if strings.TrimSpace(req.Nome) == "" {
-		return errors.New("nome do produto é obrigatório")
+		return apperrors.NewValidationError("Nome do produto é obrigatório.") //
 	}
 
 	if strings.TrimSpace(req.Resumo) == "" {
-		return errors.New("resumo do produto é obrigatório")
+		return apperrors.NewValidationError("Resumo do produto é obrigatório.") //
 	}
 
 	if req.EmpresaFilialID <= 0 {
-		return errors.New("empresa/filial é obrigatória")
+		return apperrors.NewValidationError("Empresa/filial é obrigatória.") //
 	}
 
 	if req.TipoProdutoID <= 0 {
-		return errors.New("tipo de produto é obrigatório")
+		return apperrors.NewValidationError("Tipo de produto é obrigatório.") //
 	}
 
 	if req.NcmNumero <= 0 {
-		return errors.New("NCM é obrigatório")
+		return apperrors.NewValidationError("NCM é obrigatório.") //
 	}
 
 	if req.Codigo <= 0 {
-		return errors.New("código do produto é obrigatório")
+		return apperrors.NewValidationError("Código do produto é obrigatório.") //
 	}
 
 	return nil
@@ -121,23 +121,23 @@ func (s *produtoService) validateRequiredFields(req *dto.ProdutoRequest) error {
 func (s *produtoService) validateFieldLengths(req *dto.ProdutoRequest) error {
 	// Nome
 	if len(req.Nome) > maxLengthProdutoNome {
-		return fmt.Errorf("nome do produto deve ter no máximo %d caracteres", maxLengthProdutoNome)
+		return apperrors.NewValidationError(fmt.Sprintf("Nome do produto deve ter no máximo %d caracteres.", maxLengthProdutoNome)) //
 	}
 	if len(req.Nome) < minLengthProdutoNome {
-		return fmt.Errorf("nome do produto deve ter pelo menos %d caracteres", minLengthProdutoNome)
+		return apperrors.NewValidationError(fmt.Sprintf("Nome do produto deve ter pelo menos %d caracteres.", minLengthProdutoNome)) //
 	}
 
 	// Resumo
 	if len(req.Resumo) > maxLengthProdutoResumo {
-		return fmt.Errorf("resumo do produto deve ter no máximo %d caracteres", maxLengthProdutoResumo)
+		return apperrors.NewValidationError(fmt.Sprintf("Resumo do produto deve ter no máximo %d caracteres.", maxLengthProdutoResumo)) //
 	}
 	if len(req.Resumo) < minLengthProdutoResumo {
-		return fmt.Errorf("resumo do produto deve ter pelo menos %d caracteres", minLengthProdutoResumo)
+		return apperrors.NewValidationError(fmt.Sprintf("Resumo do produto deve ter pelo menos %d caracteres.", minLengthProdutoResumo)) //
 	}
 
 	// Código de Barras (se informado)
 	if req.CodigoBarras != "" && len(req.CodigoBarras) > maxLengthCodigoBarras {
-		return fmt.Errorf("código de barras deve ter no máximo %d caracteres", maxLengthCodigoBarras)
+		return apperrors.NewValidationError(fmt.Sprintf("Código de barras deve ter no máximo %d caracteres.", maxLengthCodigoBarras)) //
 	}
 
 	// Referências (se informadas)
@@ -149,7 +149,7 @@ func (s *produtoService) validateFieldLengths(req *dto.ProdutoRequest) error {
 	}
 	for nome, ref := range referencias {
 		if ref != nil && len(*ref) > maxLengthReferencia {
-			return fmt.Errorf("%s deve ter no máximo %d caracteres", nome, maxLengthReferencia)
+			return apperrors.NewValidationError(fmt.Sprintf("%s deve ter no máximo %d caracteres.", nome, maxLengthReferencia)) //
 		}
 	}
 
@@ -173,7 +173,7 @@ func (s *produtoService) validateOptionalFields(req *dto.ProdutoRequest) error {
 
 	for nome, valor := range valores {
 		if valor != nil && *valor < 0 {
-			return fmt.Errorf("%s não pode ser negativo", nome)
+			return apperrors.NewValidationError(fmt.Sprintf("%s não pode ser negativo.", nome)) //
 		}
 	}
 
@@ -187,27 +187,27 @@ func (s *produtoService) validateRelationships(req *dto.ProdutoRequest) error {
 
 	// Validar se os IDs são consistentes
 	if req.ProdutoGrupoID != nil && *req.ProdutoGrupoID <= 0 {
-		return errors.New("ID do grupo de produto inválido")
+		return apperrors.NewValidationError("ID do grupo de produto inválido.") //
 	}
 
 	if req.ProdutoSubgrupoID != nil && *req.ProdutoSubgrupoID <= 0 {
-		return errors.New("ID do subgrupo de produto inválido")
+		return apperrors.NewValidationError("ID do subgrupo de produto inválido.") //
 	}
 
 	if req.MarcaID != nil && *req.MarcaID <= 0 {
-		return errors.New("ID da marca inválido")
+		return apperrors.NewValidationError("ID da marca inválido.") //
 	}
 
 	if req.ModeloID != nil && *req.ModeloID <= 0 {
-		return errors.New("ID do modelo inválido")
+		return apperrors.NewValidationError("ID do modelo inválido.") //
 	}
 
 	if req.SerieID != nil && *req.SerieID <= 0 {
-		return errors.New("ID da série inválido")
+		return apperrors.NewValidationError("ID da série inválido.") //
 	}
 
 	if req.EspecieID != nil && *req.EspecieID <= 0 {
-		return errors.New("ID da espécie inválido")
+		return apperrors.NewValidationError("ID da espécie inválido.") //
 	}
 
 	return nil
@@ -216,11 +216,11 @@ func (s *produtoService) validateRelationships(req *dto.ProdutoRequest) error {
 // validateUniqueCodigo verifica se o código do produto já existe
 func (s *produtoService) validateUniqueCodigo(codigo int, excludeID int) error {
 	existe, err := s.proRepo.ExistsByCodigo(codigo, excludeID)
-	if err != nil {
-		return fmt.Errorf("erro ao verificar duplicidade de código: %w", err)
+	if err != nil { //
+		return apperrors.NewInternalError("Erro ao verificar duplicidade de código.", err) //
 	}
 	if existe {
-		return fmt.Errorf("código %d já está cadastrado", codigo)
+		return apperrors.NewConflictError(fmt.Sprintf("Código %d já está cadastrado.", codigo)) //
 	}
 	return nil
 }
@@ -233,10 +233,10 @@ func (s *produtoService) validateUniqueCodigoBarras(codigoBarras *string, exclud
 
 	existe, err := s.proRepo.ExistsByCodigoBarras(*codigoBarras, excludeID)
 	if err != nil {
-		return fmt.Errorf("erro ao verificar duplicidade de código de barras: %w", err)
+		return apperrors.NewInternalError("Erro ao verificar duplicidade de código de barras.", err) //
 	}
 	if existe {
-		return fmt.Errorf("código de barras %s já está cadastrado", *codigoBarras)
+		return apperrors.NewConflictError(fmt.Sprintf("Código de barras %s já está cadastrado.", *codigoBarras)) //
 	}
 	return nil
 }
@@ -294,15 +294,15 @@ func (s *produtoService) Create(req *dto.ProdutoRequest) (*models.Produto, error
 	// Verificar se o código já existe no banco
 	produtoExists, err := s.proRepo.FindByCodigo(req.Codigo)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("erro ao verificar código: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao verificar código.", err) //
 	}
 	if produtoExists != nil {
-		return nil, fmt.Errorf("código %d já está cadastrado", req.Codigo)
+		return nil, apperrors.NewConflictError(fmt.Sprintf("Código %d já está cadastrado.", req.Codigo)) //
 	}
 
 	produto := &models.Produto{}
 	if err := utils.MapToModel(req, produto); err != nil {
-		return nil, fmt.Errorf("erro ao mapear dados do produto: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao mapear dados do produto.", err) //
 	}
 
 	// Definir campos que não podem ser mapeados automaticamente
@@ -311,7 +311,7 @@ func (s *produtoService) Create(req *dto.ProdutoRequest) (*models.Produto, error
 	produto.UpdatedAt = time.Now()
 
 	if err := s.proRepo.Create(produto); err != nil {
-		return nil, fmt.Errorf("erro ao criar produto: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao criar produto.", err) //
 	}
 
 	return produto, nil
@@ -321,10 +321,7 @@ func (s *produtoService) Create(req *dto.ProdutoRequest) (*models.Produto, error
 func (s *produtoService) GetByID(id int) (*models.Produto, error) {
 	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("produto com ID %d não encontrado", id)
-		}
-		return nil, fmt.Errorf("erro ao buscar produto: %w", err)
+		return nil, err
 	}
 	return produto, nil
 }
@@ -332,15 +329,12 @@ func (s *produtoService) GetByID(id int) (*models.Produto, error) {
 // GetByCodigo busca um produto pelo código
 func (s *produtoService) GetByCodigo(codigo int) (*models.Produto, error) {
 	if codigo <= 0 {
-		return nil, errors.New("código inválido")
+		return nil, apperrors.NewValidationError("Código inválido.") //
 	}
 
 	produto, err := s.proRepo.FindByCodigo(codigo)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("produto com código %d não encontrado", codigo)
-		}
-		return nil, fmt.Errorf("erro ao buscar produto: %w", err)
+		return nil, err
 	}
 	return produto, nil
 }
@@ -348,15 +342,12 @@ func (s *produtoService) GetByCodigo(codigo int) (*models.Produto, error) {
 // GetByCodigoBarras busca um produto pelo código de barras
 func (s *produtoService) GetByCodigoBarras(codigoBarras string) (*models.Produto, error) {
 	if strings.TrimSpace(codigoBarras) == "" {
-		return nil, errors.New("código de barras não pode ser vazio")
+		return nil, apperrors.NewValidationError("Código de barras não pode ser vazio.") //
 	}
 
 	produto, err := s.proRepo.FindByCodigoBarras(codigoBarras)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("produto com código de barras %s não encontrado", codigoBarras)
-		}
-		return nil, fmt.Errorf("erro ao buscar produto: %w", err)
+		return nil, err
 	}
 	return produto, nil
 }
@@ -370,22 +361,19 @@ func (s *produtoService) Update(id int, req *dto.ProdutoRequest) (*models.Produt
 	// Buscar o produto existente
 	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("produto com ID %d não encontrado", id)
-		}
-		return nil, fmt.Errorf("erro ao buscar produto: %w", err)
+		return nil, err
 	}
 
 	// Mapear os novos dados para o modelo existente
 	if err := utils.MapToModel(req, produto); err != nil {
-		return nil, fmt.Errorf("erro ao mapear dados do produto: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao mapear dados do produto.", err) //
 	}
 
 	// Atualizar timestamp
 	produto.UpdatedAt = time.Now()
 
 	if err := s.proRepo.Update(id, produto); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar produto: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar produto.", err) //
 	}
 
 	return produto, nil
@@ -395,12 +383,12 @@ func (s *produtoService) Update(id int, req *dto.ProdutoRequest) (*models.Produt
 func (s *produtoService) Delete(id int) error {
 	// Buscar o produto
 	existe, err := s.proRepo.ExistsByID(id)
-	if err != nil {
-		return fmt.Errorf("erro ao buscar produto: %w", err)
+	if err != nil { //
+		return err
 	}
 
 	if !existe {
-		return fmt.Errorf("produto com ID %d não encontrado", id)
+		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado.", id)) //
 	}
 
 	// Verificar dependências
@@ -424,7 +412,7 @@ func (s *produtoService) List(limit, offset int, filters map[string]interface{})
 
 	produtos, total, err := s.proRepo.List(limit, offset, filters)
 	if err != nil {
-		return nil, 0, fmt.Errorf("erro ao listar produtos: %w", err)
+		return nil, 0, err //
 	}
 	return produtos, total, nil
 }
@@ -438,11 +426,11 @@ func (s *produtoService) List(limit, offset int, filters map[string]interface{})
 func (s *produtoService) checkDependencies(produtoID int) error {
 	// 1. TODO: Verificar se tem itens em pedidos
 	// itens, err := s.documentoVendaItemRepo.FindByProdutoID(produtoID)
-	// if err != nil {
-	//     return fmt.Errorf("erro ao verificar itens de pedido: %w", err)
+	// if err != nil { //
+	//     return apperrors.NewInternalError("Erro ao verificar itens de pedido.", err) //
 	// }
 	// if len(itens) > 0 {
-	//     return errors.New("não é possível excluir produto com itens de pedido associados")
+	//     return apperrors.NewConflictError("Não é possível excluir produto com itens de pedido associados.") //
 	// }
 
 	// 2. TODO: Verificar se tem movimentações de estoque
@@ -450,8 +438,8 @@ func (s *produtoService) checkDependencies(produtoID int) error {
 	// if err != nil {
 	//     return fmt.Errorf("erro ao verificar movimentações de estoque: %w", err)
 	// }
-	// if len(movimentacoes) > 0 {
-	//     return errors.New("não é possível excluir produto com movimentações de estoque")
+	// if len(movimentacoes) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir produto com movimentações de estoque.") //
 	// }
 
 	// 3. TODO: Verificar se tem preços cadastrados
@@ -459,8 +447,8 @@ func (s *produtoService) checkDependencies(produtoID int) error {
 	// if err != nil {
 	//     return fmt.Errorf("erro ao verificar preços do produto: %w", err)
 	// }
-	// if len(precos) > 0 {
-	//     return errors.New("não é possível excluir produto com preços cadastrados")
+	// if len(precos) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir produto com preços cadastrados.") //
 	// }
 
 	// 4. TODO: Verificar se tem em tabelas de preço
@@ -468,8 +456,8 @@ func (s *produtoService) checkDependencies(produtoID int) error {
 	// if err != nil {
 	//     return fmt.Errorf("erro ao verificar tabelas de preço: %w", err)
 	// }
-	// if len(tabelasPreco) > 0 {
-	//     return errors.New("não é possível excluir produto com associações em tabelas de preço")
+	// if len(tabelasPreco) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir produto com associações em tabelas de preço.") //
 	// }
 
 	// 5. TODO: Verificar se tem composição (produtos compostos)
@@ -477,8 +465,8 @@ func (s *produtoService) checkDependencies(produtoID int) error {
 	// if err != nil {
 	//     return fmt.Errorf("erro ao verificar composição do produto: %w", err)
 	// }
-	// if len(composicao) > 0 {
-	//     return errors.New("não é possível excluir produto com composição definida")
+	// if len(composicao) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir produto com composição definida.") //
 	// }
 
 	return nil

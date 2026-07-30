@@ -25,21 +25,21 @@ func main() {
 	// Lista de modelos para migrar
 	// Adicione todos os seus modelos aqui para que o GORM possa criar/atualizar as tabelas
 	err = db.AutoMigrate(
-		&models.Empresa{},
-		&models.EmpresaFilial{},
-		&models.Usuario{},
-		&models.UsuarioFilial{},
-		&models.GrupoUsuario{},
-		&models.Moeda{},
-		&models.MoedaCotacao{},
-		&models.Pais{},
-		&models.GrupoEntidade{},
-		&models.Entidade{},
-		&models.EntidadeEndereco{},
-		&models.EntidadeContato{},
+		// &models.Empresa{},
+		// &models.EmpresaFilial{},
+		// &models.Usuario{},
+		// &models.UsuarioFilial{},
+		// &models.GrupoUsuario{},
+		// &models.Moeda{},
+		// &models.MoedaCotacao{},
+		// &models.Pais{},
+		// &models.GrupoEntidade{},
+		// &models.Entidade{},
+		// &models.EntidadeEndereco{},
+		// &models.EntidadeContato{},
 		&models.ProdutoVariacao{}, // Adicionado para migração
-		&models.Municipio{},
-		&models.Estado{},
+		// &models.Municipio{},
+		// &models.Estado{},
 	)
 	if err != nil {
 		log.Fatalf("❌ Erro ao executar AutoMigrate: %v", err)

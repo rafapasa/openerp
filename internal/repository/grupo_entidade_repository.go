@@ -92,7 +92,7 @@ func (r *grupoEntidadeRepository) FindByID(id int) (*models.GrupoEntidade, error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("grupo de entidade com ID %d não encontrado", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando grupo de entidades: ", err)
 	}
 	return &grupo, nil
 }
@@ -215,7 +215,7 @@ func (r *grupoEntidadeRepository) ExistsByDescricao(descricao string, excludeID 
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando Grupo de entidade. ", err)
 	}
 
 	return count > 0, nil

@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/base64"
-	"fmt"
 	"strings"
 
 	"github.com/openerp/backend/internal/dto"
@@ -94,8 +93,8 @@ func (s *entidadeDocumentoService) validateFile(req *dto.EntidadeDocumentoReques
 // validateEntidadeExists verifica se a entidade existe
 func (s *entidadeDocumentoService) validateEntidadeExists(entidadeID int) error {
 	_, err := s.entidadeService.GetByID(entidadeID)
-	if err != nil {
-		return fmt.Errorf("entidade não encontrada: %w", err)
+	if err != nil { //
+		return err
 	}
 	return nil
 }
@@ -129,7 +128,7 @@ func (s *entidadeDocumentoService) isUpdateValid(entidadeID, item int, req *dto.
 
 	// 3. Validar se o documento existe
 	if _, err := s.documentoRepo.FindByID(entidadeID, item); err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
+		return err
 	}
 
 	return nil
@@ -149,12 +148,12 @@ func (s *entidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*m
 	// 2. Converter DTO para Model
 	documento, err := req.ToModel()
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao converter dados: %v", err))
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
 	// 3. Salvar (o repository cuida do sequencial do Item)
 	if err := s.documentoRepo.Create(documento); err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao criar documento: %v", err))
+		return nil, apperrors.NewInternalError("Erro ao criar documento.", err) //
 	}
 
 	return documento, nil
@@ -164,7 +163,7 @@ func (s *entidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*m
 func (s *entidadeDocumentoService) GetByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
+		return nil, err
 	}
 	return documento, nil
 }
@@ -178,7 +177,7 @@ func (s *entidadeDocumentoService) GetByEntidadeID(entidadeID int) ([]models.Ent
 
 	documentos, err := s.documentoRepo.FindByEntidadeID(entidadeID)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao buscar documentos: %v", err))
+		return nil, apperrors.NewInternalError("Erro ao buscar documentos.", err)
 	}
 
 	return documentos, nil
@@ -194,7 +193,7 @@ func (s *entidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 	// 2. Buscar documento existente
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
+		return nil, err
 	}
 
 	// 3. Atualizar campos
@@ -210,7 +209,7 @@ func (s *entidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 		if data, err := base64Decode(req.Arquivo); err == nil {
 			documento.Arquivo = data
 		} else {
-			return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao decodificar arquivo: %v", err))
+			return nil, apperrors.NewInternalError("Erro ao decodificar arquivo.", err) //
 		}
 	}
 
@@ -228,7 +227,7 @@ func (s *entidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 
 	// 7. Salvar
 	if err := s.documentoRepo.Update(documento); err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("erro ao atualizar documento: %v", err))
+		return nil, apperrors.NewInternalError("Erro ao atualizar documento.", err) //
 	}
 
 	return documento, nil
@@ -238,8 +237,8 @@ func (s *entidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 func (s *entidadeDocumentoService) Delete(entidadeID, item int) error {
 	// 1. Validar se o documento existe
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
-	if err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
+	if err != nil { //
+		return err
 	}
 
 	// 2. Verificar se já foi deletado
@@ -251,7 +250,7 @@ func (s *entidadeDocumentoService) Delete(entidadeID, item int) error {
 
 	// 4. Excluir
 	if err := s.documentoRepo.Delete(entidadeID, item); err != nil {
-		return apperrors.NewValidationError(fmt.Sprintf("erro ao excluir documento: %v", err))
+		return apperrors.NewInternalError("Erro ao excluir documento.", err) //
 	}
 
 	return nil
@@ -269,7 +268,7 @@ func (s *entidadeDocumentoService) List(limit, offset int, filters map[string]in
 
 	documentos, total, err := s.documentoRepo.List(limit, offset, filters)
 	if err != nil {
-		return nil, 0, apperrors.NewValidationError(fmt.Sprintf("erro ao listar documentos: %v", err))
+		return nil, 0, apperrors.NewInternalError("Erro ao listar documentos.", err) //
 	}
 
 	return documentos, total, nil

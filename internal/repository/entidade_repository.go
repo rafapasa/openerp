@@ -71,24 +71,36 @@ func NewEntidadeRepository(db *gorm.DB) EntidadeRepository {
 
 // Create salva uma nova entidade
 func (r *entidadeRepository) Create(entidade *models.Entidade) error {
-	return r.db.Create(entidade).Error
+	err := r.db.Create(entidade).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao criar entidade.", err)
+	}
+	return nil
 }
 
 // Update atualiza uma entidade existente
 func (r *entidadeRepository) Update(id int, entidade *models.Entidade) error {
-	return r.db.
+	err := r.db.
 		Omit("EmpresaFilial", "GrupoEntidade", "TabelaPreco", "TabelaDesconto", "Horario", "created_at", "deleted_at").
 		Model(&models.Entidade{}).
 		Where("ent_id = ?", id).
 		Updates(entidade).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar entidade.", err)
+	}
+	return nil
 }
 
 // Delete realiza exclusão lógica de uma entidade pelo ID
 func (r *entidadeRepository) Delete(id int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.Entidade{}).
 		Where("ent_id = ?", id).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir entidade.", err)
+	}
+	return nil
 }
 
 // GetByID busca uma entidade pelo ID (sem relacionamentos, mais leve)
@@ -127,7 +139,7 @@ func (r *entidadeRepository) FindByID(id int) (*models.Entidade, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("entidade com ID %d não encontrada", id))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return &entidade, nil
 }
@@ -152,7 +164,7 @@ func (r *entidadeRepository) FindByDocumento(documento string) (*models.Entidade
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("entidade com documento %s não encontrada", documento))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return &entidade, nil
 }
@@ -167,7 +179,7 @@ func (r *entidadeRepository) FindByRazaoSocial(nome string, limit int) ([]models
 		Find(&entidades).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return entidades, nil
 }
@@ -182,7 +194,7 @@ func (r *entidadeRepository) FindByNomeFantasia(nome string, limit int) ([]model
 		Find(&entidades).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return entidades, nil
 }
@@ -195,7 +207,7 @@ func (r *entidadeRepository) FindByGrupoID(grupoID int) ([]models.Entidade, erro
 		Order("ent_razaosocial ASC").
 		Find(&entidades).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return entidades, nil
 }
@@ -208,7 +220,7 @@ func (r *entidadeRepository) FindByFilialID(filialID int) ([]models.Entidade, er
 		Order("ent_razaosocial ASC").
 		Find(&entidades).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 	return entidades, nil
 }
@@ -226,7 +238,7 @@ func (r *entidadeRepository) List(limit, offset int, filters map[string]interfac
 	query = utils.ApplyFilters(query, models.Entidade{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	err := query.
@@ -240,7 +252,7 @@ func (r *entidadeRepository) List(limit, offset int, filters map[string]interfac
 		Find(&entidades).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return entidades, total, nil
@@ -255,7 +267,7 @@ func (r *entidadeRepository) ListWithFullPreload(limit, offset int, filters map[
 	query = utils.ApplyFilters(query, models.Entidade{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	err := query.
@@ -274,7 +286,7 @@ func (r *entidadeRepository) ListWithFullPreload(limit, offset int, filters map[
 		Find(&entidades).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return entidades, total, nil
@@ -298,7 +310,7 @@ func (r *entidadeRepository) ExistsByDocumento(documento string, excludeID int) 
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return count > 0, nil
@@ -316,7 +328,7 @@ func (r *entidadeRepository) ExistsByRazaoSocial(razaoSocial string, excludeID i
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return count > 0, nil
@@ -338,7 +350,7 @@ func (r *entidadeRepository) ExistsByNomeFantasia(nomeFantasia string, excludeID
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return count > 0, nil
@@ -351,7 +363,7 @@ func (r *entidadeRepository) ExistsByID(id int) (bool, error) {
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando entidade.", err)
 	}
 
 	return count > 0, nil
@@ -363,16 +375,24 @@ func (r *entidadeRepository) ExistsByID(id int) (bool, error) {
 
 // BulkUpdateStatus atualiza o status de múltiplas entidades
 func (r *entidadeRepository) BulkUpdateStatus(ids []int, status string) error {
-	return r.db.Model(&models.Entidade{}).
+	err := r.db.Model(&models.Entidade{}).
 		Where("ent_id IN ? AND deleted_at IS NULL", ids).
 		Update("ent_status", status).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro atualizando status das entidades.", err)
+	}
+	return nil
 }
 
 // BulkDelete realiza exclusão lógica de múltiplas entidades
 func (r *entidadeRepository) BulkDelete(ids []int) error {
-	return r.db.Model(&models.Entidade{}).
+	err := r.db.Model(&models.Entidade{}).
 		Where("ent_id IN ? AND deleted_at IS NULL", ids).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro excluindo entidades.", err)
+	}
+	return nil
 }
 
 // ============================================================
@@ -383,7 +403,7 @@ func (r *entidadeRepository) BulkDelete(ids []int) error {
 func (r *entidadeRepository) HasDependentRecords(id int) (bool, error) {
 	counts, err := r.CountDependentRecords(id)
 	if err != nil {
-		return false, err
+		return false, apperrors.NewConflictError("Erro entidade com .")
 	}
 
 	for _, count := range counts {
@@ -403,7 +423,7 @@ func (r *entidadeRepository) CountDependentRecords(id int) (map[string]int64, er
 	if err := r.db.Model(&models.DocumentoVenda{}).
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		Count(&countVendas).Error; err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando documentos de venda.", err)
 	}
 	if countVendas > 0 {
 		result["documentos_venda"] = countVendas
@@ -414,7 +434,7 @@ func (r *entidadeRepository) CountDependentRecords(id int) (map[string]int64, er
 	if err := r.db.Model(&models.EntidadeDocumento{}).
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		Count(&countDocumentos).Error; err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando docuemntos da entidade.", err)
 	}
 	if countDocumentos > 0 {
 		result["documentos_entidade"] = countDocumentos
@@ -425,7 +445,7 @@ func (r *entidadeRepository) CountDependentRecords(id int) (map[string]int64, er
 	if err := r.db.Model(&models.Titulo{}).
 		Where("ent_id = ? AND deleted_at IS NULL", id).
 		Count(&countTitulos).Error; err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando titulos.", err)
 	}
 	if countTitulos > 0 {
 		result["titulos"] = countTitulos

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/openerp/backend/internal/constants"
@@ -77,12 +76,12 @@ func (s *entidadeService) isDataValid(req *dto.EntidadeRequest) error {
 func (s *entidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
 	// Nome / Razão Social
 	if len(req.RazaoSocial) > maxLengthRazaoSocial {
-		return apperrors.NewValidationError(fmt.Sprintf("nome/razão social deve ter no máximo %d caracteres", maxLengthRazaoSocial))
+		return apperrors.NewValidationError(fmt.Sprintf("Nome/razão social deve ter no máximo %d caracteres.", maxLengthRazaoSocial)) //
 	}
 
 	// Nome Fantasia (se informado)
 	if len(req.NomeFantasia) > maxLengthNomeFantasia {
-		return apperrors.NewValidationError(fmt.Sprintf("nome fantasia deve ter no máximo %d caracteres", maxLengthNomeFantasia))
+		return apperrors.NewValidationError(fmt.Sprintf("Nome fantasia deve ter no máximo %d caracteres.", maxLengthNomeFantasia)) //
 	}
 
 	return nil
@@ -95,7 +94,7 @@ func (s *entidadeService) validateDocument(req *dto.EntidadeRequest) error {
 
 	// Validar formato (CPF ou CNPJ)
 	if !utils.IsValidDocumento(documentoLimpo) {
-		return apperrors.NewValidationError("documento inválido, deve ser um CPF ou CNPJ válido")
+		return apperrors.NewValidationError("Documento inválido, deve ser um CPF ou CNPJ válido.") //
 	}
 
 	return nil
@@ -105,7 +104,7 @@ func (s *entidadeService) validateDocument(req *dto.EntidadeRequest) error {
 func (s *entidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 	// Verificar se o tipo de pessoa é válido (1-Física, 2-Jurídica)
 	if req.TipoPessoa != 1 && req.TipoPessoa != 2 {
-		return apperrors.NewValidationError("tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica)")
+		return apperrors.NewValidationError("Tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica).") //
 	}
 	return nil
 }
@@ -114,10 +113,10 @@ func (s *entidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 func (s *entidadeService) validateUniqueDocument(documento string, excludeID int) error {
 	existe, err := s.entidadeRepo.ExistsByDocumento(documento, excludeID)
 	if err != nil {
-		return apperrors.NewInternalError("erro ao verificar duplicidade de documento", err)
+		return apperrors.NewInternalError("Erro ao verificar duplicidade de documento.", err) //
 	}
 	if existe {
-		return apperrors.NewConflictError(fmt.Sprintf("documento %s já está cadastrado", utils.LimparDocumento(documento)))
+		return apperrors.NewConflictError(fmt.Sprintf("Documento %s já está cadastrado.", utils.LimparDocumento(documento))) //
 	}
 	return nil
 }
@@ -159,7 +158,7 @@ func (s *entidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, er
 
 	entidade := &models.Entidade{}
 	if err := utils.MapToModel(rep, entidade); err != nil {
-		return nil, fmt.Errorf("erro ao mapear dados da entidade: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao mapear dados da entidade.", err) //
 	}
 
 	// 3. Definir campos que não podem ser mapeados automaticamente
@@ -186,12 +185,12 @@ func (s *entidadeService) GetByID(id int) (*models.Entidade, error) {
 
 func (s *entidadeService) GetByDocumento(documento string) (*models.Entidade, error) {
 	if !utils.IsValidDocumento(documento) {
-		return nil, fmt.Errorf("Documento inválido, deve ser um CNPJ ou CPF válido")
+		return nil, apperrors.NewValidationError("Documento inválido, deve ser um CNPJ ou CPF válido.") //
 	}
 
 	entidade, err := s.entidadeRepo.FindByDocumento(documento)
 	if err != nil {
-		return nil, err
+		return nil, err //
 	}
 	return entidade, nil
 }
@@ -203,11 +202,11 @@ func (s *entidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Enti
 	// 1. Buscar a entidade pelo ID
 	entidade, err := s.entidadeRepo.FindByID(id)
 	if err != nil {
-		return nil, err
+		return nil, err //
 	}
 
 	if err := utils.MapToModel(req, entidade); err != nil {
-		return nil, fmt.Errorf("erro ao mapear dados da entidade: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao mapear dados da entidade.", err) //
 	}
 
 	entidade.InscricaoFederal = utils.LimparDocumento(req.InscricaoFederal)
@@ -260,47 +259,47 @@ func (s *entidadeService) List(limit, offset int, filters map[string]interface{}
 func (s *entidadeService) checkDependencies(entidadeID int) error {
 	// 1. Verificar se tem endereços
 	enderecos, err := s.entidadeEnderecoService.GetByEntidadeID(entidadeID)
-	if err != nil {
-		return fmt.Errorf("erro ao verificar endereços: %w", err)
-	}
-	if len(enderecos) > 0 {
-		return errors.New("não é possível excluir entidade com endereços cadastrados")
+	if err != nil { //
+		return apperrors.NewInternalError("Erro ao verificar endereços.", err) //
+	} //
+	if len(enderecos) > 0 { //
+		return apperrors.NewConflictError("Não é possível excluir entidade com endereços cadastrados.") //
 	}
 
 	// 2. TODO: Verificar se tem contatos
 	// contatos, err := s.entidadeContatoRepo.FindByEntidadeID(entidadeID)
-	// if err != nil {
-	//     return fmt.Errorf("erro ao verificar contatos: %w", err)
-	// }
-	// if len(contatos) > 0 {
-	//     return errors.New("não é possível excluir entidade com contatos cadastrados")
+	// if err != nil { //
+	//     return apperrors.NewInternalError("Erro ao verificar contatos.", err) //
+	// } //
+	// if len(contatos) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir entidade com contatos cadastrados.") //
 	// }
 
 	// 3. TODO: Verificar se tem documentos
 	// documentos, err := s.entidadeDocumentoRepo.FindByEntidadeID(entidadeID)
-	// if err != nil {
-	//     return fmt.Errorf("erro ao verificar documentos: %w", err)
-	// }
-	// if len(documentos) > 0 {
-	//     return errors.New("não é possível excluir entidade com documentos cadastrados")
+	// if err != nil { //
+	//     return apperrors.NewInternalError("Erro ao verificar documentos.", err) //
+	// } //
+	// if len(documentos) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir entidade com documentos cadastrados.") //
 	// }
 
 	// 4. TODO: Verificar se tem pedidos (documento_venda)
 	// pedidos, err := s.documentoVendaRepo.FindByEntidadeID(entidadeID)
-	// if err != nil {
-	//     return fmt.Errorf("erro ao verificar pedidos: %w", err)
-	// }
-	// if len(pedidos) > 0 {
-	//     return errors.New("não é possível excluir entidade com pedidos associados")
+	// if err != nil { //
+	//     return apperrors.NewInternalError("Erro ao verificar pedidos.", err) //
+	// } //
+	// if len(pedidos) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir entidade com pedidos associados.") //
 	// }
 
 	// 5. TODO: Verificar se tem notas fiscais
 	// notas, err := s.notaFiscalRepo.FindByEntidadeID(entidadeID)
-	// if err != nil {
-	//     return fmt.Errorf("erro ao verificar notas fiscais: %w", err)
-	// }
-	// if len(notas) > 0 {
-	//     return errors.New("não é possível excluir entidade com notas fiscais associadas")
+	// if err != nil { //
+	//     return apperrors.NewInternalError("Erro ao verificar notas fiscais.", err) //
+	// } //
+	// if len(notas) > 0 { //
+	//     return apperrors.NewConflictError("Não é possível excluir entidade com notas fiscais associadas.") //
 	// }
 
 	return nil

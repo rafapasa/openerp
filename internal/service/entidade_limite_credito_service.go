@@ -1,9 +1,10 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
@@ -46,11 +47,11 @@ func NewEntidadeLimiteCreditoService(db *gorm.DB, elcRepo repository.EntidadeLim
 func (s *entidadeLimiteCreditoService) Create(req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.limiteRepo.ExistsByDescricao(descricao, 0)
-	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+	if err != nil { //
+		return nil, apperrors.NewInternalError("Erro ao verificar descrição.", err) //
 	}
 	if exists {
-		return nil, errors.New("já existe um limite de crédito com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um limite de crédito com esta descrição.") //
 	}
 
 	limite := &models.EntidadeLimiteCredito{
@@ -62,30 +63,31 @@ func (s *entidadeLimiteCreditoService) Create(req *dto.EntidadeLimiteCreditoRequ
 
 	if err := s.limiteRepo.Create(limite); err != nil {
 		return nil, fmt.Errorf("erro ao criar limite de crédito: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao criar limite de crédito.", err) //
 	}
 
 	return limite, nil
 }
 
 // GetByID busca um limite de crédito por ID.
-func (s *entidadeLimiteCreditoService) GetByID(id int) (*models.EntidadeLimiteCredito, error) {
-	return s.limiteRepo.FindByID(id)
+func (s *entidadeLimiteCreditoService) GetByID(id int) (*models.EntidadeLimiteCredito, error) { //
+	return s.limiteRepo.FindByID(id) //
 }
 
 // Update atualiza um limite de crédito.
 func (s *entidadeLimiteCreditoService) Update(id int, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
 	limite, err := s.limiteRepo.FindByID(id)
 	if err != nil {
-		return nil, err
+		return nil, err //
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
 	exists, err := s.limiteRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao verificar descrição.", err) //
 	}
 	if exists {
-		return nil, errors.New("já existe um limite de crédito com esta descrição")
+		return nil, apperrors.NewConflictError("Já existe um limite de crédito com esta descrição.") //
 	}
 
 	limite.Descricao = &descricao
@@ -93,7 +95,7 @@ func (s *entidadeLimiteCreditoService) Update(id int, req *dto.EntidadeLimiteCre
 	limite.UpdatedBy = req.UpdatedBy
 
 	if err := s.limiteRepo.Update(id, limite); err != nil {
-		return nil, fmt.Errorf("erro ao atualizar limite de crédito: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar limite de crédito.", err) //
 	}
 
 	return limite, nil
@@ -101,9 +103,8 @@ func (s *entidadeLimiteCreditoService) Update(id int, req *dto.EntidadeLimiteCre
 
 // Delete exclui um limite de crédito.
 func (s *entidadeLimiteCreditoService) Delete(id int) error {
-	_, err := s.limiteRepo.FindByID(id)
-	if err != nil {
-		return err
+	if _, err := s.limiteRepo.FindByID(id); err != nil { //
+		return err //
 	}
 
 	// TODO: Adicionar verificação se o limite de crédito está em uso por alguma entidade.

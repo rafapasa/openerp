@@ -74,24 +74,36 @@ func NewTabelaPrecoProdutoRepository(db *gorm.DB) TabelaPrecoProdutoRepository {
 
 // Create salva um novo item na tabela de preço
 func (r *tabelaPrecoProdutoRepository) Create(item *models.TabelaPrecoProduto) error {
-	return r.db.Create(item).Error
+	err := r.db.Create(item).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao criar item na tabela de preço", err)
+	}
+	return nil
 }
 
 // Update atualiza um item da tabela de preço existente
 func (r *tabelaPrecoProdutoRepository) Update(tabelaPrecoID, item int, produto *models.TabelaPrecoProduto) error {
-	return r.db.
+	err := r.db.
 		Omit("TabelaPreco", "Produto", "created_at", "deleted_at").
 		Model(&models.TabelaPrecoProduto{}).
 		Where("tbp_id = ? AND tbpp_item = ?", tabelaPrecoID, item).
 		Updates(produto).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao atualizar item na tabela de preço", err)
+	}
+	return nil
 }
 
 // Delete realiza exclusão lógica
 func (r *tabelaPrecoProdutoRepository) Delete(tabelaPrecoID, item int) error {
-	return r.db.
+	err := r.db.
 		Model(&models.TabelaPrecoProduto{}).
 		Where("tbp_id = ? AND tbpp_item = ?", tabelaPrecoID, item).
 		Update("deleted_at", gorm.Expr("NOW()")).Error
+	if err != nil {
+		return apperrors.NewInternalError("Erro ao excluir item da tabela de preço", err)
+	}
+	return nil
 }
 
 // FindByID busca um item da tabela de preço pelo ID composto com relacionamentos
@@ -107,7 +119,7 @@ func (r *tabelaPrecoProdutoRepository) FindByID(tabelaPrecoID, item int) (*model
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("item da tabela de preço com tabela %d e item %d não encontrado", tabelaPrecoID, item))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return &produto, nil
 }
@@ -123,7 +135,7 @@ func (r *tabelaPrecoProdutoRepository) GetByID(tabelaPrecoID, item int) (*models
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("item da tabela de preço com tabela %d e item %d não encontrado", tabelaPrecoID, item))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return &produto, nil
 }
@@ -142,7 +154,7 @@ func (r *tabelaPrecoProdutoRepository) FindByTabelaPrecoID(tabelaPrecoID int) ([
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return produtos, nil
 }
@@ -156,7 +168,7 @@ func (r *tabelaPrecoProdutoRepository) FindByTabelaPrecoIDWithPagination(tabelaP
 		Where("tbp_id = ? AND deleted_at IS NULL", tabelaPrecoID)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	err := query.
@@ -167,7 +179,7 @@ func (r *tabelaPrecoProdutoRepository) FindByTabelaPrecoIDWithPagination(tabelaP
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	return produtos, total, nil
@@ -183,7 +195,7 @@ func (r *tabelaPrecoProdutoRepository) FindByProdutoID(produtoID int) ([]models.
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return produtos, nil
 }
@@ -201,7 +213,7 @@ func (r *tabelaPrecoProdutoRepository) FindByTabelaPrecoAndProduto(tabelaPrecoID
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // Não encontrado, não é erro
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return &produto, nil
 }
@@ -216,7 +228,7 @@ func (r *tabelaPrecoProdutoRepository) FindActiveByTabelaPrecoID(tabelaPrecoID i
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return produtos, nil
 }
@@ -232,7 +244,7 @@ func (r *tabelaPrecoProdutoRepository) FindBySituacao(situacao int) ([]models.Ta
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return produtos, nil
 }
@@ -252,7 +264,7 @@ func (r *tabelaPrecoProdutoRepository) List(tabelaPrecoID, limit, offset int, fi
 	query = utils.ApplyFilters(query, models.TabelaPrecoProduto{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	err := query.
@@ -264,7 +276,7 @@ func (r *tabelaPrecoProdutoRepository) List(tabelaPrecoID, limit, offset int, fi
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	return produtos, total, nil
@@ -279,7 +291,7 @@ func (r *tabelaPrecoProdutoRepository) ListWithFullPreload(limit, offset int, fi
 	query = utils.ApplyFilters(query, models.TabelaPrecoProduto{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	err := query.
@@ -295,7 +307,7 @@ func (r *tabelaPrecoProdutoRepository) ListWithFullPreload(limit, offset int, fi
 		Find(&produtos).Error
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 
 	return produtos, total, nil
@@ -309,7 +321,7 @@ func (r *tabelaPrecoProdutoRepository) FindAll() ([]models.TabelaPrecoProduto, e
 		Order("tbp_id ASC, tbpp_item ASC").
 		Find(&produtos).Error
 	if err != nil {
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return produtos, nil
 }
@@ -329,7 +341,7 @@ func (r *tabelaPrecoProdutoRepository) ExistsByTabelaPrecoAndProduto(tabelaPreco
 	}
 
 	if err := query.Count(&count).Error; err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return count > 0, nil
 }
@@ -341,7 +353,7 @@ func (r *tabelaPrecoProdutoRepository) ExistsByID(tabelaPrecoID, item int) (bool
 		Where("tbp_id = ? AND tbpp_item = ? AND deleted_at IS NULL", tabelaPrecoID, item).
 		Count(&count).Error
 	if err != nil {
-		return false, err
+		return false, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return count > 0, nil
 }
@@ -353,7 +365,7 @@ func (r *tabelaPrecoProdutoRepository) CountByTabelaPrecoID(tabelaPrecoID int) (
 		Where("tbp_id = ? AND deleted_at IS NULL", tabelaPrecoID).
 		Count(&count).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return count, nil
 }
@@ -366,7 +378,7 @@ func (r *tabelaPrecoProdutoRepository) GetNextItemNumber(tabelaPrecoID int) (int
 		Select("COALESCE(MAX(tbpp_item), 0) + 1").
 		Scan(&maxItem).Error
 	if err != nil {
-		return 0, err
+		return 0, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}
 	return maxItem, nil
 }

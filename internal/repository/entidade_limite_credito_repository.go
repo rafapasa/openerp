@@ -3,7 +3,9 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 	"gorm.io/gorm"
@@ -83,7 +85,7 @@ func (r *entidadeLimiteCreditoRepository) FindByID(id int) (*models.EntidadeLimi
 	err := r.db.Where("elc_id = ? AND deleted_at IS NULL", id).First(&limite).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("limite de crédito não encontrado")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("Limite de crédito com ID %d não encontrado.", id))
 		}
 		return nil, err
 	}

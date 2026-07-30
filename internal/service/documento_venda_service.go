@@ -31,12 +31,13 @@ type DocumentoVendaService interface {
 
 // documentoVendaService é a implementação concreta de DocumentoVendaService.
 type documentoVendaService struct {
-	db         *gorm.DB
-	ddvRepo    repository.DocumentoVendaRepository
-	dviService DocumentoVendaItemService // Alterado para a interface
-	dvpService DocumentoVendaPagamentoService
-	entService EntidadeService
-	proService ProdutoService
+	db                *gorm.DB
+	ddvRepo           repository.DocumentoVendaRepository
+	dviService        DocumentoVendaItemService
+	dvpService        DocumentoVendaPagamentoService
+	entService        EntidadeService
+	proService        ProdutoService
+	dviServiceFactory DocumentoVendaItemServiceFactory
 }
 
 func NewDocumentoVendaService(db *gorm.DB,
@@ -44,14 +45,16 @@ func NewDocumentoVendaService(db *gorm.DB,
 	dviService DocumentoVendaItemService,
 	dvpService DocumentoVendaPagamentoService,
 	entService EntidadeService,
-	proService ProdutoService) *documentoVendaService {
+	proService ProdutoService,
+	dviServiceFactory DocumentoVendaItemServiceFactory) *documentoVendaService {
 	return &documentoVendaService{
-		db:         db,
-		ddvRepo:    ddvRepo,
-		dviService: dviService,
-		dvpService: dvpService,
-		entService: entService,
-		proService: proService,
+		db:                db,
+		ddvRepo:           ddvRepo,
+		dviService:        dviService,
+		dvpService:        dvpService,
+		entService:        entService,
+		proService:        proService,
+		dviServiceFactory: dviServiceFactory,
 	}
 }
 
@@ -75,7 +78,7 @@ func (s *documentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUp
 	if req.EntidadeID != nil && *req.EntidadeID > 0 {
 		entidade, err := s.entService.GetByID(*req.EntidadeID)
 		if err != nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("Entidade com ID %d não encontrada.", *req.EntidadeID))
+			return err
 		}
 		if !entidade.IsActive() {
 			return apperrors.NewValidationError(fmt.Sprintf("A entidade '%s' não está ativa.", entidade.GetNomeExibicao()))
@@ -101,7 +104,7 @@ func (s *documentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUp
 		// Valida se o produto existe e está ativo
 		produto, err := s.proService.GetByID(item.ProdutoID)
 		if err != nil {
-			return apperrors.NewInternalError("Erro ao verificar produto.", err)
+			return err
 		}
 		if produto == nil {
 			return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado para o item %d.", item.ProdutoID, i+1))
@@ -231,7 +234,7 @@ func (s *documentoVendaService) Update(id int, req *dto.DocumentoVendaRequest) (
 	s.recalcularTotais(doc)
 
 	if err := s.ddvRepo.Update(doc); err != nil {
-		return nil, apperrors.NewInternalError("Erro ao atualizar documento.", err)
+		return nil, apperrors.NewInternalError("Erro ao atualizar documento.", err) //
 	}
 
 	return s.GetByID(id)
@@ -259,7 +262,7 @@ func (s *documentoVendaService) executarOperacaoItem(docVendaID int,
 	itemOperation func(dviServiceTx DocumentoVendaItemService) error) (*models.DocumentoVenda, error) {
 	tx := s.db.Begin()
 	if tx.Error != nil {
-		return nil, apperrors.NewInternalError("Erro ao iniciar transação.", tx.Error)
+		return nil, apperrors.NewInternalError("Erro ao iniciar transação.", tx.Error) //
 	}
 
 	// Defer a rollback. Se o commit for bem-sucedido, o rollback não terá efeito.
@@ -272,7 +275,7 @@ func (s *documentoVendaService) executarOperacaoItem(docVendaID int,
 	}()
 
 	// Executa a operação do item (Create, Update, Delete) dentro da transação.
-	dviServiceTx := NewDocumentoVendaItemService(tx) // Retorna a interface
+	dviServiceTx := s.dviServiceFactory.CreateWithTx(tx) // Retorna a interface
 	if err := itemOperation(dviServiceTx); err != nil {
 		tx.Rollback()
 		return nil, err // Retorna o erro original da operação do item.
@@ -284,21 +287,21 @@ func (s *documentoVendaService) executarOperacaoItem(docVendaID int,
 	// Busca o documento de venda completo para recalcular os totais.
 	doc, err := ddvRepoTx.FindByID(docVendaID)
 	if err != nil {
-		tx.Rollback()
-		return nil, apperrors.NewInternalError("Erro ao buscar documento após operação no item.", err)
+		tx.Rollback()                                                                                  //
+		return nil, apperrors.NewInternalError("Erro ao buscar documento após operação no item.", err) //
 	}
 
 	// Recalcula e salva os totais atualizados.
 	s.recalcularTotais(doc)
 	if err := ddvRepoTx.Update(doc); err != nil {
-		tx.Rollback()
-		return nil, apperrors.NewInternalError("Erro ao atualizar totais do documento via repositório.", err)
+		tx.Rollback()                                                                                         //
+		return nil, apperrors.NewInternalError("Erro ao atualizar totais do documento via repositório.", err) //
 	}
 
 	// Commita a transação.
 	if err := tx.Commit().Error; err != nil {
-		tx.Rollback() // Garante o rollback em caso de falha no commit.
-		return nil, apperrors.NewInternalError("Erro ao commitar transação.", err)
+		tx.Rollback()                                                              // Garante o rollback em caso de falha no commit. //
+		return nil, apperrors.NewInternalError("Erro ao commitar transação.", err) //
 	}
 
 	return doc, nil
@@ -331,7 +334,7 @@ func (s *documentoVendaService) executarOperacaoPagamento(
 	pagamentoOperation func(dvpService DocumentoVendaPagamentoService) error,
 ) (*models.DocumentoVenda, error) {
 	tx := s.db.Begin()
-	if tx.Error != nil {
+	if tx.Error != nil { //
 		return nil, apperrors.NewInternalError("Erro ao iniciar transação.", tx.Error)
 	}
 	defer tx.Rollback()
@@ -355,19 +358,19 @@ func (s *documentoVendaService) executarOperacaoPagamento(
 	// Busca o documento de venda completo para recalcular os totais.
 	doc, err := ddvRepoTx.FindByID(docVendaID)
 	if err != nil {
-		tx.Rollback()
-		return nil, apperrors.NewInternalError("Erro ao buscar documento após operação no pagamento.", err)
+		tx.Rollback()                                                                                       //
+		return nil, apperrors.NewInternalError("Erro ao buscar documento após operação no pagamento.", err) //
 	}
 
 	// Recalcula e salva os totais de pagamento atualizados.
 	s.recalcularTotaisPagamentos(doc)
 	if err := ddvRepoTx.Update(doc); err != nil {
-		tx.Rollback()
-		return nil, apperrors.NewInternalError("Erro ao atualizar totais de pagamento do documento.", err)
+		tx.Rollback()                                                                                      //
+		return nil, apperrors.NewInternalError("Erro ao atualizar totais de pagamento do documento.", err) //
 	}
 
 	// Commita a transação.
-	if err := tx.Commit().Error; err != nil {
+	if err := tx.Commit().Error; err != nil { //
 		tx.Rollback()
 		return nil, apperrors.NewInternalError("Erro ao commitar transação.", err)
 	}

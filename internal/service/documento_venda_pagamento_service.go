@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/openerp/backend/internal/dto"
 	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
@@ -44,7 +42,7 @@ func (s *documentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamento
 func (s *documentoVendaPagamentoService) Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error {
 	pagamento, err := s.dvpRepo.FindByID(ddvId, dvpItem)
 	if err != nil {
-		return apperrors.NewNotFoundError(fmt.Sprintf("Pagamento %d do documento %d não encontrado.", dvpItem, ddvId))
+		return err //
 	}
 
 	if err := utils.MapToModel(req, pagamento); err != nil {

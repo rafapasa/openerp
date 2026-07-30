@@ -21,9 +21,9 @@ type ProdutoVariacaoService interface {
 
 // ProdutoVariacaoService gerencia a lógica de negócios para variações de produto.
 type produtoVariacaoService struct {
-	provRepo    repository.ProdutoVariacaoRepository
-	proService  ProdutoService
-	corService  ProdutoCorService     // Renamed from procService
+	provRepo       repository.ProdutoVariacaoRepository
+	proService     ProdutoService
+	corService     ProdutoCorService     // Renamed from procService
 	tamanhoService ProdutoTamanhoService // Renamed from protService
 }
 
@@ -35,9 +35,9 @@ func NewProdutoVariacaoService(
 	provRepo repository.ProdutoVariacaoRepository, // Changed parameter name to provRepo
 ) ProdutoVariacaoService {
 	return &produtoVariacaoService{
-		provRepo:    provRepo,
-		proService:  proService,
-		corService:  procService, // Assigned to new field name
+		provRepo:       provRepo,
+		proService:     proService,
+		corService:     procService, // Assigned to new field name
 		tamanhoService: protService, // Assigned to new field name
 	}
 }
@@ -69,7 +69,7 @@ func (s *produtoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 	// Verificar se o Produto existe
 	produto, err := s.proService.FindById(req.ProdutoID)
 	if err != nil {
-		return apperrors.NewInternalError("Erro ao verificar produto.", err)
+		return err
 	}
 	if produto == nil {
 		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado.", req.ProdutoID))
@@ -77,28 +77,24 @@ func (s *produtoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 
 	// Verificar se Cor existe (se informada)
 	if req.CorID != nil && *req.CorID > 0 { // Changed from s.corRepo to s.corService
-		cor, err := s.corService.FindByID(*req.CorID)
+		_, err := s.corService.FindByID(*req.CorID)
 		if err != nil {
-			return apperrors.NewInternalError(fmt.Sprintf("Erro ao verificar cor com ID %d.", *req.CorID), err)
+			return err
 		}
-		if cor == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("Cor com ID %d não encontrada.", *req.CorID))
-		}
+
 	}
 
 	// Verificar se Tamanho existe (se informada)
 	if req.TamanhoID != nil && *req.TamanhoID > 0 { // Changed from s.tamanhoRepo to s.tamanhoService
-		tamanho, err := s.tamanhoService.FindByID(*req.TamanhoID)
+		_, err := s.tamanhoService.FindByID(*req.TamanhoID)
 		if err != nil {
-			return apperrors.NewInternalError(fmt.Sprintf("Erro ao verificar tamanho com ID %d.", *req.TamanhoID), err)
+			return err
 		}
-		if tamanho == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("Tamanho com ID %d não encontrado.", *req.TamanhoID))
-		}
+
 	}
 
 	// Verificar unicidade do SKU por EmpresaFilial
-	existingVariacao, err := s.repo.FindBySKU(req.SKU, req.EmpresaFilialID)
+	existingVariacao, err := s.provRepo.FindBySKU(req.SKU)
 	if err != nil {
 		return apperrors.NewInternalError("Erro ao verificar SKU existente.", err)
 	}
@@ -153,11 +149,11 @@ func (s *produtoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.P
 		return nil, apperrors.NewInternalError("Erro ao mapear DTO para modelo.", err)
 	}
 
-	if err := s.repo.Create(variacao); err != nil {
+	if err := s.provRepo.Create(variacao); err != nil {
 		return nil, apperrors.NewInternalError("Erro ao criar variação de produto.", err)
 	}
 
-	createdVariacao, err := s.repo.FindByID(variacao.ID)
+	createdVariacao, err := s.provRepo.FindByID(variacao.ID)
 	if err != nil {
 		return nil, apperrors.NewInternalError("Erro ao buscar variação de produto criada.", err)
 	}
@@ -171,12 +167,12 @@ func (s *produtoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, 
 		return nil, apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
 
-	variacao, err := s.repo.FindByID(id)
+	variacao, err := s.provRepo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 	if variacao == nil || variacao.IsDeleted() {
-		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada.", id))
+		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada.", id)) //
 	}
 
 	return s.mapModelToResponse(variacao)
@@ -193,23 +189,23 @@ func (s *produtoVariacaoService) Update(id int, req *dto.ProdutoVariacaoRequest)
 		return nil, err
 	}
 
-	existingVariacao, err := s.repo.FindByID(id)
+	existingVariacao, err := s.provRepo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 	if existingVariacao == nil || existingVariacao.IsDeleted() {
-		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada para atualização.", id))
+		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada para atualização.", id)) //
 	}
 
 	if err := utils.MapToModel(req, existingVariacao); err != nil {
 		return nil, apperrors.NewInternalError("Erro ao mapear DTO para modelo existente.", err)
 	}
 
-	if err := s.repo.Update(existingVariacao); err != nil {
+	if err := s.provRepo.Update(id, existingVariacao); err != nil {
 		return nil, apperrors.NewInternalError("Erro ao atualizar variação de produto.", err)
 	}
 
-	updatedVariacao, err := s.repo.FindByID(existingVariacao.ID)
+	updatedVariacao, err := s.provRepo.FindByID(existingVariacao.ID)
 	if err != nil {
 		return nil, apperrors.NewInternalError("Erro ao buscar variação de produto atualizada.", err)
 	}
@@ -223,15 +219,15 @@ func (s *produtoVariacaoService) Delete(id int) error {
 		return apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
 
-	existingVariacao, err := s.repo.FindByID(id)
+	existingVariacao, err := s.provRepo.FindByID(id)
 	if err != nil {
 		return err
 	}
 	if existingVariacao == nil || existingVariacao.IsDeleted() {
-		return apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada para exclusão.", id))
+		return apperrors.NewNotFoundError(fmt.Sprintf("Variação de produto com ID %d não encontrada para exclusão.", id)) //
 	}
 
-	if err := s.repo.Delete(id); err != nil {
+	if err := s.provRepo.Delete(id); err != nil {
 		return apperrors.NewInternalError("Erro ao excluir variação de produto.", err)
 	}
 	return nil
@@ -246,7 +242,7 @@ func (s *produtoVariacaoService) List(limit, offset int, filters map[string]inte
 		offset = 0
 	}
 
-	variacoes, total, err := s.repo.List(limit, offset, filters)
+	variacoes, total, err := s.provRepo.List(limit, offset, filters)
 	if err != nil {
 		return nil, 0, apperrors.NewInternalError("Erro ao listar variações de produto.", err)
 	}

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	apperrors "github.com/openerp/backend/internal/erros"
+
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
@@ -65,11 +67,11 @@ func (s *entidadeContatoService) isDataValid(req *dto.EntidadeContatoRequest) er
 // validateRequiredFields valida campos obrigatórios
 func (s *entidadeContatoService) validateRequiredFields(req *dto.EntidadeContatoRequest) error {
 	if strings.TrimSpace(req.Informacao) == "" {
-		return errors.New("informação do contato é obrigatória")
+		return apperrors.NewValidationError("Informação do contato é obrigatória.") //
 	}
 
 	if req.FormaContatoID == 0 {
-		return errors.New("forma de contato é obrigatória")
+		return apperrors.NewValidationError("Forma de contato é obrigatória.") //
 	}
 
 	return nil
@@ -77,8 +79,8 @@ func (s *entidadeContatoService) validateRequiredFields(req *dto.EntidadeContato
 
 // validateTipoContato valida o tipo de contato
 func (s *entidadeContatoService) validateTipoContato(req *dto.EntidadeContatoRequest) error {
-	if !isValidTipoContato(req.FormaContatoID) {
-		return fmt.Errorf("tipo de contato inválido: %d", req.FormaContatoID)
+	if !isValidTipoContato(req.FormaContatoID) { //
+		return apperrors.NewValidationError(fmt.Sprintf("Tipo de contato inválido: %d.", req.FormaContatoID)) //
 	}
 	return nil
 }
@@ -86,8 +88,8 @@ func (s *entidadeContatoService) validateTipoContato(req *dto.EntidadeContatoReq
 // validateEntidadeExists verifica se a entidade existe
 func (s *entidadeContatoService) validateEntidadeExists(entidadeID int) error {
 	_, err := s.entidadeService.GetByID(entidadeID)
-	if err != nil {
-		return fmt.Errorf("entidade não encontrada: %w", err)
+	if err != nil { //
+		return err
 	}
 	return nil
 }
@@ -130,7 +132,7 @@ func (s *entidadeContatoService) isUpdateValid(entidadeID, item int, req *dto.En
 
 	// 3. Validar se o contato existe
 	if _, err := s.contatoRepo.FindByID(entidadeID, item); err != nil {
-		return fmt.Errorf("contato não encontrado: %w", err)
+		return err
 	}
 
 	return nil
@@ -170,12 +172,12 @@ func (s *entidadeContatoService) Create(req *dto.EntidadeContatoRequest) (*model
 	// 2. Converter DTO para Model
 	contato, err := req.ToModel()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao converter dados: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao converter dados.", err) //
 	}
 
 	// 3. Salvar (o repository cuida do sequencial do Item)
 	if err := s.contatoRepo.Create(contato); err != nil {
-		return nil, fmt.Errorf("erro ao criar contato: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao criar contato.", err) //
 	}
 
 	return contato, nil
@@ -184,8 +186,8 @@ func (s *entidadeContatoService) Create(req *dto.EntidadeContatoRequest) (*model
 // GetByID busca um contato específico
 func (s *entidadeContatoService) GetByID(entidadeID, item int) (*models.EntidadeContato, error) {
 	contato, err := s.contatoRepo.FindByID(entidadeID, item)
-	if err != nil {
-		return nil, fmt.Errorf("contato não encontrado: %w", err)
+	if err != nil { //
+		return nil, err //
 	}
 	return contato, nil
 }
@@ -199,7 +201,7 @@ func (s *entidadeContatoService) GetByEntidadeID(entidadeID int) ([]models.Entid
 
 	contatos, err := s.contatoRepo.FindByEntidadeID(entidadeID)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar contatos: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao buscar contatos.", err) //
 	}
 
 	return contatos, nil
@@ -214,12 +216,12 @@ func (s *entidadeContatoService) GetByEntidadeIDAndTipo(entidadeID, formaContato
 
 	// Validar tipo
 	if !isValidTipoContato(formaContatoID) {
-		return nil, fmt.Errorf("tipo de contato inválido: %d", formaContatoID)
+		return nil, apperrors.NewValidationError(fmt.Sprintf("Tipo de contato inválido: %d.", formaContatoID)) //
 	}
 
 	contatos, err := s.contatoRepo.FindByEntidadeIDAndTipo(entidadeID, formaContatoID)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar contatos: %w", err)
+		return nil, apperrors.NewInternalError("Erro ao buscar contatos.", err) //
 	}
 
 	return contatos, nil
@@ -291,7 +293,7 @@ func (s *entidadeContatoService) List(limit, offset int, filters map[string]inte
 
 	contatos, total, err := s.contatoRepo.List(limit, offset, filters)
 	if err != nil {
-		return nil, 0, fmt.Errorf("erro ao listar contatos: %w", err)
+		return nil, 0, apperrors.NewInternalError("Erro ao listar contatos.", err) //
 	}
 
 	return contatos, total, nil

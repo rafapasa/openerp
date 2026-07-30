@@ -3,9 +3,11 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 )
 
@@ -85,9 +87,9 @@ func (r *entidadeDocumentoRepository) FindByID(entidadeID, item int) (*models.En
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("documento não encontrado")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("documento para entidade %d item %d não encontrado", entidadeID, item))
 		}
-		return nil, err
+		return nil, apperrors.NewInternalError("Erro buscando documento: ", err)
 	}
 	return &documento, nil
 }
