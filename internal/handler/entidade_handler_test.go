@@ -107,7 +107,7 @@ func (s *EntidadeTestSuite) SetupSuite() {
 	router := gin.Default()
 
 	// Inicializa as camadas (Repository -> Service -> Handler)
-	entidadeService := service.NewEntidadeService(s.DB)
+	entidadeService := service.NewEntidadeService(nil, nil)
 	entidadeHandler := NewEntidadeHandler(entidadeService)
 
 	// Usa um middleware mock para simular a autenticação

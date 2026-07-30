@@ -15,14 +15,14 @@ import (
 // ============================================================
 
 type EntidadeLimiteCreditoHandler struct {
-	service *service.EntidadeLimiteCreditoService
+	service service.EntidadeLimiteCreditoService
 }
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
 
-func NewEntidadeLimiteCreditoHandler(service *service.EntidadeLimiteCreditoService) *EntidadeLimiteCreditoHandler {
+func NewEntidadeLimiteCreditoHandler(service service.EntidadeLimiteCreditoService) *EntidadeLimiteCreditoHandler {
 	return &EntidadeLimiteCreditoHandler{
 		service: service,
 	}

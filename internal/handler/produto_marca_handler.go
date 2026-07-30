@@ -9,10 +9,10 @@ import (
 )
 
 type ProdutoMarcaHandler struct {
-	service *service.ProdutoMarcaService
+	service service.ProdutoMarcaService
 }
 
-func NewProdutoMarcaHandler(service *service.ProdutoMarcaService) *ProdutoMarcaHandler {
+func NewProdutoMarcaHandler(service service.ProdutoMarcaService) *ProdutoMarcaHandler {
 	return &ProdutoMarcaHandler{
 		service: service,
 	}

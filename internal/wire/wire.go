@@ -224,6 +224,8 @@ type RouterConfig struct {
 	TabelaPrecoHandler              *handler.TabelaPrecoHandler
 	TabelaPrecoProdutoHandler       *handler.TabelaPrecoProdutoHandler
 	DocumentoVendaHandler           *handler.DocumentoVendaHandler
+	DocumentoVendaItemHandler       *handler.DocumentoVendaItemHandler
+	DocumentoVendaPagamentoHandler  *handler.DocumentoVendaPagamentoHandler
 }
 
 func NewRouterConfig(
@@ -244,6 +246,8 @@ func NewRouterConfig(
 	tabelaPrecoHandler *handler.TabelaPrecoHandler,
 	tabelaPrecoProdutoHandler *handler.TabelaPrecoProdutoHandler,
 	documentoVendaHandler *handler.DocumentoVendaHandler,
+	documentoVendaItemHandler *handler.DocumentoVendaItemHandler,
+	documentoVendaPagamentoHandler *handler.DocumentoVendaPagamentoHandler,
 ) *RouterConfig {
 	return &RouterConfig{
 		JWTSecret:                       jwtSecret,
@@ -263,6 +267,8 @@ func NewRouterConfig(
 		TabelaPrecoHandler:              tabelaPrecoHandler,
 		TabelaPrecoProdutoHandler:       tabelaPrecoProdutoHandler,
 		DocumentoVendaHandler:           documentoVendaHandler,
+		DocumentoVendaItemHandler:       documentoVendaItemHandler,
+		DocumentoVendaPagamentoHandler:  documentoVendaPagamentoHandler,
 	}
 }
 
@@ -488,6 +494,34 @@ func SetupRouter(cfg *RouterConfig) *gin.Engine {
 			documento.DELETE("/:id", cfg.DocumentoVendaHandler.Delete)
 			documento.POST("/:id/emitir", cfg.DocumentoVendaHandler.Emitir)
 			documento.POST("/:id/cancelar", cfg.DocumentoVendaHandler.Cancelar)
+		}
+	}
+
+	// ============================================================
+	// ROTAS - DOCUMENTO VENDA ITEM
+	// ============================================================
+	if cfg.DocumentoVendaItemHandler != nil {
+		item := api.Group("/documentos/venda/:documento_venda_id/itens")
+		{
+			item.GET("", cfg.DocumentoVendaItemHandler.List)
+			item.POST("", cfg.DocumentoVendaItemHandler.Create)
+			item.GET("/:item", cfg.DocumentoVendaItemHandler.GetByID)
+			item.PUT("/:item", cfg.DocumentoVendaItemHandler.Update)
+			item.DELETE("/:item", cfg.DocumentoVendaItemHandler.Delete)
+		}
+	}
+
+	// ============================================================
+	// ROTAS - DOCUMENTO VENDA PAGAMENTO
+	// ============================================================
+	if cfg.DocumentoVendaPagamentoHandler != nil {
+		pagamento := api.Group("/documentos/venda/:documento_venda_id/pagamentos")
+		{
+			pagamento.GET("", cfg.DocumentoVendaPagamentoHandler.List)
+			pagamento.POST("", cfg.DocumentoVendaPagamentoHandler.Create)
+			pagamento.GET("/:item", cfg.DocumentoVendaPagamentoHandler.GetByID)
+			pagamento.PUT("/:item", cfg.DocumentoVendaPagamentoHandler.Update)
+			pagamento.DELETE("/:item", cfg.DocumentoVendaPagamentoHandler.Delete)
 		}
 	}
 

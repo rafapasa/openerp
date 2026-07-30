@@ -38,7 +38,7 @@ type entidadeEnderecoService struct {
 // CONSTRUCTOR
 // ============================================================
 
-func NewentidadeEnderecoService(db *gorm.DB) EntidadeEnderecoService {
+func NewEntidadeEnderecoService(db *gorm.DB) EntidadeEnderecoService {
 	return &entidadeEnderecoService{
 		entidadeEnderecoRepo: repository.NewEntidadeEnderecoRepository(db),
 		entidadeRepo:         repository.NewEntidadeRepository(db),

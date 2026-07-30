@@ -13,14 +13,14 @@ import (
 // ============================================================
 
 type ProdutoSubgrupoHandler struct {
-	service *service.ProdutoSubgrupoService
+	service service.ProdutoSubgrupoService
 }
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
 
-func NewProdutoSubgrupoHandler(service *service.ProdutoSubgrupoService) *ProdutoSubgrupoHandler {
+func NewProdutoSubgrupoHandler(service service.ProdutoSubgrupoService) *ProdutoSubgrupoHandler {
 	return &ProdutoSubgrupoHandler{
 		service: service,
 	}

@@ -17,7 +17,7 @@ import (
 
 // EntidadeDocumentoHandler é o handler para documentos de entidade
 type EntidadeDocumentoHandler struct {
-	service *service.EntidadeDocumentoService
+	service service.EntidadeDocumentoService
 }
 
 // ============================================================
@@ -25,7 +25,7 @@ type EntidadeDocumentoHandler struct {
 // ============================================================
 
 // NewEntidadeDocumentoHandler cria uma nova instância
-func NewEntidadeDocumentoHandler(service *service.EntidadeDocumentoService) *EntidadeDocumentoHandler {
+func NewEntidadeDocumentoHandler(service service.EntidadeDocumentoService) *EntidadeDocumentoHandler {
 	return &EntidadeDocumentoHandler{
 		service: service,
 	}

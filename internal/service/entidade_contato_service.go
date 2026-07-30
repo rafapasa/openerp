@@ -38,7 +38,7 @@ type entidadeContatoService struct {
 // ============================================================
 
 // NewentidadeContatoService cria uma nova instância
-func NewentidadeContatoService(efcRepo repository.EntidadeContatoRepository, entService EntidadeService) EntidadeContatoService {
+func NewEntidadeContatoService(efcRepo repository.EntidadeContatoRepository, entService EntidadeService) EntidadeContatoService {
 	return &entidadeContatoService{
 		contatoRepo:     efcRepo,
 		entidadeService: entService,

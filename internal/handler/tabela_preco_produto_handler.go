@@ -9,10 +9,10 @@ import (
 )
 
 type TabelaPrecoProdutoHandler struct {
-	service *service.TabelaPrecoProdutoService
+	service service.TabelaPrecoProdutoService
 }
 
-func NewTabelaPrecoProdutoHandler(service *service.TabelaPrecoProdutoService) *TabelaPrecoProdutoHandler {
+func NewTabelaPrecoProdutoHandler(service service.TabelaPrecoProdutoService) *TabelaPrecoProdutoHandler {
 	return &TabelaPrecoProdutoHandler{
 		service: service,
 	}

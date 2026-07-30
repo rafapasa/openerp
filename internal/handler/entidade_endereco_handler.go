@@ -17,7 +17,7 @@ import (
 
 // EntidadeEnderecoHandler é o handler para endereços de entidade
 type EntidadeEnderecoHandler struct {
-	service *service.EntidadeEnderecoService
+	service service.EntidadeEnderecoService
 }
 
 // ============================================================
@@ -25,7 +25,7 @@ type EntidadeEnderecoHandler struct {
 // ============================================================
 
 // NewEntidadeEnderecoHandler cria uma nova instância
-func NewEntidadeEnderecoHandler(service *service.EntidadeEnderecoService) *EntidadeEnderecoHandler {
+func NewEntidadeEnderecoHandler(service service.EntidadeEnderecoService) *EntidadeEnderecoHandler {
 	return &EntidadeEnderecoHandler{
 		service: service,
 	}

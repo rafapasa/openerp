@@ -8,10 +8,10 @@ import (
 )
 
 type DocumentoVendaHandler struct {
-	service *service.DocumentoVendaService
+	service service.DocumentoVendaService
 }
 
-func NewDocumentoVendaHandler(s *service.DocumentoVendaService) *DocumentoVendaHandler {
+func NewDocumentoVendaHandler(s service.DocumentoVendaService) *DocumentoVendaHandler {
 	return &DocumentoVendaHandler{
 		service: s,
 	}

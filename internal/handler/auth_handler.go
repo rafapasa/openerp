@@ -16,7 +16,7 @@ import (
 
 // AuthHandler representa o handler de autenticação
 type AuthHandler struct {
-	authService *service.AuthService
+	authService service.AuthService
 }
 
 // ============================================================
@@ -24,7 +24,7 @@ type AuthHandler struct {
 // ============================================================
 
 // NewAuthHandler cria uma nova instância do AuthHandler
-func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
 	}

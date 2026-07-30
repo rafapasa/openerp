@@ -11,10 +11,10 @@ import (
 )
 
 type TabelaPrecoHandler struct {
-	service *service.TabelaPrecoService
+	service service.TabelaPrecoService
 }
 
-func NewTabelaPrecoHandler(service *service.TabelaPrecoService) *TabelaPrecoHandler {
+func NewTabelaPrecoHandler(service service.TabelaPrecoService) *TabelaPrecoHandler {
 	return &TabelaPrecoHandler{
 		service: service,
 	}

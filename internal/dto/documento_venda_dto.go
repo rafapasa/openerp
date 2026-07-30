@@ -32,6 +32,8 @@ type DocumentoVendaItemRequest struct {
 	DescricaoProduto   *string  `json:"descricao_produto,omitempty"`
 	PesoBruto          *float64 `json:"peso_bruto,omitempty"`
 	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
+	CreatedBy          *int     `json:"created_by,omitempty"`
+	UpdatedBy          *int     `json:"updated_by,omitempty"`
 }
 
 // DocumentoVendaPagamentoRequest representa um pagamento no request
@@ -41,12 +43,12 @@ type DocumentoVendaPagamentoRequest struct {
 	Valor            float64    `json:"valor" binding:"required,gt=0"`
 	DataVencimento   *time.Time `json:"data_vencimento,omitempty"`
 	DataPagamento    *time.Time `json:"data_pagamento,omitempty"`
-	NumeroParcelas   int        `json:"numero_parcelas,omitempty"`
-	ParcelaAtual     int        `json:"parcela_atual,omitempty"`
 	ValorJuros       *float64   `json:"valor_juros,omitempty"`
 	ValorMulta       *float64   `json:"valor_multa,omitempty"`
 	ValorDesconto    *float64   `json:"valor_desconto,omitempty"`
 	Observacao       *string    `json:"observacao,omitempty"`
+	CreatedBy        *int       `json:"created_by,omitempty"`
+	UpdatedBy        *int       `json:"updated_by,omitempty"`
 }
 
 // DocumentoVendaRequest representa o request para criar/atualizar um documento de venda.
@@ -132,14 +134,12 @@ type DocumentoVendaPagamentoResponse struct {
 	Valor              float64  `json:"valor"`
 	DataVencimento     string   `json:"data_vencimento,omitempty"`
 	DataPagamento      string   `json:"data_pagamento,omitempty"`
-	NumeroParcelas     int      `json:"numero_parcelas,omitempty"`
-	ParcelaAtual       int      `json:"parcela_atual,omitempty"`
 	ValorJuros         *float64 `json:"valor_juros,omitempty"`
 	ValorMulta         *float64 `json:"valor_multa,omitempty"`
 	ValorDesconto      *float64 `json:"valor_desconto,omitempty"`
 	Observacao         *string  `json:"observacao,omitempty"`
-	Status             int      `json:"status"`
-	StatusLabel        string   `json:"status_label,omitempty"`
+	// Status             int      `json:"status"` // Not in model
+	// StatusLabel        string   `json:"status_label,omitempty"` // Not in model
 }
 
 // DocumentoVendaResponse representa a resposta de um documento de venda.
@@ -223,6 +223,49 @@ type DocumentoVendaListResponse struct {
 	Page       int                      `json:"page"`
 	Limit      int                      `json:"limit"`
 	TotalPages int                      `json:"total_pages"`
+}
+
+// ============================================================
+// MÉTODOS DE CONVERSÃO (FROM MODEL) para DocumentoVendaPagamentoResponse
+// ============================================================
+
+// FromModel converte models.DocumentoVendaPagamento para DocumentoVendaPagamentoResponse
+func (r *DocumentoVendaPagamentoResponse) FromModel(pagamento *models.DocumentoVendaPagamento) *DocumentoVendaPagamentoResponse {
+	if pagamento == nil {
+		return nil
+	}
+
+	r.DocumentoVendaID = pagamento.DocumentoVendaID
+	r.Item = pagamento.Item
+	// FormaPagamentoID is a pointer in model, dereference it if not nil
+	if pagamento.FormaPagamentoID != nil {
+		r.FormaPagamentoID = *pagamento.FormaPagamentoID
+	}
+	r.Valor = pagamento.Valor
+
+	if !pagamento.DataVencimento.IsZero() {
+		r.DataVencimento = utils.FormatDate(pagamento.DataVencimento)
+	}
+	if pagamento.DataPagamento != nil && !pagamento.DataPagamento.IsZero() {
+		r.DataPagamento = utils.FormatDate(*pagamento.DataPagamento)
+	}
+	r.ValorJuros = pagamento.ValorJuros
+	r.ValorMulta = pagamento.ValorMulta
+	r.ValorDesconto = pagamento.ValorDesconto
+	r.Observacao = pagamento.Observacao
+
+	if pagamento.FormaPagamento != nil {
+		r.FormaPagamentoNome = pagamento.FormaPagamento.Descricao
+	}
+	return r
+}
+
+type DocumentoVendaItemListResponse struct {
+	Items      []DocumentoVendaItemResponse `json:"items"`
+	Total      int64                        `json:"total"`
+	Page       int                          `json:"page"`
+	Limit      int                          `json:"limit"`
+	TotalPages int                          `json:"total_pages"`
 }
 
 // ============================================================
@@ -490,35 +533,23 @@ func convertPayments(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
 			DocumentoVendaID: pagamento.DocumentoVendaID,
 			Item:             pagamento.Item,
 			FormaPagamentoID: *pagamento.FormaPagamentoID,
-			Valor:            pagamento.Valor,
-			// NumeroParcelas:   pagamento.NumeroParcelas,
-			// ParcelaAtual:     pagamento.ParcelaAtual,
-			// Status:           pagamento.Status,
+			Valor:            pagamento.Valor, //
+			ValorJuros:       pagamento.ValorJuros, //
+			ValorMulta:       pagamento.ValorMulta, //
+			ValorDesconto:    pagamento.ValorDesconto, //
+			Observacao:       pagamento.Observacao, //
 		}
 
 		if pagamento.FormaPagamento != nil {
-			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Descricao
+			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Descricao //
 		}
 
 		if !pagamento.DataVencimento.IsZero() {
-			pagResp.DataVencimento = utils.FormatDate(pagamento.DataVencimento)
+			pagResp.DataVencimento = utils.FormatDate(pagamento.DataVencimento) //
 		}
-
-		// if pagamento.ValorJuros != nil {
-		// 	pagResp.ValorJuros = pagamento.ValorJuros
-		// }
-
-		// if pagamento.ValorMulta != nil {
-		// 	pagResp.ValorMulta = pagamento.ValorMulta
-		// }
-
-		// if pagamento.ValorDesconto != nil {
-		// 	pagResp.ValorDesconto = pagamento.ValorDesconto
-		// }
-
-		// if pagamento.Observacao != nil {
-		// 	pagResp.Observacao = pagamento.Observacao
-		// }
+		if pagamento.DataPagamento != nil && !pagamento.DataPagamento.IsZero() {
+			pagResp.DataPagamento = utils.FormatDate(*pagamento.DataPagamento) //
+		}
 
 		// Status label - usando constantes existentes
 		// pagResp.StatusLabel = getStatusPagamentoLabel(pagamento.Status)

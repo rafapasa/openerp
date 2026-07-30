@@ -13,14 +13,14 @@ import (
 // ============================================================
 
 type GrupoEntidadeHandler struct {
-	service *service.GrupoEntidadeService
+	service service.GrupoEntidadeService
 }
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
 
-func NewGrupoEntidadeHandler(service *service.GrupoEntidadeService) *GrupoEntidadeHandler {
+func NewGrupoEntidadeHandler(service service.GrupoEntidadeService) *GrupoEntidadeHandler {
 	return &GrupoEntidadeHandler{
 		service: service,
 	}
@@ -31,6 +31,7 @@ func NewGrupoEntidadeHandler(service *service.GrupoEntidadeService) *GrupoEntida
 // ============================================================
 
 // Create cria um novo grupo de entidade
+//
 //	@Summary		Cria um novo grupo de entidade
 //	@Description	Cadastra um novo grupo para ser usado nas entidades
 //	@Tags			GrupoEntidades
@@ -64,6 +65,7 @@ func (h *GrupoEntidadeHandler) Create(c *gin.Context) {
 }
 
 // List lista todos os grupos de entidade
+//
 //	@Summary		Lista grupos de entidade
 //	@Description	Retorna uma lista paginada de grupos de entidade
 //	@Tags			GrupoEntidades
@@ -109,6 +111,7 @@ func (h *GrupoEntidadeHandler) List(c *gin.Context) {
 }
 
 // GetByID busca um grupo de entidade por ID
+//
 //	@Summary		Busca grupo por ID
 //	@Description	Retorna os dados de um grupo de entidade específico
 //	@Tags			GrupoEntidades
@@ -136,6 +139,7 @@ func (h *GrupoEntidadeHandler) GetByID(c *gin.Context) {
 }
 
 // Update atualiza um grupo de entidade
+//
 //	@Summary		Atualiza um grupo de entidade
 //	@Description	Atualiza o nome de um grupo de entidade
 //	@Tags			GrupoEntidades
@@ -153,6 +157,7 @@ func (h *GrupoEntidadeHandler) Update(c *gin.Context) {
 }
 
 // Delete exclui um grupo de entidade
+//
 //	@Summary		Exclui um grupo de entidade
 //	@Description	Realiza a exclusão lógica de um grupo de entidade
 //	@Tags			GrupoEntidades

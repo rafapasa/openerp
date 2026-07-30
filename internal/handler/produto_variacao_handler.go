@@ -15,11 +15,11 @@ import (
 
 // ProdutoVariacaoHandler gerencia as requisições HTTP para variações de produto.
 type ProdutoVariacaoHandler struct {
-	service *service.ProdutoVariacaoService
+	service service.ProdutoVariacaoService
 }
 
 // NewProdutoVariacaoHandler cria uma nova instância de ProdutoVariacaoHandler.
-func NewProdutoVariacaoHandler(s *service.ProdutoVariacaoService) *ProdutoVariacaoHandler {
+func NewProdutoVariacaoHandler(s service.ProdutoVariacaoService) *ProdutoVariacaoHandler {
 	return &ProdutoVariacaoHandler{service: s}
 }
 

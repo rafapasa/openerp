@@ -17,7 +17,7 @@ import (
 
 // EntidadeRegimeTributarioHandler é o handler para os regimes da entidade.
 type EntidadeRegimeTributarioHandler struct {
-	service *service.EntidadeRegimeTributarioService
+	service service.EntidadeRegimeTributarioService
 }
 
 // ============================================================
@@ -25,7 +25,7 @@ type EntidadeRegimeTributarioHandler struct {
 // ============================================================
 
 // NewEntidadeRegimeTributarioHandler cria uma nova instância.
-func NewEntidadeRegimeTributarioHandler(service *service.EntidadeRegimeTributarioService) *EntidadeRegimeTributarioHandler {
+func NewEntidadeRegimeTributarioHandler(service service.EntidadeRegimeTributarioService) *EntidadeRegimeTributarioHandler {
 	return &EntidadeRegimeTributarioHandler{
 		service: service,
 	}

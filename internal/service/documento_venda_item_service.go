@@ -22,6 +22,8 @@ type DocumentoVendaItemServiceFactory interface {
 type DocumentoVendaItemService interface {
 	Create(req *dto.DocumentoVendaItemRequest) error
 	Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error
+	GetByID(ddvId, dviItem int) (*models.DocumentoVendaItem, error)
+	List(limit, offset, ddvId int, filters map[string]interface{}) ([]models.DocumentoVendaItem, int64, error)
 	Delete(ddvId, dviItem int) error
 }
 
@@ -153,6 +155,20 @@ func (s *documentoVendaItemService) Update(ddvId, dviItem int, req *dto.Document
 
 func (s *documentoVendaItemService) Delete(ddvId, dviItem int) error {
 	return s.dviRepo.Delete(ddvId, dviItem)
+}
+
+// GetByID busca um item de documento de venda específico.
+func (s *documentoVendaItemService) GetByID(ddvId, dviItem int) (*models.DocumentoVendaItem, error) {
+	item, err := s.dviRepo.FindByID(ddvId, dviItem)
+	if err != nil {
+		return nil, apperrors.NewNotFoundError(fmt.Sprintf("Item %d do documento %d não encontrado.", dviItem, ddvId))
+	}
+	return item, nil
+}
+
+// List lista itens de documento de venda com paginação e filtros.
+func (s *documentoVendaItemService) List(limit, offset, ddvId int, filters map[string]interface{}) ([]models.DocumentoVendaItem, int64, error) {
+	return s.dviRepo.ListByDocumentoVendaID(limit, offset, ddvId)
 }
 
 // recalcularValoresItem calcula os totais do item.

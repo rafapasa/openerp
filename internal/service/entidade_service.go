@@ -9,7 +9,6 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
 // EntidadeService define os métodos públicos para o serviço de entidade.
@@ -36,7 +35,10 @@ const (
 	maxLengthNomeFantasia = 100
 )
 
-func NewentidadeService(db *gorm.DB, entRepo repository.EntidadeRepository, entEnderecoService EntidadeEnderecoService) EntidadeService {
+func NewEntidadeService(
+	entRepo repository.EntidadeRepository,
+	entEnderecoService EntidadeEnderecoService,
+) EntidadeService {
 	return &entidadeService{
 		entidadeRepo:            entRepo,
 		entidadeEnderecoService: entEnderecoService,

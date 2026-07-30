@@ -17,7 +17,7 @@ import (
 
 // EntidadeContatoHandler é o handler para contatos de entidade
 type EntidadeContatoHandler struct {
-	service *service.EntidadeContatoService
+	service service.EntidadeContatoService
 }
 
 // ============================================================
@@ -25,7 +25,7 @@ type EntidadeContatoHandler struct {
 // ============================================================
 
 // NewEntidadeContatoHandler cria uma nova instância
-func NewEntidadeContatoHandler(service *service.EntidadeContatoService) *EntidadeContatoHandler {
+func NewEntidadeContatoHandler(service service.EntidadeContatoService) *EntidadeContatoHandler {
 	return &EntidadeContatoHandler{
 		service: service,
 	}
