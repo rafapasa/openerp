@@ -11,17 +11,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type ProdutoModeloService struct {
+// ProdutoModeloService define os métodos públicos para o serviço de modelo de produto.
+type ProdutoModeloService interface {
+	Create(req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error)
+	GetByID(id int) (*models.ProdutoModelo, error)
+	Update(id int, req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoModelo, int64, error)
+}
+
+type produtoModeloService struct {
 	repo *repository.ProdutoModeloRepository
 }
 
-func NewProdutoModeloService(db *gorm.DB) *ProdutoModeloService {
-	return &ProdutoModeloService{
+func NewProdutoModeloService(db *gorm.DB) ProdutoModeloService {
+	return &produtoModeloService{
 		repo: repository.NewProdutoModeloRepository(db),
 	}
 }
 
-func (s *ProdutoModeloService) Create(req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error) {
+func (s *produtoModeloService) Create(req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -47,11 +56,11 @@ func (s *ProdutoModeloService) Create(req *dto.ProdutoModeloRequest) (*models.Pr
 	return modelo, nil
 }
 
-func (s *ProdutoModeloService) GetByID(id int) (*models.ProdutoModelo, error) {
+func (s *produtoModeloService) GetByID(id int) (*models.ProdutoModelo, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *ProdutoModeloService) Update(id int, req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error) {
+func (s *produtoModeloService) Update(id int, req *dto.ProdutoModeloRequest) (*models.ProdutoModelo, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -81,7 +90,7 @@ func (s *ProdutoModeloService) Update(id int, req *dto.ProdutoModeloRequest) (*m
 	return modelo, nil
 }
 
-func (s *ProdutoModeloService) Delete(id int) error {
+func (s *produtoModeloService) Delete(id int) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return err
 	}
@@ -97,7 +106,7 @@ func (s *ProdutoModeloService) Delete(id int) error {
 	return s.repo.Delete(id)
 }
 
-func (s *ProdutoModeloService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoModelo, int64, error) {
+func (s *produtoModeloService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoModelo, int64, error) {
 	if limit <= 0 {
 		limit = 10
 	}

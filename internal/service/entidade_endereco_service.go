@@ -13,21 +13,32 @@ import (
 	"github.com/openerp/backend/internal/utils"
 )
 
+// EntidadeEnderecoService define os métodos públicos para o serviço de endereço de entidade.
+type EntidadeEnderecoService interface {
+	Create(req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error)
+	GetByID(entidadeID, item int) (*models.EntidadeEndereco, error)
+	GetByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error)
+	GetByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error)
+	Update(entidadeID, item int, req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error)
+	Delete(entidadeID, item int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error)
+}
+
 // ============================================================
 // TYPES
 // ============================================================
 
-type EntidadeEnderecoService struct {
-	entidadeEnderecoRepo *repository.EntidadeEnderecoRepository
-	entidadeRepo         *repository.EntidadeRepository
+type entidadeEnderecoService struct {
+	entidadeEnderecoRepo repository.EntidadeEnderecoRepository
+	entidadeRepo         repository.EntidadeRepository // This should probably be EntidadeService, but keeping as is for now.
 }
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
 
-func NewEntidadeEnderecoService(db *gorm.DB) *EntidadeEnderecoService {
-	return &EntidadeEnderecoService{
+func NewentidadeEnderecoService(db *gorm.DB) EntidadeEnderecoService {
+	return &entidadeEnderecoService{
 		entidadeEnderecoRepo: repository.NewEntidadeEnderecoRepository(db),
 		entidadeRepo:         repository.NewEntidadeRepository(db),
 	}
@@ -38,7 +49,7 @@ func NewEntidadeEnderecoService(db *gorm.DB) *EntidadeEnderecoService {
 // ============================================================
 
 // isDataValid realiza as validações básicas de um endereço
-func (s *EntidadeEnderecoService) isDataValid(req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) isDataValid(req *dto.EntidadeEnderecoRequest) error {
 	// 1. Validar campos obrigatórios
 	if err := s.validateRequiredFields(req); err != nil {
 		return err
@@ -58,7 +69,7 @@ func (s *EntidadeEnderecoService) isDataValid(req *dto.EntidadeEnderecoRequest) 
 }
 
 // validateRequiredFields valida campos obrigatórios
-func (s *EntidadeEnderecoService) validateRequiredFields(req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) validateRequiredFields(req *dto.EntidadeEnderecoRequest) error {
 	if strings.TrimSpace(req.Logradouro) == "" {
 		return errors.New("logradouro é obrigatório")
 	}
@@ -83,7 +94,7 @@ func (s *EntidadeEnderecoService) validateRequiredFields(req *dto.EntidadeEndere
 }
 
 // validateTipoEndereco valida o tipo de endereço
-func (s *EntidadeEnderecoService) validateTipoEndereco(req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) validateTipoEndereco(req *dto.EntidadeEnderecoRequest) error {
 	if req.Tipo < 1 || req.Tipo > 4 {
 		return errors.New("tipo de endereço inválido, deve ser 1 (Cobrança), 2 (Entrega), 3 (Comercial) ou 4 (Residencial)")
 	}
@@ -91,7 +102,7 @@ func (s *EntidadeEnderecoService) validateTipoEndereco(req *dto.EntidadeEndereco
 }
 
 // validateDates valida as datas
-func (s *EntidadeEnderecoService) validateDates(req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) validateDates(req *dto.EntidadeEnderecoRequest) error {
 	// Validar formato da data inicial
 	if req.DataIni != "" {
 		if _, err := utils.ParseDate(req.DataIni); err != nil {
@@ -110,7 +121,7 @@ func (s *EntidadeEnderecoService) validateDates(req *dto.EntidadeEnderecoRequest
 }
 
 // validateEntidadeExists verifica se a entidade existe
-func (s *EntidadeEnderecoService) validateEntidadeExists(entidadeID int) error {
+func (s *entidadeEnderecoService) validateEntidadeExists(entidadeID int) error {
 	_, err := s.entidadeRepo.FindByID(entidadeID)
 	if err != nil {
 		return fmt.Errorf("entidade não encontrada: %w", err)
@@ -119,7 +130,7 @@ func (s *EntidadeEnderecoService) validateEntidadeExists(entidadeID int) error {
 }
 
 // isCreateValid valida dados para criação
-func (s *EntidadeEnderecoService) isCreateValid(req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) isCreateValid(req *dto.EntidadeEnderecoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -143,7 +154,7 @@ func (s *EntidadeEnderecoService) isCreateValid(req *dto.EntidadeEnderecoRequest
 }
 
 // isUpdateValid valida dados para atualização
-func (s *EntidadeEnderecoService) isUpdateValid(entidadeID, item int, req *dto.EntidadeEnderecoRequest) error {
+func (s *entidadeEnderecoService) isUpdateValid(entidadeID, item int, req *dto.EntidadeEnderecoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -167,7 +178,7 @@ func (s *EntidadeEnderecoService) isUpdateValid(entidadeID, item int, req *dto.E
 // ============================================================
 
 // Create cria um novo endereço para uma entidade
-func (s *EntidadeEnderecoService) Create(req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error) {
+func (s *entidadeEnderecoService) Create(req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error) {
 	// 1. Validar dados
 	if err := s.isCreateValid(req); err != nil {
 		return nil, err
@@ -188,7 +199,7 @@ func (s *EntidadeEnderecoService) Create(req *dto.EntidadeEnderecoRequest) (*mod
 }
 
 // GetByID busca um endereço específico
-func (s *EntidadeEnderecoService) GetByID(entidadeID, item int) (*models.EntidadeEndereco, error) {
+func (s *entidadeEnderecoService) GetByID(entidadeID, item int) (*models.EntidadeEndereco, error) {
 	endereco, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item)
 	if err != nil {
 		return nil, fmt.Errorf("endereço não encontrado: %w", err)
@@ -197,7 +208,7 @@ func (s *EntidadeEnderecoService) GetByID(entidadeID, item int) (*models.Entidad
 }
 
 // GetByEntidadeID busca todos os endereços de uma entidade
-func (s *EntidadeEnderecoService) GetByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error) {
+func (s *entidadeEnderecoService) GetByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error) {
 	// Validar se a entidade existe
 	if err := s.validateEntidadeExists(entidadeID); err != nil {
 		return nil, err
@@ -212,7 +223,7 @@ func (s *EntidadeEnderecoService) GetByEntidadeID(entidadeID int) ([]models.Enti
 }
 
 // GetByEntidadeIDAndTipo busca endereços de uma entidade por tipo
-func (s *EntidadeEnderecoService) GetByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error) {
+func (s *entidadeEnderecoService) GetByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error) {
 	// Validar se a entidade existe
 	if err := s.validateEntidadeExists(entidadeID); err != nil {
 		return nil, err
@@ -232,7 +243,7 @@ func (s *EntidadeEnderecoService) GetByEntidadeIDAndTipo(entidadeID, tipo int) (
 }
 
 // Update atualiza um endereço existente
-func (s *EntidadeEnderecoService) Update(entidadeID, item int, req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error) {
+func (s *entidadeEnderecoService) Update(entidadeID, item int, req *dto.EntidadeEnderecoRequest) (*models.EntidadeEndereco, error) {
 	// 1. Validar dados
 	if err := s.isUpdateValid(entidadeID, item, req); err != nil {
 		return nil, err
@@ -288,7 +299,7 @@ func (s *EntidadeEnderecoService) Update(entidadeID, item int, req *dto.Entidade
 }
 
 // Delete exclui logicamente um endereço
-func (s *EntidadeEnderecoService) Delete(entidadeID, item int) error {
+func (s *entidadeEnderecoService) Delete(entidadeID, item int) error {
 	// 1. Validar se o endereço existe
 	endereco, err := s.entidadeEnderecoRepo.FindByID(entidadeID, item)
 	if err != nil {
@@ -312,7 +323,7 @@ func (s *EntidadeEnderecoService) Delete(entidadeID, item int) error {
 }
 
 // List lista endereços com paginação e filtros
-func (s *EntidadeEnderecoService) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error) {
+func (s *entidadeEnderecoService) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error) {
 	// Validar parâmetros de paginação
 	if limit <= 0 {
 		limit = 10

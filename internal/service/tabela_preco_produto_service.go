@@ -8,38 +8,47 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
-type TabelaPrecoProdutoService struct {
-	repo        *repository.TabelaPrecoProdutoRepository
-	tabelaRepo  *repository.TabelaPrecoRepository
-	produtoRepo *repository.ProdutoRepository
+// TabelaPrecoProdutoService define os métodos públicos para o serviço de produtos em tabelas de preço.
+type TabelaPrecoProdutoService interface {
+	Create(req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error)
+	GetByID(id, item int) (*models.TabelaPrecoProduto, error)
+	Update(id, item int, req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error)
+	Delete(id, item int) error
+	List(tabelaPrecoID, limit, offset int, filters map[string]interface{}) ([]models.TabelaPrecoProduto, int64, error)
+	GetByProduto(tbpId, proId int) (*models.TabelaPrecoProduto, error)
 }
 
-func NewTabelaPrecoProdutoService(db *gorm.DB) *TabelaPrecoProdutoService {
-	return &TabelaPrecoProdutoService{
-		repo:        repository.NewTabelaPrecoProdutoRepository(db),
-		tabelaRepo:  repository.NewTabelaPrecoRepository(db),
-		produtoRepo: repository.NewProdutoRepository(db),
+type tabelaPrecoProdutoService struct {
+	tbppRepo   repository.TabelaPrecoProdutoRepository
+	tbpService TabelaPrecoService
+	proService ProdutoService
+}
+
+func NewTabelaPrecoProdutoService(tbppRepo repository.TabelaPrecoProdutoRepository, tbpService TabelaPrecoService, proService ProdutoService) TabelaPrecoProdutoService {
+	return &tabelaPrecoProdutoService{
+		tbppRepo:   tbppRepo,
+		tbpService: tbpService,
+		proService: proService,
 	}
 }
 
-func (s *TabelaPrecoProdutoService) validateDependencies(tabelaPrecoID, produtoID int) error {
-	if _, err := s.tabelaRepo.FindByID(tabelaPrecoID); err != nil {
+func (s *tabelaPrecoProdutoService) validateDependencies(tabelaPrecoID, produtoID int) error {
+	if _, err := s.tbpService.GetByID(tabelaPrecoID); err != nil {
 		return errors.New("tabela de preço não encontrada")
 	}
-	exists, err := s.produtoRepo.ExistsByID(produtoID)
+	produto, err := s.proService.GetByID(produtoID)
 	if err != nil {
 		return fmt.Errorf("erro ao verificar produto: %w", err)
 	}
-	if !exists {
+	if produto == nil{
 		return errors.New("produto não encontrado")
 	}
 	return nil
 }
 
-func (s *TabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error) {
+func (s *tabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -48,7 +57,7 @@ func (s *TabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (
 		return nil, err
 	}
 
-	exists, err := s.repo.ExistsByProduto(req.TabelaPrecoID, req.ProdutoID, 0)
+	exists, err := s.tbppRepo.ExistsByTabelaPrecoAndProduto(req.TabelaPrecoID, req.ProdutoID, 0)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao verificar duplicidade de produto: %w", err)
 	}
@@ -61,18 +70,18 @@ func (s *TabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (
 		return nil, fmt.Errorf("erro ao converter dados: %w", err)
 	}
 
-	if err := s.repo.Create(createItem); err != nil {
+	if err := s.tbppRepo.Create(createItem); err != nil {
 		return nil, fmt.Errorf("erro ao adicionar produto à tabela de preço: %w", err)
 	}
 
-	return s.repo.FindByID(createItem.TabelaPrecoID, createItem.Item)
+	return s.tbppRepo.FindByID(createItem.TabelaPrecoID, createItem.Item)
 }
 
-func (s *TabelaPrecoProdutoService) GetByID(id, item int) (*models.TabelaPrecoProduto, error) {
-	return s.repo.FindByID(id, item)
+func (s *tabelaPrecoProdutoService) GetByID(id, item int) (*models.TabelaPrecoProduto, error) {
+	return s.tbppRepo.FindByID(id, item)
 }
 
-func (s *TabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error) {
+func (s *tabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -86,7 +95,7 @@ func (s *TabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoPro
 		return nil, err
 	}
 
-	exists, err := s.repo.ExistsByProduto(req.TabelaPrecoID, req.ProdutoID, id)
+	exists, err := s.tbppRepo.ExistsByTabelaPrecoAndProduto(req.TabelaPrecoID, req.ProdutoID, id)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao verificar duplicidade de produto: %w", err)
 	}
@@ -102,33 +111,33 @@ func (s *TabelaPrecoProdutoService) Update(id, item int, req *dto.TabelaPrecoPro
 	updatedItem.TabelaPrecoID = id // Garantir que o ID não seja alterado
 	updatedItem.Item = item        // Garantir que o ID não seja alterado
 
-	if err := s.repo.Update(id, item, updatedItem); err != nil {
+	if err := s.tbppRepo.Update(id, item, updatedItem); err != nil {
 		return nil, fmt.Errorf("erro ao atualizar produto na tabela de preço: %w", err)
 	}
 
-	return s.repo.FindByID(id, item)
+	return s.tbppRepo.FindByID(id, item)
 }
 
-func (s *TabelaPrecoProdutoService) Delete(id, item int) error {
+func (s *tabelaPrecoProdutoService) Delete(id, item int) error {
 	if id == 0 {
 		return errors.New("ID da tabela de preço inválido")
 	}
 	if item == 0 {
 		return errors.New("item inválido")
 	}
-	return s.repo.Delete(id, item)
+	return s.tbppRepo.Delete(id, item)
 }
 
-func (s *TabelaPrecoProdutoService) List(tabelaPrecoID, limit, offset int, filters map[string]interface{}) ([]models.TabelaPrecoProduto, int64, error) {
-	if _, err := s.tabelaRepo.FindByID(tabelaPrecoID); err != nil {
+func (s *tabelaPrecoProdutoService) List(tabelaPrecoID, limit, offset int, filters map[string]interface{}) ([]models.TabelaPrecoProduto, int64, error) {
+	if _, err := s.tbpService.GetByID(tabelaPrecoID); err != nil {
 		return nil, 0, errors.New("tabela de preço não encontrada")
 	}
 	if limit <= 0 {
 		limit = 10
 	}
-	return s.repo.List(tabelaPrecoID, limit, offset, filters)
+	return s.tbppRepo.List(tabelaPrecoID, limit, offset, filters)
 }
 
-func (s *TabelaPrecoProdutoService) GetByProduto(tbpId, proId int) (*models.TabelaPrecoProduto, error) {
-	return s.repo.FindByProduto(tbpId, proId)
+func (s *tabelaPrecoProdutoService) GetByProduto(tbpId, proId int) (*models.TabelaPrecoProduto, error) {
+	return s.tbppRepo.FindByProduto(tbpId, proId)
 }

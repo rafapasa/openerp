@@ -30,6 +30,10 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 	}
 }
 
+func (h *AuthHandler) Refresh(c *gin.Context) {
+	panic("Implementar Refresh") // TODO: Implementar
+}
+
 // ============================================================
 // HANDLERS
 // ============================================================

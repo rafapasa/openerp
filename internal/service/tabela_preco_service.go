@@ -8,26 +8,34 @@ import (
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
-	"gorm.io/gorm"
 )
 
-type TabelaPrecoService struct {
-	repo *repository.TabelaPrecoRepository
+// TabelaPrecoService define os métodos públicos para o serviço de tabela de preço.
+type TabelaPrecoService interface {
+	Create(req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error)
+	GetByID(id int) (*models.TabelaPreco, error)
+	Update(id int, req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.TabelaPreco, int64, error)
 }
 
-func NewTabelaPrecoService(db *gorm.DB) *TabelaPrecoService {
-	return &TabelaPrecoService{
-		repo: repository.NewTabelaPrecoRepository(db),
+type tabelaPrecoService struct {
+	tbpRepo repository.TabelaPrecoRepository
+}
+
+func NewTabelaPrecoService(tbptbpRepo repository.TabelaPrecoRepository) TabelaPrecoService {
+	return &tabelaPrecoService{
+		tbpRepo: tbptbpRepo,
 	}
 }
 
-func (s *TabelaPrecoService) Create(req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error) {
+func (s *tabelaPrecoService) Create(req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, 0)
+	exists, err := s.tbpRepo.ExistsByDescricao(descricao, 0)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
 	}
@@ -40,29 +48,29 @@ func (s *TabelaPrecoService) Create(req *dto.TabelaPrecoRequest) (*models.Tabela
 		return nil, fmt.Errorf("erro ao converter dados: %w", err)
 	}
 
-	if err := s.repo.Create(tabela); err != nil {
+	if err := s.tbpRepo.Create(tabela); err != nil {
 		return nil, fmt.Errorf("erro ao criar tabela de preço: %w", err)
 	}
 
 	return tabela, nil
 }
 
-func (s *TabelaPrecoService) GetByID(id int) (*models.TabelaPreco, error) {
-	return s.repo.FindByID(id)
+func (s *tabelaPrecoService) GetByID(id int) (*models.TabelaPreco, error) {
+	return s.tbpRepo.FindByID(id)
 }
 
-func (s *TabelaPrecoService) Update(id int, req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error) {
+func (s *tabelaPrecoService) Update(id int, req *dto.TabelaPrecoRequest) (*models.TabelaPreco, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
 
-	tabela, err := s.repo.FindByID(id)
+	tabela, err := s.tbpRepo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	descricao := strings.TrimSpace(req.Descricao)
-	exists, err := s.repo.ExistsByDescricao(descricao, id)
+	exists, err := s.tbpRepo.ExistsByDescricao(descricao, id)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao verificar descrição: %w", err)
 	}
@@ -73,19 +81,19 @@ func (s *TabelaPrecoService) Update(id int, req *dto.TabelaPrecoRequest) (*model
 	tabela.Descricao = descricao
 	tabela.UpdatedBy = req.UpdatedBy
 
-	if err := s.repo.Update(id, tabela); err != nil {
+	if err := s.tbpRepo.Update(id, tabela); err != nil {
 		return nil, fmt.Errorf("erro ao atualizar tabela de preço: %w", err)
 	}
 
 	return tabela, nil
 }
 
-func (s *TabelaPrecoService) Delete(id int) error {
-	if _, err := s.repo.FindByID(id); err != nil {
+func (s *tabelaPrecoService) Delete(id int) error {
+	if _, err := s.tbpRepo.FindByID(id); err != nil {
 		return err
 	}
 
-	count, err := s.repo.CountByTabelaPreco(id)
+	count, err := s.tbpRepo.CountProdutosByTabela(id)
 	if err != nil {
 		return fmt.Errorf("erro ao verificar uso da tabela de preço: %w", err)
 	}
@@ -93,12 +101,12 @@ func (s *TabelaPrecoService) Delete(id int) error {
 		return fmt.Errorf("tabela de preço está em uso por %d documento(s) e não pode ser excluída", count)
 	}
 
-	return s.repo.Delete(id)
+	return s.tbpRepo.Delete(id)
 }
 
-func (s *TabelaPrecoService) List(limit, offset int, filters map[string]interface{}) ([]models.TabelaPreco, int64, error) {
+func (s *tabelaPrecoService) List(limit, offset int, filters map[string]interface{}) ([]models.TabelaPreco, int64, error) {
 	if limit <= 0 {
 		limit = 10
 	}
-	return s.repo.List(limit, offset, filters)
+	return s.tbpRepo.List(limit, offset, filters)
 }

@@ -17,6 +17,22 @@ func NewDocumentoVendaHandler(s *service.DocumentoVendaService) *DocumentoVendaH
 	}
 }
 
+func (h *DocumentoVendaHandler) Emitir(c *gin.Context) {
+	panic("Implementar Emitir") // TODO: Implementar
+	// FIXME: Descrição do bug a ser corrigido
+	// OPTIMIZE: Descrição da otimização
+	// SECURITY: Descrição da melhoria de segurança
+
+}
+
+func (h *DocumentoVendaHandler) Cancelar(c *gin.Context) {
+	panic("Implementar Cancelar") // TODO: Implementar
+	// FIXME: Descrição do bug a ser corrigido
+	// OPTIMIZE: Descrição da otimização
+	// SECURITY: Descrição da melhoria de segurança
+
+}
+
 // @Summary      Cria um novo documento de venda
 // @Description  Cria um novo documento de venda com base nos dados fornecidos.
 // @Tags         Documentos de Venda

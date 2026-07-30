@@ -24,6 +24,12 @@ type RouteConfig struct {
 	ProdutoSubgrupoHandler          *handler.ProdutoSubgrupoHandler
 	ProdutoMarcaHandler             *handler.ProdutoMarcaHandler
 	ProdutoModeloHandler            *handler.ProdutoModeloHandler
+	ProdutoVariacaoHandler          *handler.ProdutoVariacaoHandler
+	// ProdutoSerieHandler             *handler.ProdutoSerieHandler
+	// ProdutoEspecieHandler           *handler.ProdutoEspecieHandler
+	// ProdutoCorHandler               *handler.ProdutoCorHandler
+	// ProdutoTamanhoHandler           *handler.ProdutoTamanhoHandler	
+	TabelaPreco                     *handler.ProdutoModeloHandler
 	TabelaPrecoHandler              *handler.TabelaPrecoHandler
 	TabelaPrecoProdutoHandler       *handler.TabelaPrecoProdutoHandler
 	EntidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler
@@ -81,6 +87,7 @@ func registerProtectedRoutes(router *gin.Engine, cfg *RouteConfig) {
 	RegisterProdutoGrupoRoutes(api, cfg.ProdutoGrupoHandler)
 	RegisterProdutoSubgrupoRoutes(api, cfg.ProdutoSubgrupoHandler)
 	RegisterProdutoMarcaRoutes(api, cfg.ProdutoMarcaHandler)
+	RegisterProdutoVariacaoRoutes(api, cfg.ProdutoVariacaoHandler) // Novo: Rotas de Variação de Produto
 	RegisterProdutoModeloRoutes(api, cfg.ProdutoModeloHandler)
 	RegisterTabelaPrecoRoutes(api, cfg.TabelaPrecoHandler, cfg.TabelaPrecoProdutoHandler)
 	RegisterDocumentoVendaRoutes(api, cfg.DocumentoVendaHandler)

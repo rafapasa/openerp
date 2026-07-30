@@ -1,68 +1,91 @@
+// internal/repository/condicao_pagamento_repository.go
 package repository
 
 import (
 	"errors"
-
 	"fmt"
+
+	"gorm.io/gorm"
 
 	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
 // ============================================================
-// TYPES
+// INTERFACE
 // ============================================================
 
-// CondicaoPagamentoRepository é o repositório para CondicaoPagamento
-type CondicaoPagamentoRepository struct {
+// CondicaoPagamentoRepository define o contrato para operações de banco
+type CondicaoPagamentoRepository interface {
+	// CRUD Básico
+	Create(condicaoPagamento *models.CondicaoPagamento) error
+	Update(id int, condicaoPagamento *models.CondicaoPagamento) error
+	Delete(id int) error
+	GetByID(id int) (*models.CondicaoPagamento, error)
+	FindByID(id int) (*models.CondicaoPagamento, error)
+
+	// Buscas Específicas
+	FindByTipoDocumento(id string) (*models.CondicaoPagamento, error)
+	FindByDescricao(nome string, limit int) ([]models.CondicaoPagamento, error)
+
+	// Listagem com Filtros
+	List(limit, offset int, filters map[string]interface{}) ([]models.CondicaoPagamento, int64, error)
+
+	// Consultas de Validação (APENAS CONSULTAS)
+	ExistsByTipoDocumento(id string, excludeID int) (bool, error)
+	ExistsByDescricao(descricao string, excludeID int) (bool, error)
+	ExistsByID(id int) (bool, error)
+	Count() (int64, error)
+}
+
+// ============================================================
+// IMPLEMENTAÇÃO CONCRETA (privada)
+// ============================================================
+
+// condicaoPagamentoRepository é a implementação concreta
+type condicaoPagamentoRepository struct {
 	db *gorm.DB
 }
 
-// ============================================================
-// CONSTRUCTOR
-// ============================================================
-
-// NewCondicaoPagamentoRepository cria uma nova instância
-func NewCondicaoPagamentoRepository(db *gorm.DB) *CondicaoPagamentoRepository {
-	return &CondicaoPagamentoRepository{db: db}
+// NewCondicaoPagamentoRepository cria uma nova instância (retorna a interface)
+func NewCondicaoPagamentoRepository(db *gorm.DB) CondicaoPagamentoRepository {
+	return &condicaoPagamentoRepository{db: db}
 }
 
 // ============================================================
-// MÉTODOS CRUD
+// MÉTODOS CRUD (APENAS PERSISTÊNCIA)
 // ============================================================
 
 // Create salva uma nova CondicaoPagamento
-func (r *CondicaoPagamentoRepository) Create(condicaoPagamento *models.CondicaoPagamento) error {
+func (r *condicaoPagamentoRepository) Create(condicaoPagamento *models.CondicaoPagamento) error {
 	return r.db.Create(condicaoPagamento).Error
 }
 
 // Update atualiza uma CondicaoPagamento existente
-func (r *CondicaoPagamentoRepository) Update(id int, condicaoPagamento *models.CondicaoPagamento) error {
+func (r *condicaoPagamentoRepository) Update(id int, condicaoPagamento *models.CondicaoPagamento) error {
 	return r.db.
-		Omit("Tipo_Documento", "Forma_Pagamento", "Portador").
+		Omit("Tipo_Documento", "Forma_Pagamento", "Portador", "created_at", "deleted_at").
 		Model(&models.CondicaoPagamento{}).
 		Where("cdpgt_id = ?", id).
 		Updates(condicaoPagamento).Error
 }
 
 // Delete realiza exclusão lógica de uma CondicaoPagamento pelo ID
-func (r *CondicaoPagamentoRepository) Delete(id int) error {
-	condicaoPagamento, err := r.FindByID(id)
-	if err != nil {
-		return err
-	}
-	if condicaoPagamento.IsDeleted() {
-		return errors.New("CondicaoPagamento já foi deletada")
-	}
-	condicaoPagamento.SoftDelete()
-	return r.Update(id, condicaoPagamento)
+func (r *condicaoPagamentoRepository) Delete(id int) error {
+	return r.db.
+		Model(&models.CondicaoPagamento{}).
+		Where("cdpgt_id = ?", id).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
 }
 
-func (r *CondicaoPagamentoRepository) GetByID(id int) (*models.CondicaoPagamento, error) {
+// GetByID busca uma CondicaoPagamento pelo ID (sem relacionamentos)
+func (r *condicaoPagamentoRepository) GetByID(id int) (*models.CondicaoPagamento, error) {
 	var condicaoPagamento models.CondicaoPagamento
-	result := r.db.Where("cdpgt_id = ?", id).First(&condicaoPagamento)
+	result := r.db.
+		Where("cdpgt_id = ? AND deleted_at IS NULL", id).
+		First(&condicaoPagamento)
+
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("CondicaoPagamento com ID %d não encontrada", id))
@@ -77,7 +100,7 @@ func (r *CondicaoPagamentoRepository) GetByID(id int) (*models.CondicaoPagamento
 // ============================================================
 
 // FindByID busca uma CondicaoPagamento pelo ID com relacionamentos
-func (r *CondicaoPagamentoRepository) FindByID(id int) (*models.CondicaoPagamento, error) {
+func (r *condicaoPagamentoRepository) FindByID(id int) (*models.CondicaoPagamento, error) {
 	var condicaoPagamento models.CondicaoPagamento
 	err := r.db.
 		Preload("TipoDocumento").
@@ -85,6 +108,7 @@ func (r *CondicaoPagamentoRepository) FindByID(id int) (*models.CondicaoPagament
 		Preload("Portador").
 		Where("cdpgt_id = ? AND deleted_at IS NULL", id).
 		First(&condicaoPagamento).Error
+
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewNotFoundError(fmt.Sprintf("CondicaoPagamento com ID %d não encontrada", id))
@@ -95,11 +119,15 @@ func (r *CondicaoPagamentoRepository) FindByID(id int) (*models.CondicaoPagament
 }
 
 // FindByTipoDocumento busca uma CondicaoPagamento pelo TipoDocumento
-func (r *CondicaoPagamentoRepository) FindByTipoDocumento(id string) (*models.CondicaoPagamento, error) {
+func (r *condicaoPagamentoRepository) FindByTipoDocumento(id string) (*models.CondicaoPagamento, error) {
 	var condicaoPagamento models.CondicaoPagamento
 	err := r.db.
+		Preload("TipoDocumento").
+		Preload("FormaPagamento").
+		Preload("Portador").
 		Where("tdoc_id = ? AND deleted_at IS NULL", id).
 		First(&condicaoPagamento).Error
+
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("CondicaoPagamento não encontrada")
@@ -109,17 +137,19 @@ func (r *CondicaoPagamentoRepository) FindByTipoDocumento(id string) (*models.Co
 	return &condicaoPagamento, nil
 }
 
-// FindByNome busca CondicaoPagamento pela Nome (autocomplete)
-func (r *CondicaoPagamentoRepository) FindByNome(nome string, limit int) ([]models.CondicaoPagamento, error) {
-	var Condicoes []models.CondicaoPagamento
+// FindByDescricao busca CondicaoPagamento pela descrição (autocomplete)
+func (r *condicaoPagamentoRepository) FindByDescricao(nome string, limit int) ([]models.CondicaoPagamento, error) {
+	var condicoes []models.CondicaoPagamento
 	err := r.db.
 		Where("cdpgt_descricao LIKE ? AND deleted_at IS NULL", "%"+nome+"%").
 		Limit(limit).
-		Find(&Condicoes).Error
+		Order("cdpgt_descricao ASC").
+		Find(&condicoes).Error
+
 	if err != nil {
 		return nil, err
 	}
-	return Condicoes, nil
+	return condicoes, nil
 }
 
 // ============================================================
@@ -127,12 +157,11 @@ func (r *CondicaoPagamentoRepository) FindByNome(nome string, limit int) ([]mode
 // ============================================================
 
 // List retorna uma lista de CondicaoPagamento com paginação e filtros
-func (r *CondicaoPagamentoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.CondicaoPagamento, int64, error) {
-	var Condicoes []models.CondicaoPagamento
+func (r *condicaoPagamentoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.CondicaoPagamento, int64, error) {
+	var condicoes []models.CondicaoPagamento
 	var total int64
 
 	query := r.db.Model(&models.CondicaoPagamento{}).Where("deleted_at IS NULL")
-
 	query = utils.ApplyFilters(query, models.CondicaoPagamento{}, filters)
 
 	if err := query.Count(&total).Error; err != nil {
@@ -145,29 +174,76 @@ func (r *CondicaoPagamentoRepository) List(limit, offset int, filters map[string
 		Preload("Portador").
 		Limit(limit).
 		Offset(offset).
-		Order("codpgt_id DESC").
-		Find(&Condicoes).Error
+		Order("cdpgt_id DESC").
+		Find(&condicoes).Error
 
 	if err != nil {
 		return nil, 0, err
 	}
 
-	return Condicoes, total, nil
+	return condicoes, total, nil
 }
 
 // ============================================================
-// MÉTODO ADICIONAL: Verificar duplicidade
+// MÉTODOS DE CONSULTA PARA VALIDAÇÕES (APENAS CONSULTAS)
 // ============================================================
 
 // ExistsByTipoDocumento verifica se já existe uma CondicaoPagamento com o TipoDocumento
-func (r *CondicaoPagamentoRepository) ExistsByTipoDocumento(id string, excludeID int) (bool, error) {
+func (r *condicaoPagamentoRepository) ExistsByTipoDocumento(id string, excludeID int) (bool, error) {
 	var count int64
-	query := r.db.Model(&models.CondicaoPagamento{}).Where("tdoc_id = ? AND deleted_at IS NULL", utils.LimparDocumento(id))
+	query := r.db.Model(&models.CondicaoPagamento{}).
+		Where("tdoc_id = ? AND deleted_at IS NULL", id)
+
 	if excludeID > 0 {
-		query = query.Where("codpgt_id != ?", excludeID)
+		query = query.Where("cdpgt_id != ?", excludeID)
 	}
+
 	if err := query.Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// ExistsByDescricao verifica se já existe uma CondicaoPagamento com a descrição
+func (r *condicaoPagamentoRepository) ExistsByDescricao(descricao string, excludeID int) (bool, error) {
+	if descricao == "" {
+		return false, nil
+	}
+
+	var count int64
+	query := r.db.Model(&models.CondicaoPagamento{}).
+		Where("cdpgt_descricao = ? AND deleted_at IS NULL", descricao)
+
+	if excludeID > 0 {
+		query = query.Where("cdpgt_id != ?", excludeID)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// ExistsByID verifica se uma CondicaoPagamento existe pelo ID
+func (r *condicaoPagamentoRepository) ExistsByID(id int) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.CondicaoPagamento{}).
+		Where("cdpgt_id = ? AND deleted_at IS NULL", id).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// Count retorna o total de CondicoesPagamento
+func (r *condicaoPagamentoRepository) Count() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.CondicaoPagamento{}).
+		Where("deleted_at IS NULL").
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

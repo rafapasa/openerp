@@ -1,3 +1,4 @@
+// internal/repository/entidade_endereco_repository.go
 package repository
 
 import (
@@ -10,71 +11,68 @@ import (
 )
 
 // ============================================================
-// TYPES
+// INTERFACE
 // ============================================================
 
-type EntidadeEnderecoRepository struct {
+// EntidadeEnderecoRepository define as operações para endereços de entidade
+type EntidadeEnderecoRepository interface {
+	// CRUD Básico
+	Create(endereco *models.EntidadeEndereco) error
+	Update(endereco *models.EntidadeEndereco) error
+	Delete(entidadeID, item int) error
+	FindByID(entidadeID, item int) (*models.EntidadeEndereco, error)
+
+	// Buscas Específicas
+	FindByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error)
+	FindByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error)
+
+	// Listagem com Filtros
+	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error)
+
+	// Consultas de Validação (APENAS CONSULTAS)
+	ExistsByEntidadeTipo(entidadeID, tipo int, excludeItem int) (bool, error)
+	GetNextItemNumber(entidadeID int) (int, error)
+	CountByEntidadeID(entidadeID int) (int64, error)
+}
+
+// ============================================================
+// IMPLEMENTAÇÃO CONCRETA
+// ============================================================
+
+type entidadeEnderecoRepository struct {
 	db *gorm.DB
 }
 
-// ============================================================
-// CONSTRUCTOR
-// ============================================================
-
-func NewEntidadeEnderecoRepository(db *gorm.DB) *EntidadeEnderecoRepository {
-	return &EntidadeEnderecoRepository{db: db}
+// NewEntidadeEnderecoRepository cria uma nova instância do repositório
+// ✅ Retorna a interface, não a struct concreta
+func NewEntidadeEnderecoRepository(db *gorm.DB) EntidadeEnderecoRepository {
+	return &entidadeEnderecoRepository{db: db}
 }
 
 // ============================================================
-// MÉTODOS CRUD
+// MÉTODOS CRUD (APENAS PERSISTÊNCIA)
 // ============================================================
 
 // Create salva um novo endereço com sequencial manual
-func (r *EntidadeEnderecoRepository) Create(endereco *models.EntidadeEndereco) error {
-	// 1. Buscar o próximo número para esta entidade
-	var maxItem int
-	err := r.db.Model(&models.EntidadeEndereco{}).
-		Where("ent_id = ?", endereco.EntidadeID).
-		Select("COALESCE(MAX(ete_item), 0) + 1").
-		Scan(&maxItem).Error
-	if err != nil {
-		return err
-	}
-
-	// 2. Atribuir o próximo número
-	endereco.Item = maxItem
-
-	// 3. Salvar
+func (r *entidadeEnderecoRepository) Create(endereco *models.EntidadeEndereco) error {
 	return r.db.Create(endereco).Error
 }
 
 // Update atualiza um endereço existente
-func (r *EntidadeEnderecoRepository) Update(endereco *models.EntidadeEndereco) error {
+func (r *entidadeEnderecoRepository) Update(endereco *models.EntidadeEndereco) error {
 	return r.db.
-		Omit("municipio", "estado", "pais").
+		Omit("municipio", "estado", "pais", "created_at", "deleted_at").
 		Model(&models.EntidadeEndereco{}).
 		Where("ent_id = ? AND ete_item = ?", endereco.EntidadeID, endereco.Item).
 		Updates(endereco).Error
 }
 
 // Delete realiza exclusão lógica
-func (r *EntidadeEnderecoRepository) Delete(entidadeID, item int) error {
-	// 1. Buscar o endereço
-	endereco, err := r.FindByID(entidadeID, item)
-	if err != nil {
-		return err
-	}
-
-	// 2. Verificar se já foi deletado
-	if endereco.IsDeleted() {
-		return errors.New("endereço já foi deletado")
-	}
-
-	// 3. Realizar soft delete
-	endereco.SoftDelete()
-
-	// 4. Salvar
-	return r.Update(endereco)
+func (r *entidadeEnderecoRepository) Delete(entidadeID, item int) error {
+	return r.db.
+		Model(&models.EntidadeEndereco{}).
+		Where("ent_id = ? AND ete_item = ?", entidadeID, item).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
 }
 
 // ============================================================
@@ -82,7 +80,7 @@ func (r *EntidadeEnderecoRepository) Delete(entidadeID, item int) error {
 // ============================================================
 
 // FindByID busca um endereço pelo ID composto (ent_id + ete_item)
-func (r *EntidadeEnderecoRepository) FindByID(entidadeID, item int) (*models.EntidadeEndereco, error) {
+func (r *entidadeEnderecoRepository) FindByID(entidadeID, item int) (*models.EntidadeEndereco, error) {
 	var endereco models.EntidadeEndereco
 	err := r.db.
 		Preload("Pais").
@@ -101,7 +99,7 @@ func (r *EntidadeEnderecoRepository) FindByID(entidadeID, item int) (*models.Ent
 }
 
 // FindByEntidadeID busca todos os endereços de uma entidade
-func (r *EntidadeEnderecoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error) {
+func (r *entidadeEnderecoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeEndereco, error) {
 	var enderecos []models.EntidadeEndereco
 	err := r.db.
 		Preload("Pais").
@@ -118,7 +116,7 @@ func (r *EntidadeEnderecoRepository) FindByEntidadeID(entidadeID int) ([]models.
 }
 
 // FindByEntidadeIDAndTipo busca endereços de uma entidade por tipo
-func (r *EntidadeEnderecoRepository) FindByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error) {
+func (r *entidadeEnderecoRepository) FindByEntidadeIDAndTipo(entidadeID, tipo int) ([]models.EntidadeEndereco, error) {
 	var enderecos []models.EntidadeEndereco
 	err := r.db.
 		Preload("Pais").
@@ -135,46 +133,21 @@ func (r *EntidadeEnderecoRepository) FindByEntidadeIDAndTipo(entidadeID, tipo in
 }
 
 // ============================================================
-// MÉTODOS DE VERIFICAÇÃO
-// ============================================================
-
-// ExistsByEntidadeTipo verifica se a entidade já tem um endereço do tipo especificado
-func (r *EntidadeEnderecoRepository) ExistsByEntidadeTipo(entidadeID, tipo int, excludeItem int) (bool, error) {
-	var count int64
-	query := r.db.Model(&models.EntidadeEndereco{}).
-		Where("ent_id = ? AND ete_tipo = ? AND deleted_at IS NULL", entidadeID, tipo)
-
-	if excludeItem > 0 {
-		query = query.Where("ete_item != ?", excludeItem)
-	}
-
-	if err := query.Count(&count).Error; err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
-
-// ============================================================
 // MÉTODOS DE LISTAGEM
 // ============================================================
 
 // List retorna uma lista de endereços com paginação e filtros
-func (r *EntidadeEnderecoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error) {
+func (r *entidadeEnderecoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeEndereco, int64, error) {
 	var enderecos []models.EntidadeEndereco
 	var total int64
 
-	// Construir query base
 	query := r.db.Model(&models.EntidadeEndereco{}).Where("deleted_at IS NULL")
-
-	// Aplicar filtros
 	query = utils.ApplyFilters(query, models.EntidadeEndereco{}, filters)
 
-	// Contar total
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// Buscar com paginação e relacionamentos
 	err := query.
 		Preload("Pais").
 		Preload("Estado").
@@ -189,4 +162,49 @@ func (r *EntidadeEnderecoRepository) List(limit, offset int, filters map[string]
 	}
 
 	return enderecos, total, nil
+}
+
+// ============================================================
+// MÉTODOS DE CONSULTA PARA VALIDAÇÕES (APENAS CONSULTAS)
+// ============================================================
+
+// ExistsByEntidadeTipo verifica se a entidade já tem um endereço do tipo especificado
+func (r *entidadeEnderecoRepository) ExistsByEntidadeTipo(entidadeID, tipo int, excludeItem int) (bool, error) {
+	var count int64
+	query := r.db.Model(&models.EntidadeEndereco{}).
+		Where("ent_id = ? AND ete_tipo = ? AND deleted_at IS NULL", entidadeID, tipo)
+
+	if excludeItem > 0 {
+		query = query.Where("ete_item != ?", excludeItem)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// GetNextItemNumber retorna o próximo número de item para uma entidade
+func (r *entidadeEnderecoRepository) GetNextItemNumber(entidadeID int) (int, error) {
+	var maxItem int
+	err := r.db.Model(&models.EntidadeEndereco{}).
+		Where("ent_id = ?", entidadeID).
+		Select("COALESCE(MAX(ete_item), 0) + 1").
+		Scan(&maxItem).Error
+	if err != nil {
+		return 0, err
+	}
+	return maxItem, nil
+}
+
+// CountByEntidadeID retorna a quantidade de endereços de uma entidade
+func (r *entidadeEnderecoRepository) CountByEntidadeID(entidadeID int) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.EntidadeEndereco{}).
+		Where("ent_id = ? AND deleted_at IS NULL", entidadeID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

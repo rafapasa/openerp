@@ -17,10 +17,24 @@ import (
 	"github.com/openerp/backend/internal/utils"
 )
 
-type ProdutoService struct {
-	produtoRepo *repository.ProdutoRepository
-	// Repositórios para validação de dependências
-	tabelaPrecoProdutoRepo *repository.TabelaPrecoProdutoRepository
+// ProdutoService define os métodos públicos para o serviço de produto.
+type ProdutoService interface {
+	Create(req *dto.ProdutoRequest) (*models.Produto, error)
+	GetByID(id int) (*models.Produto, error)
+	GetByCodigo(codigo int) (*models.Produto, error)
+	GetByCodigoBarras(codigoBarras string) (*models.Produto, error)
+	Update(id int, req *dto.ProdutoRequest) (*models.Produto, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.Produto, int64, error)
+	Activate(id int) error
+	Deactivate(id int) error
+	FindById(id int) (*models.Produto, error)
+	GetValorUnitario(tbpId, proId int) (float64, error)
+}
+
+type produtoService struct {
+	proRepo     repository.ProdutoRepository
+	tbppService TabelaPrecoProdutoService
 	// estoqueRepo        *repository.EstoqueRepository
 	// documentoVendaItemRepo *repository.DocumentoVendaItemRepository
 }
@@ -38,10 +52,10 @@ const (
 	minLengthProdutoResumo = 3
 )
 
-func NewProdutoService(db *gorm.DB) *ProdutoService {
-	return &ProdutoService{
-		produtoRepo:            repository.NewProdutoRepository(db),
-		tabelaPrecoProdutoRepo: repository.NewTabelaPrecoProdutoRepository(db),
+func NewProdutoService(proRepo repository.ProdutoRepository, tbppService TabelaPrecoProdutoService) ProdutoService {
+	return &produtoService{
+		proRepo:     proRepo,
+		tbppService: tbppService,
 	}
 }
 
@@ -49,8 +63,8 @@ func NewProdutoService(db *gorm.DB) *ProdutoService {
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-// isDataValid realiza as validações básicas de um produto
-func (s *ProdutoService) isDataValid(req *dto.ProdutoRequest) error {
+// isDataValid realiza as validações básicas de um produto.
+func (s *produtoService) isDataValid(req *dto.ProdutoRequest) error {
 	// 1. Validar campos obrigatórios
 	if err := s.validateRequiredFields(req); err != nil {
 		return err
@@ -75,7 +89,7 @@ func (s *ProdutoService) isDataValid(req *dto.ProdutoRequest) error {
 }
 
 // validateRequiredFields valida campos obrigatórios
-func (s *ProdutoService) validateRequiredFields(req *dto.ProdutoRequest) error {
+func (s *produtoService) validateRequiredFields(req *dto.ProdutoRequest) error {
 	if strings.TrimSpace(req.Nome) == "" {
 		return errors.New("nome do produto é obrigatório")
 	}
@@ -104,7 +118,7 @@ func (s *ProdutoService) validateRequiredFields(req *dto.ProdutoRequest) error {
 }
 
 // validateFieldLengths valida o tamanho dos campos
-func (s *ProdutoService) validateFieldLengths(req *dto.ProdutoRequest) error {
+func (s *produtoService) validateFieldLengths(req *dto.ProdutoRequest) error {
 	// Nome
 	if len(req.Nome) > maxLengthProdutoNome {
 		return fmt.Errorf("nome do produto deve ter no máximo %d caracteres", maxLengthProdutoNome)
@@ -143,7 +157,7 @@ func (s *ProdutoService) validateFieldLengths(req *dto.ProdutoRequest) error {
 }
 
 // validateOptionalFields valida campos opcionais
-func (s *ProdutoService) validateOptionalFields(req *dto.ProdutoRequest) error {
+func (s *produtoService) validateOptionalFields(req *dto.ProdutoRequest) error {
 	// Validar se valores numéricos não são negativos
 	valores := map[string]*float64{
 		"custo de compra": req.CustoCompra,
@@ -167,7 +181,7 @@ func (s *ProdutoService) validateOptionalFields(req *dto.ProdutoRequest) error {
 }
 
 // validateRelationships valida as chaves estrangeiras
-func (s *ProdutoService) validateRelationships(req *dto.ProdutoRequest) error {
+func (s *produtoService) validateRelationships(req *dto.ProdutoRequest) error {
 	// Os repositórios de relacionamento seriam injetados para validação
 	// Aqui faremos apenas validações básicas
 
@@ -200,8 +214,8 @@ func (s *ProdutoService) validateRelationships(req *dto.ProdutoRequest) error {
 }
 
 // validateUniqueCodigo verifica se o código do produto já existe
-func (s *ProdutoService) validateUniqueCodigo(codigo int, excludeID int) error {
-	existe, err := s.produtoRepo.ExistsByCodigo(codigo, excludeID)
+func (s *produtoService) validateUniqueCodigo(codigo int, excludeID int) error {
+	existe, err := s.proRepo.ExistsByCodigo(codigo, excludeID)
 	if err != nil {
 		return fmt.Errorf("erro ao verificar duplicidade de código: %w", err)
 	}
@@ -212,12 +226,12 @@ func (s *ProdutoService) validateUniqueCodigo(codigo int, excludeID int) error {
 }
 
 // validateUniqueCodigoBarras verifica se o código de barras já existe
-func (s *ProdutoService) validateUniqueCodigoBarras(codigoBarras *string, excludeID string) error { // Corrected: Changed parameter type to *string
+func (s *produtoService) validateUniqueCodigoBarras(codigoBarras *string, excludeID int) error { // Corrected: Changed parameter type to *string
 	if codigoBarras == nil || *codigoBarras == "" {
 		return nil // Código de barras é opcional
 	}
 
-	existe, err := s.produtoRepo.ExistByCodigoBarras(*codigoBarras, excludeID)
+	existe, err := s.proRepo.ExistsByCodigoBarras(*codigoBarras, excludeID)
 	if err != nil {
 		return fmt.Errorf("erro ao verificar duplicidade de código de barras: %w", err)
 	}
@@ -228,7 +242,7 @@ func (s *ProdutoService) validateUniqueCodigoBarras(codigoBarras *string, exclud
 }
 
 // isCreateValid valida dados para criação
-func (s *ProdutoService) isCreateValid(req *dto.ProdutoRequest) error {
+func (s *produtoService) isCreateValid(req *dto.ProdutoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -240,7 +254,7 @@ func (s *ProdutoService) isCreateValid(req *dto.ProdutoRequest) error {
 	}
 
 	// 3. Validar duplicidade de código de barras
-	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, ""); err != nil { // Corrected: Passed req.CodigoBarras directly
+	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, 0); err != nil { // Corrected: Passed req.CodigoBarras directly
 		return err
 	}
 
@@ -248,7 +262,7 @@ func (s *ProdutoService) isCreateValid(req *dto.ProdutoRequest) error {
 }
 
 // isUpdateValid valida dados para atualização
-func (s *ProdutoService) isUpdateValid(id int, req *dto.ProdutoRequest) error {
+func (s *produtoService) isUpdateValid(id int, req *dto.ProdutoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -260,7 +274,7 @@ func (s *ProdutoService) isUpdateValid(id int, req *dto.ProdutoRequest) error {
 	}
 
 	// 3. Validar duplicidade de código de barras (excluindo o próprio ID)
-	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, fmt.Sprintf("%d", id)); err != nil { // Corrected: Passed req.CodigoBarras directly
+	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, id); err != nil { // Corrected: Passed req.CodigoBarras directly
 		return err
 	}
 
@@ -272,13 +286,13 @@ func (s *ProdutoService) isUpdateValid(id int, req *dto.ProdutoRequest) error {
 // ============================================================
 
 // Create cria um novo produto
-func (s *ProdutoService) Create(req *dto.ProdutoRequest) (*models.Produto, error) {
+func (s *produtoService) Create(req *dto.ProdutoRequest) (*models.Produto, error) {
 	if err := s.isCreateValid(req); err != nil {
 		return nil, err
 	}
 
 	// Verificar se o código já existe no banco
-	produtoExists, err := s.produtoRepo.FindByCodigo(req.Codigo)
+	produtoExists, err := s.proRepo.FindByCodigo(req.Codigo)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("erro ao verificar código: %w", err)
 	}
@@ -296,7 +310,7 @@ func (s *ProdutoService) Create(req *dto.ProdutoRequest) (*models.Produto, error
 	produto.CreatedAt = time.Now()
 	produto.UpdatedAt = time.Now()
 
-	if err := s.produtoRepo.Create(produto); err != nil {
+	if err := s.proRepo.Create(produto); err != nil {
 		return nil, fmt.Errorf("erro ao criar produto: %w", err)
 	}
 
@@ -304,8 +318,8 @@ func (s *ProdutoService) Create(req *dto.ProdutoRequest) (*models.Produto, error
 }
 
 // GetByID busca um produto pelo ID
-func (s *ProdutoService) GetByID(id int) (*models.Produto, error) {
-	produto, err := s.produtoRepo.FindByID(id)
+func (s *produtoService) GetByID(id int) (*models.Produto, error) {
+	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("produto com ID %d não encontrado", id)
@@ -316,12 +330,12 @@ func (s *ProdutoService) GetByID(id int) (*models.Produto, error) {
 }
 
 // GetByCodigo busca um produto pelo código
-func (s *ProdutoService) GetByCodigo(codigo int) (*models.Produto, error) {
+func (s *produtoService) GetByCodigo(codigo int) (*models.Produto, error) {
 	if codigo <= 0 {
 		return nil, errors.New("código inválido")
 	}
 
-	produto, err := s.produtoRepo.FindByCodigo(codigo)
+	produto, err := s.proRepo.FindByCodigo(codigo)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("produto com código %d não encontrado", codigo)
@@ -332,12 +346,12 @@ func (s *ProdutoService) GetByCodigo(codigo int) (*models.Produto, error) {
 }
 
 // GetByCodigoBarras busca um produto pelo código de barras
-func (s *ProdutoService) GetByCodigoBarras(codigoBarras string) (*models.Produto, error) {
+func (s *produtoService) GetByCodigoBarras(codigoBarras string) (*models.Produto, error) {
 	if strings.TrimSpace(codigoBarras) == "" {
 		return nil, errors.New("código de barras não pode ser vazio")
 	}
 
-	produto, err := s.produtoRepo.FindByCodigoBarras(codigoBarras)
+	produto, err := s.proRepo.FindByCodigoBarras(codigoBarras)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("produto com código de barras %s não encontrado", codigoBarras)
@@ -348,13 +362,13 @@ func (s *ProdutoService) GetByCodigoBarras(codigoBarras string) (*models.Produto
 }
 
 // Update atualiza um produto existente
-func (s *ProdutoService) Update(id int, req *dto.ProdutoRequest) (*models.Produto, error) {
+func (s *produtoService) Update(id int, req *dto.ProdutoRequest) (*models.Produto, error) {
 	if err := s.isUpdateValid(id, req); err != nil {
 		return nil, err
 	}
 
 	// Buscar o produto existente
-	produto, err := s.produtoRepo.FindByID(id)
+	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("produto com ID %d não encontrado", id)
@@ -370,7 +384,7 @@ func (s *ProdutoService) Update(id int, req *dto.ProdutoRequest) (*models.Produt
 	// Atualizar timestamp
 	produto.UpdatedAt = time.Now()
 
-	if err := s.produtoRepo.Update(produto); err != nil {
+	if err := s.proRepo.Update(id, produto); err != nil {
 		return nil, fmt.Errorf("erro ao atualizar produto: %w", err)
 	}
 
@@ -378,9 +392,9 @@ func (s *ProdutoService) Update(id int, req *dto.ProdutoRequest) (*models.Produt
 }
 
 // Delete realiza a exclusão lógica de um produto
-func (s *ProdutoService) Delete(id int) error {
+func (s *produtoService) Delete(id int) error {
 	// Buscar o produto
-	existe, err := s.produtoRepo.ExistsByID(id)
+	existe, err := s.proRepo.ExistsByID(id)
 	if err != nil {
 		return fmt.Errorf("erro ao buscar produto: %w", err)
 	}
@@ -395,11 +409,11 @@ func (s *ProdutoService) Delete(id int) error {
 	}
 
 	// Realizar exclusão lógica
-	return s.produtoRepo.Delete(id)
+	return s.proRepo.Delete(id)
 }
 
 // List lista produtos com paginação e filtros
-func (s *ProdutoService) List(limit, offset int, filters map[string]interface{}) ([]models.Produto, int64, error) {
+func (s *produtoService) List(limit, offset int, filters map[string]interface{}) ([]models.Produto, int64, error) {
 	// Validar parâmetros de paginação
 	if limit <= 0 {
 		limit = 10 // valor padrão
@@ -408,7 +422,7 @@ func (s *ProdutoService) List(limit, offset int, filters map[string]interface{})
 		offset = 0
 	}
 
-	produtos, total, err := s.produtoRepo.List(limit, offset, filters)
+	produtos, total, err := s.proRepo.List(limit, offset, filters)
 	if err != nil {
 		return nil, 0, fmt.Errorf("erro ao listar produtos: %w", err)
 	}
@@ -420,8 +434,8 @@ func (s *ProdutoService) List(limit, offset int, filters map[string]interface{})
 // ============================================================
 
 // checkDependencies verifica se o produto tem dependências
-// ESTE MÉTODO DEVE ESTAR NO SERVICE, NÃO NO REPOSITORY!
-func (s *ProdutoService) checkDependencies(produtoID int) error {
+// ESTE MÉTODO DEVE ESTAR NO SERVICE, NÃO NO REPOSITORY! (Receiver changed)
+func (s *produtoService) checkDependencies(produtoID int) error {
 	// 1. TODO: Verificar se tem itens em pedidos
 	// itens, err := s.documentoVendaItemRepo.FindByProdutoID(produtoID)
 	// if err != nil {
@@ -475,8 +489,8 @@ func (s *ProdutoService) checkDependencies(produtoID int) error {
 // ============================================================
 
 // Activate ativa um produto
-func (s *ProdutoService) Activate(id int) error {
-	produto, err := s.produtoRepo.FindByID(id)
+func (s *produtoService) Activate(id int) error {
+	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
 		return err
 	}
@@ -486,12 +500,12 @@ func (s *ProdutoService) Activate(id int) error {
 	}
 
 	produto.Situacao = constants.StatusAtivo
-	return s.produtoRepo.Update(produto)
+	return s.proRepo.Update(id, produto)
 }
 
 // Deactivate desativa um produto
-func (s *ProdutoService) Deactivate(id int) error {
-	produto, err := s.produtoRepo.FindByID(id)
+func (s *produtoService) Deactivate(id int) error {
+	produto, err := s.proRepo.FindByID(id)
 	if err != nil {
 		return err
 	}
@@ -501,24 +515,24 @@ func (s *ProdutoService) Deactivate(id int) error {
 	}
 
 	produto.Situacao = constants.StatusInativo
-	return s.produtoRepo.Update(produto)
+	return s.proRepo.Update(id, produto)
 }
 
-func (s *ProdutoService) FindById(id int) (*models.Produto, error) {
+func (s *produtoService) FindById(id int) (*models.Produto, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("O 'id' é obrigatório.")
 	}
-	return s.produtoRepo.FindByID(id)
+	return s.proRepo.FindByID(id)
 }
 
-func (s *ProdutoService) GetValorUnitario(tbpId, proId int) (float64, error) {
+func (s *produtoService) GetValorUnitario(tbpId, proId int) (float64, error) {
 	if tbpId <= 0 {
 		return 0, apperrors.NewValidationError("O 'tabela_preco_id' é obrigatório.")
 	}
 	if proId <= 0 {
 		return 0, apperrors.NewValidationError("O 'produto_id' é obrigatório.")
 	}
-	itemTabPreco, err := s.tabelaPrecoProdutoRepo.FindByProduto(tbpId, proId)
+	itemTabPreco, err := s.tbppService.GetByProduto(tbpId, proId)
 	if err != nil {
 		return 0, err
 	}

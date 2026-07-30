@@ -4,21 +4,24 @@ import (
 	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
-	"gorm.io/gorm"
 )
 
-type OperacaoFiscalService struct {
-	db      *gorm.DB
-	opfRepo *repository.OperacaoFiscalRepository
+// OperacaoFiscalService define os métodos públicos para o serviço de operação fiscal.
+type OperacaoFiscalService interface {
+	FindByID(id int) (*models.OperacaoFiscal, error)
 }
 
-func NewOperacaoFiscalService(db *gorm.DB) *OperacaoFiscalService {
-	return &OperacaoFiscalService{
-		db: db,
+type operacaoFiscalService struct {
+	opfRepo repository.OperacaoFiscalRepository
+}
+
+func NewOperacaoFiscalService(opfRepo repository.OperacaoFiscalRepository) OperacaoFiscalService { // Removed db parameter as it's not used
+	return &operacaoFiscalService{
+		opfRepo: opfRepo,
 	}
 }
 
-func (s *OperacaoFiscalService) FindByID(id int) (*models.OperacaoFiscal, error) {
+func (s *operacaoFiscalService) FindByID(id int) (*models.OperacaoFiscal, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID da operação fiscal inválido.")
 	}

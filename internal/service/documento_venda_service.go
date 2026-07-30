@@ -13,23 +13,45 @@ import (
 	"gorm.io/gorm"
 )
 
-type DocumentoVendaService struct {
-	db         *gorm.DB
-	ddvRepo    *repository.DocumentoVendaRepository
-	dviService *DocumentoVendaItemService
-	dvpService *DocumentoVendaPagamentoService
-	entService *EntidadeService
-	proService *ProdutoService
+// DocumentoVendaService define os métodos públicos para o serviço de documento de venda.
+type DocumentoVendaService interface {
+	Create(req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error)
+	FindByID(id int) (*models.DocumentoVenda, error)
+	GetByID(id int) (*models.DocumentoVenda, error)
+	Update(id int, req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error)
+	List(limit, offset int, filters map[string]any) ([]models.DocumentoVenda, int64, error)
+	Delete(id int) error
+	AddItem(reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error)
+	EditItem(ddvId, dviItem int, reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error)
+	DeleteItem(ddvId, dviItem int) (*models.DocumentoVenda, error)
+	AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error)
+	EditPagamento(ddvId, dvpItem int, reqPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error)
+	DeletePagamento(ddvId, dvpItem int) (*models.DocumentoVenda, error)
 }
 
-func NewDocumentoVendaService(db *gorm.DB) *DocumentoVendaService {
-	return &DocumentoVendaService{
+// documentoVendaService é a implementação concreta de DocumentoVendaService.
+type documentoVendaService struct {
+	db         *gorm.DB
+	ddvRepo    repository.DocumentoVendaRepository
+	dviService DocumentoVendaItemService // Alterado para a interface
+	dvpService DocumentoVendaPagamentoService
+	entService EntidadeService
+	proService ProdutoService
+}
+
+func NewDocumentoVendaService(db *gorm.DB,
+	ddvRepo repository.DocumentoVendaRepository,
+	dviService DocumentoVendaItemService,
+	dvpService DocumentoVendaPagamentoService,
+	entService EntidadeService,
+	proService ProdutoService) *documentoVendaService {
+	return &documentoVendaService{
 		db:         db,
-		ddvRepo:    repository.NewDocumentoVendaRepository(db),
-		dviService: NewDocumentoVendaItemService(db),
-		dvpService: NewDocumentoVendaPagamentoService(db),
-		entService: NewEntidadeService(db),
-		proService: NewProdutoService(db),
+		ddvRepo:    ddvRepo,
+		dviService: dviService,
+		dvpService: dvpService,
+		entService: entService,
+		proService: proService,
 	}
 }
 
@@ -37,7 +59,7 @@ func NewDocumentoVendaService(db *gorm.DB) *DocumentoVendaService {
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-func (s *DocumentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUpdate bool) error {
+func (s *documentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUpdate bool) error {
 	// 1. Validar campos obrigatórios do cabeçalho
 	if req.EmpresaFilialID == 0 {
 		return apperrors.NewValidationError("O campo 'empresa_filial_id' é obrigatório.")
@@ -90,7 +112,7 @@ func (s *DocumentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUp
 }
 
 // recalcularTotais calcula os totais do documento com base nos itens.
-func (s *DocumentoVendaService) recalcularTotais(doc *models.DocumentoVenda) {
+func (s *documentoVendaService) recalcularTotais(doc *models.DocumentoVenda) {
 	var totalProdutos, totalDescontos, totalPesoBruto, totalPesoLiquido float64
 
 	for i := range doc.Itens {
@@ -121,7 +143,7 @@ func (s *DocumentoVendaService) recalcularTotais(doc *models.DocumentoVenda) {
 }
 
 // recalcularTotaisPagamentos calcula os totais de pagamento do documento.
-func (s *DocumentoVendaService) recalcularTotaisPagamentos(doc *models.DocumentoVenda) {
+func (s *documentoVendaService) recalcularTotaisPagamentos(doc *models.DocumentoVenda) {
 	var totalPago float64
 
 	for _, p := range doc.Pagamentos {
@@ -138,7 +160,7 @@ func (s *DocumentoVendaService) recalcularTotaisPagamentos(doc *models.Documento
 // MÉTODOS PÚBLICOS (CRUD)
 // ============================================================
 
-func (s *DocumentoVendaService) Create(req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) Create(req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error) {
 	if err := s.isDataValid(req, false); err != nil {
 		return nil, err
 	}
@@ -173,21 +195,21 @@ func (s *DocumentoVendaService) Create(req *dto.DocumentoVendaRequest) (*models.
 	return s.GetByID(doc.ID)
 }
 
-func (s *DocumentoVendaService) FindByID(id int) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) FindByID(id int) (*models.DocumentoVenda, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID do documento inválido.")
 	}
 	return s.ddvRepo.FindByID(id)
 }
 
-func (s *DocumentoVendaService) GetByID(id int) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) GetByID(id int) (*models.DocumentoVenda, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID do documento inválido.")
 	}
 	return s.ddvRepo.GetByID(id)
 }
 
-func (s *DocumentoVendaService) Update(id int, req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) Update(id int, req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error) {
 	if err := s.isDataValid(req, true); err != nil {
 		return nil, err
 	}
@@ -215,11 +237,11 @@ func (s *DocumentoVendaService) Update(id int, req *dto.DocumentoVendaRequest) (
 	return s.GetByID(id)
 }
 
-func (s *DocumentoVendaService) List(limit, offset int, filters map[string]any) ([]models.DocumentoVenda, int64, error) {
+func (s *documentoVendaService) List(limit, offset int, filters map[string]any) ([]models.DocumentoVenda, int64, error) {
 	return s.ddvRepo.List(limit, offset, filters)
 }
 
-func (s *DocumentoVendaService) Delete(id int) error {
+func (s *documentoVendaService) Delete(id int) error {
 	doc, err := s.ddvRepo.FindByID(id)
 	if err != nil {
 		return err
@@ -233,10 +255,8 @@ func (s *DocumentoVendaService) Delete(id int) error {
 }
 
 // executarOperacaoItem gerencia a transação para operações de item (Adicionar, Editar, Deletar).
-func (s *DocumentoVendaService) executarOperacaoItem(
-	docVendaID int,
-	itemOperation func(dviService *DocumentoVendaItemService) error,
-) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) executarOperacaoItem(docVendaID int,
+	itemOperation func(dviServiceTx DocumentoVendaItemService) error) (*models.DocumentoVenda, error) {
 	tx := s.db.Begin()
 	if tx.Error != nil {
 		return nil, apperrors.NewInternalError("Erro ao iniciar transação.", tx.Error)
@@ -252,7 +272,7 @@ func (s *DocumentoVendaService) executarOperacaoItem(
 	}()
 
 	// Executa a operação do item (Create, Update, Delete) dentro da transação.
-	dviServiceTx := NewDocumentoVendaItemService(tx)
+	dviServiceTx := NewDocumentoVendaItemService(tx) // Retorna a interface
 	if err := itemOperation(dviServiceTx); err != nil {
 		tx.Rollback()
 		return nil, err // Retorna o erro original da operação do item.
@@ -284,32 +304,31 @@ func (s *DocumentoVendaService) executarOperacaoItem(
 	return doc, nil
 }
 
-func (s *DocumentoVendaService) AddItem(reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoItem(reqItem.DocumentoVendaID, func(dviService *DocumentoVendaItemService) error {
+func (s *documentoVendaService) AddItem(reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error) {
+	return s.executarOperacaoItem(reqItem.DocumentoVendaID, func(dviService DocumentoVendaItemService) error {
 		// A função `Create` do dviService precisa ser criada ou ajustada para receber o DTO.
 		// Assumindo que ela exista:
 		return dviService.Create(reqItem)
 	})
 }
 
-func (s *DocumentoVendaService) EditItem(ddvId, dviItem int, reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoItem(ddvId, func(dviService *DocumentoVendaItemService) error {
-		// Delega a operação de atualização para o serviço de item.
-		return dviService.Update(ddvId, dviItem, reqItem)
+func (s *documentoVendaService) EditItem(ddvId, dviItem int, reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error) {
+	return s.executarOperacaoItem(ddvId, func(dviServicTx DocumentoVendaItemService) error {
+		return dviServicTx.Update(ddvId, dviItem, reqItem)
 	})
 }
 
-func (s *DocumentoVendaService) DeleteItem(ddvId, dviItem int) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoItem(ddvId, func(dviService *DocumentoVendaItemService) error {
-		// Delega a operação de exclusão para o serviço de item.
+func (s *documentoVendaService) DeleteItem(ddvId, dviItem int) (*models.DocumentoVenda, error) {
+	return s.executarOperacaoItem(ddvId, func(dviService DocumentoVendaItemService) error {
+		// Delega a operação de exclusão para o serviço de item. (This comment is slightly inaccurate, it should be DocumentoVendaItemServiceInterface)
 		return dviService.Delete(ddvId, dviItem)
 	})
 }
 
 // executarOperacaoPagamento gerencia a transação para operações de pagamento.
-func (s *DocumentoVendaService) executarOperacaoPagamento(
+func (s *documentoVendaService) executarOperacaoPagamento(
 	docVendaID int,
-	pagamentoOperation func(dvpService *DocumentoVendaPagamentoService) error,
+	pagamentoOperation func(dvpService DocumentoVendaPagamentoService) error,
 ) (*models.DocumentoVenda, error) {
 	tx := s.db.Begin()
 	if tx.Error != nil {
@@ -324,7 +343,7 @@ func (s *DocumentoVendaService) executarOperacaoPagamento(
 	}()
 
 	// Executa a operação de pagamento dentro da transação.
-	dvpServiceTx := NewDocumentoVendaPagamentoService(tx)
+	dvpServiceTx := NewDocumentoVendaPagamentoService(tx, repository.NewDocumentoVendaPagamentoRepository(tx))
 	if err := pagamentoOperation(dvpServiceTx); err != nil {
 		tx.Rollback()
 		return nil, err
@@ -356,24 +375,22 @@ func (s *DocumentoVendaService) executarOperacaoPagamento(
 	return doc, nil
 }
 
-func (s *DocumentoVendaService) AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoPagamento(
-		reqAddPagamento.DocumentoVendaID,
-		func(dvpService *DocumentoVendaPagamentoService) error {
-			return dvpService.Create(reqAddPagamento)
+func (s *documentoVendaService) AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
+	return s.executarOperacaoPagamento(reqAddPagamento.DocumentoVendaID, func(dvpServiceTx DocumentoVendaPagamentoService) error {
+		return dvpServiceTx.Create(reqAddPagamento)
+	})
+}
+
+func (s *documentoVendaService) EditPagamento(ddvId, dvpItem int, reqPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
+	return s.executarOperacaoPagamento(ddvId,
+		func(dvpServiceTx DocumentoVendaPagamentoService) error {
+			return dvpServiceTx.Update(ddvId, dvpItem, reqPagamento)
 		})
 }
 
-func (s *DocumentoVendaService) EditPagamento(ddvId, dvpItem int, reqPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
+func (s *documentoVendaService) DeletePagamento(ddvId, dvpItem int) (*models.DocumentoVenda, error) {
 	return s.executarOperacaoPagamento(ddvId,
-		func(dvpService *DocumentoVendaPagamentoService) error {
-			return dvpService.Update(ddvId, dvpItem, reqPagamento)
-		})
-}
-
-func (s *DocumentoVendaService) DeletePagamento(ddvId, dvpItem int) (*models.DocumentoVenda, error) {
-	return s.executarOperacaoPagamento(ddvId,
-		func(dvpService *DocumentoVendaPagamentoService) error {
-			return dvpService.Delete(ddvId, dvpItem)
+		func(dvpServiceTx DocumentoVendaPagamentoService) error {
+			return dvpServiceTx.Delete(ddvId, dvpItem)
 		})
 }

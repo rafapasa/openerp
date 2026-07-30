@@ -8,16 +8,25 @@ import (
 	"github.com/openerp/backend/internal/models"
 )
 
-type UsuarioRepository struct {
+type UsuarioRepository interface {
+	FindByID(id int) (*models.Usuario, error)
+	FindByLogin(login string) (*models.Usuario, error)
+	FindByLoginWithGrupo(login string) (*models.Usuario, error)
+	FindByIDWithGrupo(id int) (*models.Usuario, error)
+	FindGrupoByID(id int) (*models.GrupoUsuario, error)
+	FindUsuarioFiliais(usuarioID int) ([]models.UsuarioFilial, error)
+}
+
+type usuarioRepository struct {
 	db *gorm.DB
 }
 
-func NewUsuarioRepository(db *gorm.DB) *UsuarioRepository {
-	return &UsuarioRepository{db: db}
+func NewUsuarioRepository(db *gorm.DB) UsuarioRepository {
+	return &usuarioRepository{db: db}
 }
 
 // FindByID busca um usuário pelo ID - SEM PRELOAD para evitar erros
-func (r *UsuarioRepository) FindByID(id int) (*models.Usuario, error) {
+func (r *usuarioRepository) FindByID(id int) (*models.Usuario, error) {
 	var usuario models.Usuario
 	err := r.db.
 		Where("usu_id = ? AND deleted_at IS NULL", id).
@@ -32,7 +41,7 @@ func (r *UsuarioRepository) FindByID(id int) (*models.Usuario, error) {
 }
 
 // FindByLogin busca um usuário pelo login - SEM PRELOAD para evitar erros
-func (r *UsuarioRepository) FindByLogin(login string) (*models.Usuario, error) {
+func (r *usuarioRepository) FindByLogin(login string) (*models.Usuario, error) {
 	var usuario models.Usuario
 	err := r.db.
 		Where("usu_login = ? AND deleted_at IS NULL", login).
@@ -47,7 +56,7 @@ func (r *UsuarioRepository) FindByLogin(login string) (*models.Usuario, error) {
 }
 
 // FindByLoginWithGrupo busca um usuário com o grupo (apenas grupo)
-func (r *UsuarioRepository) FindByLoginWithGrupo(login string) (*models.Usuario, error) {
+func (r *usuarioRepository) FindByLoginWithGrupo(login string) (*models.Usuario, error) {
 	var usuario models.Usuario
 	err := r.db.
 		Preload("GrupoUsuario").
@@ -63,7 +72,7 @@ func (r *UsuarioRepository) FindByLoginWithGrupo(login string) (*models.Usuario,
 }
 
 // FindByIDWithGrupo busca um usuário com o grupo (apenas grupo)
-func (r *UsuarioRepository) FindByIDWithGrupo(id int) (*models.Usuario, error) {
+func (r *usuarioRepository) FindByIDWithGrupo(id int) (*models.Usuario, error) {
 	var usuario models.Usuario
 	err := r.db.
 		Preload("GrupoUsuario").
@@ -79,7 +88,7 @@ func (r *UsuarioRepository) FindByIDWithGrupo(id int) (*models.Usuario, error) {
 }
 
 // FindGrupoByID busca um grupo de usuário pelo ID
-func (r *UsuarioRepository) FindGrupoByID(id int) (*models.GrupoUsuario, error) {
+func (r *usuarioRepository) FindGrupoByID(id int) (*models.GrupoUsuario, error) {
 	var grupo models.GrupoUsuario
 	err := r.db.
 		Where("gpu_id = ? AND deleted_at IS NULL", id).
@@ -94,7 +103,7 @@ func (r *UsuarioRepository) FindGrupoByID(id int) (*models.GrupoUsuario, error) 
 }
 
 // FindUsuarioFiliais busca as filiais do usuário
-func (r *UsuarioRepository) FindUsuarioFiliais(usuarioID int) ([]models.UsuarioFilial, error) {
+func (r *usuarioRepository) FindUsuarioFiliais(usuarioID int) ([]models.UsuarioFilial, error) {
 	var filiais []models.UsuarioFilial
 	err := r.db.
 		Where("usu_id = ? AND deleted_at IS NULL", usuarioID).

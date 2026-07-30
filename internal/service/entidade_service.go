@@ -13,9 +13,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type EntidadeService struct {
-	entidadeRepo         *repository.EntidadeRepository
-	entidadeEnderecoRepo *repository.EntidadeEnderecoRepository
+// EntidadeService define os métodos públicos para o serviço de entidade.
+type EntidadeService interface {
+	Create(rep *dto.EntidadeRequest) (*models.Entidade, error)
+	GetByID(id int) (*models.Entidade, error)
+	GetByDocumento(documento string) (*models.Entidade, error)
+	Update(id int, req *dto.EntidadeRequest) (*models.Entidade, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.Entidade, int64, error)
+}
+
+type entidadeService struct {
+	entidadeRepo            repository.EntidadeRepository
+	entidadeEnderecoService EntidadeEnderecoService // Already an interface, just need to update constructor
 }
 
 // ============================================================
@@ -27,10 +37,10 @@ const (
 	maxLengthNomeFantasia = 100
 )
 
-func NewEntidadeService(db *gorm.DB) *EntidadeService {
-	return &EntidadeService{
-		entidadeRepo:         repository.NewEntidadeRepository(db),
-		entidadeEnderecoRepo: repository.NewEntidadeEnderecoRepository(db),
+func NewentidadeService(db *gorm.DB, entRepo repository.EntidadeRepository, entEnderecoService EntidadeEnderecoService) EntidadeService {
+	return &entidadeService{
+		entidadeRepo:            entRepo,
+		entidadeEnderecoService: entEnderecoService,
 	}
 }
 
@@ -39,7 +49,7 @@ func NewEntidadeService(db *gorm.DB) *EntidadeService {
 // ============================================================
 
 // isDataValid realiza as validações básicas de uma entidade
-func (s *EntidadeService) isDataValid(req *dto.EntidadeRequest) error {
+func (s *entidadeService) isDataValid(req *dto.EntidadeRequest) error {
 	// 1. Validar campos obrigatórios
 	if err := utils.ValidateMandatoryFields(req); err != nil {
 		return err
@@ -64,7 +74,7 @@ func (s *EntidadeService) isDataValid(req *dto.EntidadeRequest) error {
 }
 
 // validateFieldLengths valida o tamanho dos campos
-func (s *EntidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
+func (s *entidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
 	// Nome / Razão Social
 	if len(req.RazaoSocial) > maxLengthRazaoSocial {
 		return apperrors.NewValidationError(fmt.Sprintf("nome/razão social deve ter no máximo %d caracteres", maxLengthRazaoSocial))
@@ -79,7 +89,7 @@ func (s *EntidadeService) validateFieldLengths(req *dto.EntidadeRequest) error {
 }
 
 // validateDocument valida o documento (CPF/CNPJ)
-func (s *EntidadeService) validateDocument(req *dto.EntidadeRequest) error {
+func (s *entidadeService) validateDocument(req *dto.EntidadeRequest) error {
 	// Remover caracteres especiais para validação
 	documentoLimpo := utils.LimparDocumento(req.InscricaoFederal)
 
@@ -92,7 +102,7 @@ func (s *EntidadeService) validateDocument(req *dto.EntidadeRequest) error {
 }
 
 // validateTipoPessoa valida o tipo de pessoa
-func (s *EntidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
+func (s *entidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 	// Verificar se o tipo de pessoa é válido (1-Física, 2-Jurídica)
 	if req.TipoPessoa != 1 && req.TipoPessoa != 2 {
 		return apperrors.NewValidationError("tipo de pessoa inválido, deve ser 1 (Física) ou 2 (Jurídica)")
@@ -101,7 +111,7 @@ func (s *EntidadeService) validateTipoPessoa(req *dto.EntidadeRequest) error {
 }
 
 // validateUniqueDocument verifica se o documento já existe
-func (s *EntidadeService) validateUniqueDocument(documento string, excludeID int) error {
+func (s *entidadeService) validateUniqueDocument(documento string, excludeID int) error {
 	existe, err := s.entidadeRepo.ExistsByDocumento(documento, excludeID)
 	if err != nil {
 		return apperrors.NewInternalError("erro ao verificar duplicidade de documento", err)
@@ -113,7 +123,7 @@ func (s *EntidadeService) validateUniqueDocument(documento string, excludeID int
 }
 
 // isCreateValid valida dados para criação
-func (s *EntidadeService) isCreateValid(req *dto.EntidadeRequest) error {
+func (s *entidadeService) isCreateValid(req *dto.EntidadeRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -128,7 +138,7 @@ func (s *EntidadeService) isCreateValid(req *dto.EntidadeRequest) error {
 }
 
 // isUpdateValid valida dados para atualização
-func (s *EntidadeService) isUpdateValid(id int, req *dto.EntidadeRequest) error {
+func (s *entidadeService) isUpdateValid(id int, req *dto.EntidadeRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -142,7 +152,7 @@ func (s *EntidadeService) isUpdateValid(id int, req *dto.EntidadeRequest) error 
 	return nil
 }
 
-func (s *EntidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, error) {
+func (s *entidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, error) {
 	if err := s.isCreateValid(rep); err != nil {
 		return nil, err
 	}
@@ -164,7 +174,7 @@ func (s *EntidadeService) Create(rep *dto.EntidadeRequest) (*models.Entidade, er
 	return entidade, nil
 }
 
-func (s *EntidadeService) GetByID(id int) (*models.Entidade, error) {
+func (s *entidadeService) GetByID(id int) (*models.Entidade, error) {
 	// 1. Buscar a entidade pelo ID
 	// A validaçãi de se a entidade existe e não foi deletada é feita no repositório
 	entidade, err := s.entidadeRepo.FindByID(id)
@@ -174,7 +184,7 @@ func (s *EntidadeService) GetByID(id int) (*models.Entidade, error) {
 	return entidade, nil
 }
 
-func (s *EntidadeService) GetByDocumento(documento string) (*models.Entidade, error) {
+func (s *entidadeService) GetByDocumento(documento string) (*models.Entidade, error) {
 	if !utils.IsValidDocumento(documento) {
 		return nil, fmt.Errorf("Documento inválido, deve ser um CNPJ ou CPF válido")
 	}
@@ -186,7 +196,7 @@ func (s *EntidadeService) GetByDocumento(documento string) (*models.Entidade, er
 	return entidade, nil
 }
 
-func (s *EntidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Entidade, error) {
+func (s *entidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Entidade, error) {
 	if err := s.isUpdateValid(id, req); err != nil {
 		return nil, err
 	}
@@ -210,7 +220,7 @@ func (s *EntidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Enti
 	return entidade, nil
 }
 
-func (s *EntidadeService) Delete(id int) error {
+func (s *entidadeService) Delete(id int) error {
 	// 1. Buscar a entidade pelo ID
 	entidade, err := s.entidadeRepo.FindByID(id)
 	if err != nil {
@@ -224,7 +234,7 @@ func (s *EntidadeService) Delete(id int) error {
 	return s.entidadeRepo.Delete(entidade.ID)
 }
 
-func (s *EntidadeService) List(limit, offset int, filters map[string]interface{}) ([]models.Entidade, int64, error) {
+func (s *entidadeService) List(limit, offset int, filters map[string]interface{}) ([]models.Entidade, int64, error) {
 	// 1. Listar entidades com filtros
 
 	// Validar parâmetros de paginação
@@ -247,9 +257,9 @@ func (s *EntidadeService) List(limit, offset int, filters map[string]interface{}
 
 // checkDependencies verifica se a entidade tem dependências
 // ESTE MÉTODO DEVE ESTAR NO SERVICE, NÃO NO REPOSITORY!
-func (s *EntidadeService) checkDependencies(entidadeID int) error {
+func (s *entidadeService) checkDependencies(entidadeID int) error {
 	// 1. Verificar se tem endereços
-	enderecos, err := s.entidadeEnderecoRepo.FindByEntidadeID(entidadeID)
+	enderecos, err := s.entidadeEnderecoService.GetByEntidadeID(entidadeID)
 	if err != nil {
 		return fmt.Errorf("erro ao verificar endereços: %w", err)
 	}

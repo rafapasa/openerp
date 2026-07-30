@@ -9,30 +9,38 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
-type DocumentoVendaItemService struct {
-	db            *gorm.DB
-	ddvService    *DocumentoVendaService
-	dviRepo       *repository.DocumentoVendaItemRepository
-	proService    *ProdutoService
-	prcService    *ProcessoService
-	configService *ConfiguracaoService
+// DocumentoVendaItemServiceInterface define os métodos públicos para o serviço de itens de documento de venda.
+type DocumentoVendaItemService interface {
+	Create(req *dto.DocumentoVendaItemRequest) error
+	Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error
+	Delete(ddvId, dviItem int) error
 }
 
-func NewDocumentoVendaItemService(db *gorm.DB) *DocumentoVendaItemService {
-	return &DocumentoVendaItemService{
-		db:            db,
-		ddvService:    NewDocumentoVendaService(db),
-		dviRepo:       repository.NewDocumentoVendaItemRepository(db),
-		proService:    NewProdutoService(db),
-		prcService:    NewProcessoService(db),
-		configService: NewConfiguracaoService(db),
-	}
+// documentoVendaItemService é a implementação concreta de DocumentoVendaItemServiceInterface.
+type documentoVendaItemService struct {
+	ddvService    DocumentoVendaService
+	dviRepo       repository.DocumentoVendaItemRepository
+	proService    ProdutoService
+	prcService    ProcessoService
+	configService ConfiguracaoService
 }
 
-func (s *DocumentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) error {
+func NewDocumentoVendaItemService(ddvService DocumentoVendaService,
+	dviRepo repository.DocumentoVendaItemRepository,
+	proService ProdutoService,
+	prcService ProcessoService,
+	configService ConfiguracaoService) DocumentoVendaItemService {
+	return &documentoVendaItemService{
+		ddvService:    ddvService,
+		dviRepo:       dviRepo,
+		proService:    proService,
+		prcService:    prcService,
+		configService: configService}
+}
+
+func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) error {
 	if err := s.isDataValid(req); err != nil {
 		return err
 	}
@@ -82,7 +90,7 @@ func (s *DocumentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 	return s.dviRepo.Create(dvi)
 }
 
-func (s *DocumentoVendaItemService) Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error {
+func (s *documentoVendaItemService) Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error {
 	if err := s.isDataValid(req); err != nil {
 		return err
 	}
@@ -101,12 +109,12 @@ func (s *DocumentoVendaItemService) Update(ddvId, dviItem int, req *dto.Document
 	return s.dviRepo.Update(ddvId, dviItem, item)
 }
 
-func (s *DocumentoVendaItemService) Delete(ddvId, dviItem int) error {
+func (s *documentoVendaItemService) Delete(ddvId, dviItem int) error {
 	return s.dviRepo.Delete(ddvId, dviItem)
 }
 
 // recalcularValoresItem calcula os totais do item.
-func (s *DocumentoVendaItemService) recalcularValoresItem(item *models.DocumentoVendaItem) {
+func (s *documentoVendaItemService) recalcularValoresItem(item *models.DocumentoVendaItem) {
 	item.TotalProdutos = item.Quantidade * item.ValorUnitario
 	item.TotalItem = item.TotalProdutos
 	if item.ValorDesconto != nil {
@@ -114,7 +122,7 @@ func (s *DocumentoVendaItemService) recalcularValoresItem(item *models.Documento
 	}
 }
 
-func (s *DocumentoVendaItemService) isDataValid(req *dto.DocumentoVendaItemRequest) error {
+func (s *documentoVendaItemService) isDataValid(req *dto.DocumentoVendaItemRequest) error {
 	if req.ProdutoID <= 0 {
 		return apperrors.NewValidationError("O 'produto_id' é obrigatório.")
 	}

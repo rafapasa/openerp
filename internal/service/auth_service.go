@@ -14,15 +14,24 @@ import (
 	"github.com/openerp/backend/internal/utils"
 )
 
-type AuthService struct {
-	userRepo   *repository.UsuarioRepository
+// authServiceInterface define o contrato para as operações de autenticação.
+type AuthService interface {
+	Login(login, senha string, empresaID *int) (*models.Usuario, string, string, error)
+	RefreshToken(refreshToken string) (string, error)
+	ValidateToken(token string) (*utils.JWTClaims, error)
+}
+
+// authService implementa authServiceInterface para gerenciar a autenticação de usuários.
+
+type authService struct {
+	userRepo   repository.UsuarioRepository
 	jwtSecret  string
 	expiresIn  time.Duration
 	refreshExp time.Duration
 }
 
-func NewAuthService(db *gorm.DB, cfg *config.Config) *AuthService {
-	return &AuthService{
+func NewauthService(db *gorm.DB, cfg *config.Config) AuthService {
+	return &authService{
 		userRepo:   repository.NewUsuarioRepository(db),
 		jwtSecret:  cfg.JWTSecret,
 		expiresIn:  cfg.JWTExpiresIn,
@@ -31,7 +40,7 @@ func NewAuthService(db *gorm.DB, cfg *config.Config) *AuthService {
 }
 
 // Login realiza o login do usuário
-func (s *AuthService) Login(login, senha string, empresaID *int) (*models.Usuario, string, string, error) {
+func (s *authService) Login(login, senha string, empresaID *int) (*models.Usuario, string, string, error) {
 	// 1. Buscar o usuário pelo login (COM GRUPO)
 	usuario, err := s.userRepo.FindByLoginWithGrupo(login)
 	if err != nil {
@@ -88,7 +97,7 @@ func (s *AuthService) Login(login, senha string, empresaID *int) (*models.Usuari
 }
 
 // RefreshToken renova o token de acesso
-func (s *AuthService) RefreshToken(refreshToken string) (string, error) {
+func (s *authService) RefreshToken(refreshToken string) (string, error) {
 	claims, err := utils.ValidateRefreshToken(refreshToken, s.jwtSecret)
 	if err != nil {
 		return "", errors.New("refresh token inválido")
@@ -119,12 +128,12 @@ func (s *AuthService) RefreshToken(refreshToken string) (string, error) {
 	return accessToken, nil
 }
 
-func (s *AuthService) ValidateToken(token string) (*utils.JWTClaims, error) {
+func (s *authService) ValidateToken(token string) (*utils.JWTClaims, error) {
 	return utils.ValidateToken(token, s.jwtSecret)
 }
 
 // getEmpresaID retorna o ID da empresa a ser usada no token
-func (s *AuthService) getEmpresaID(usuarioID int, empresaID *int) int {
+func (s *authService) getEmpresaID(usuarioID int, empresaID *int) int {
 	if empresaID != nil && *empresaID > 0 {
 		return *empresaID
 	}

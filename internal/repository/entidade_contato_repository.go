@@ -1,3 +1,4 @@
+// internal/repository/entidade_contato_repository.go
 package repository
 
 import (
@@ -9,73 +10,68 @@ import (
 )
 
 // ============================================================
-// TYPES
+// INTERFACE
 // ============================================================
 
-// EntidadeContatoRepository é o repositório para contatos de entidade
-type EntidadeContatoRepository struct {
+// EntidadeContatoRepository define o contrato para operações de banco
+type EntidadeContatoRepository interface {
+	// CRUD Básico
+	Create(contato *models.EntidadeContato) error
+	Update(contato *models.EntidadeContato) error
+	Delete(entidadeID, item int) error
+	FindByID(entidadeID, item int) (*models.EntidadeContato, error)
+
+	// Buscas Específicas
+	FindByEntidadeID(entidadeID int) ([]models.EntidadeContato, error)
+	FindByEntidadeIDAndTipo(entidadeID, formaContatoID int) ([]models.EntidadeContato, error)
+
+	// Listagem com Filtros
+	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeContato, int64, error)
+
+	// Consultas de Validação (APENAS CONSULTAS)
+	GetNextItemNumber(entidadeID int) (int, error)
+	CountByEntidadeID(entidadeID int) (int64, error)
+	ExistsByEntidadeTipo(entidadeID, formaContatoID int, excludeItem int) (bool, error)
+}
+
+// ============================================================
+// IMPLEMENTAÇÃO CONCRETA (privada)
+// ============================================================
+
+type entidadeContatoRepository struct {
 	db *gorm.DB
 }
 
-// ============================================================
-// CONSTRUCTOR
-// ============================================================
-
-// NewEntidadeContatoRepository cria uma nova instância
-func NewEntidadeContatoRepository(db *gorm.DB) *EntidadeContatoRepository {
-	return &EntidadeContatoRepository{db: db}
+// NewEntidadeContatoRepository cria uma nova instância do repositório
+// ✅ Retorna a interface, não a struct concreta
+func NewEntidadeContatoRepository(db *gorm.DB) EntidadeContatoRepository {
+	return &entidadeContatoRepository{db: db}
 }
 
 // ============================================================
-// MÉTODOS CRUD
+// MÉTODOS CRUD (APENAS PERSISTÊNCIA)
 // ============================================================
 
 // Create salva um novo contato com sequencial manual
-func (r *EntidadeContatoRepository) Create(contato *models.EntidadeContato) error {
-	// 1. Buscar o próximo número para esta entidade
-	var maxItem int
-	err := r.db.Model(&models.EntidadeContato{}).
-		Where("ent_id = ?", contato.EntidadeID).
-		Select("COALESCE(MAX(efc_item), 0) + 1").
-		Scan(&maxItem).Error
-	if err != nil {
-		return err
-	}
-
-	// 2. Atribuir o próximo número
-	contato.Item = maxItem
-
-	// 3. Salvar
+func (r *entidadeContatoRepository) Create(contato *models.EntidadeContato) error {
 	return r.db.Create(contato).Error
 }
 
 // Update atualiza um contato existente
-func (r *EntidadeContatoRepository) Update(contato *models.EntidadeContato) error {
+func (r *entidadeContatoRepository) Update(contato *models.EntidadeContato) error {
 	return r.db.
-		Omit("FormaContato").
+		Omit("FormaContato", "created_at", "deleted_at").
 		Model(&models.EntidadeContato{}).
 		Where("ent_id = ? AND efc_item = ?", contato.EntidadeID, contato.Item).
 		Updates(contato).Error
 }
 
 // Delete realiza exclusão lógica de um contato
-func (r *EntidadeContatoRepository) Delete(entidadeID, item int) error {
-	// 1. Buscar o contato
-	contato, err := r.FindByID(entidadeID, item)
-	if err != nil {
-		return err
-	}
-
-	// 2. Verificar se já foi deletado
-	if contato.IsDeleted() {
-		return errors.New("contato já foi deletado")
-	}
-
-	// 3. Realizar soft delete
-	contato.SoftDelete()
-
-	// 4. Salvar
-	return r.Update(contato)
+func (r *entidadeContatoRepository) Delete(entidadeID, item int) error {
+	return r.db.
+		Model(&models.EntidadeContato{}).
+		Where("ent_id = ? AND efc_item = ?", entidadeID, item).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
 }
 
 // ============================================================
@@ -83,7 +79,7 @@ func (r *EntidadeContatoRepository) Delete(entidadeID, item int) error {
 // ============================================================
 
 // FindByID busca um contato pelo ID composto (ent_id + efc_item)
-func (r *EntidadeContatoRepository) FindByID(entidadeID, item int) (*models.EntidadeContato, error) {
+func (r *entidadeContatoRepository) FindByID(entidadeID, item int) (*models.EntidadeContato, error) {
 	var contato models.EntidadeContato
 	err := r.db.
 		Preload("FormaContato").
@@ -100,7 +96,7 @@ func (r *EntidadeContatoRepository) FindByID(entidadeID, item int) (*models.Enti
 }
 
 // FindByEntidadeID busca todos os contatos de uma entidade
-func (r *EntidadeContatoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeContato, error) {
+func (r *entidadeContatoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeContato, error) {
 	var contatos []models.EntidadeContato
 	err := r.db.
 		Preload("FormaContato").
@@ -115,7 +111,7 @@ func (r *EntidadeContatoRepository) FindByEntidadeID(entidadeID int) ([]models.E
 }
 
 // FindByEntidadeIDAndTipo busca contatos de uma entidade por tipo
-func (r *EntidadeContatoRepository) FindByEntidadeIDAndTipo(entidadeID, formaContatoID int) ([]models.EntidadeContato, error) {
+func (r *entidadeContatoRepository) FindByEntidadeIDAndTipo(entidadeID, formaContatoID int) ([]models.EntidadeContato, error) {
 	var contatos []models.EntidadeContato
 	err := r.db.
 		Preload("FormaContato").
@@ -130,46 +126,21 @@ func (r *EntidadeContatoRepository) FindByEntidadeIDAndTipo(entidadeID, formaCon
 }
 
 // ============================================================
-// MÉTODOS DE VERIFICAÇÃO
-// ============================================================
-
-// ExistsByEntidadeTipo verifica se a entidade já tem um contato do tipo especificado
-func (r *EntidadeContatoRepository) ExistsByEntidadeTipo(entidadeID, formaContatoID int, excludeItem int) (bool, error) {
-	var count int64
-	query := r.db.Model(&models.EntidadeContato{}).
-		Where("ent_id = ? AND frc_id = ? AND deleted_at IS NULL", entidadeID, formaContatoID)
-
-	if excludeItem > 0 {
-		query = query.Where("efc_item != ?", excludeItem)
-	}
-
-	if err := query.Count(&count).Error; err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
-
-// ============================================================
 // MÉTODOS DE LISTAGEM
 // ============================================================
 
 // List retorna uma lista de contatos com paginação e filtros
-func (r *EntidadeContatoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeContato, int64, error) {
+func (r *entidadeContatoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeContato, int64, error) {
 	var contatos []models.EntidadeContato
 	var total int64
 
-	// Construir query base
 	query := r.db.Model(&models.EntidadeContato{}).Where("deleted_at IS NULL")
-
-	// Aplicar filtros
 	query = r.applyFilters(query, filters)
 
-	// Contar total
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// Buscar com paginação e relacionamentos
 	err := query.
 		Preload("FormaContato").
 		Limit(limit).
@@ -185,11 +156,56 @@ func (r *EntidadeContatoRepository) List(limit, offset int, filters map[string]i
 }
 
 // ============================================================
-// MÉTODOS AUXILIARES
+// MÉTODOS DE CONSULTA PARA VALIDAÇÕES (APENAS CONSULTAS)
+// ============================================================
+
+// GetNextItemNumber retorna o próximo número de item para uma entidade
+func (r *entidadeContatoRepository) GetNextItemNumber(entidadeID int) (int, error) {
+	var maxItem int
+	err := r.db.Model(&models.EntidadeContato{}).
+		Where("ent_id = ?", entidadeID).
+		Select("COALESCE(MAX(efc_item), 0) + 1").
+		Scan(&maxItem).Error
+	if err != nil {
+		return 0, err
+	}
+	return maxItem, nil
+}
+
+// CountByEntidadeID retorna a quantidade de contatos de uma entidade
+func (r *entidadeContatoRepository) CountByEntidadeID(entidadeID int) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.EntidadeContato{}).
+		Where("ent_id = ? AND deleted_at IS NULL", entidadeID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// ExistsByEntidadeTipo verifica se a entidade já tem um contato do tipo especificado
+func (r *entidadeContatoRepository) ExistsByEntidadeTipo(entidadeID, formaContatoID int, excludeItem int) (bool, error) {
+	var count int64
+	query := r.db.Model(&models.EntidadeContato{}).
+		Where("ent_id = ? AND frc_id = ? AND deleted_at IS NULL", entidadeID, formaContatoID)
+
+	if excludeItem > 0 {
+		query = query.Where("efc_item != ?", excludeItem)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// ============================================================
+// MÉTODOS AUXILIARES (FILTROS)
 // ============================================================
 
 // applyFilters aplica os filtros à query
-func (r *EntidadeContatoRepository) applyFilters(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
+func (r *entidadeContatoRepository) applyFilters(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
 	for key, value := range filters {
 		if value == nil || value == "" {
 			continue

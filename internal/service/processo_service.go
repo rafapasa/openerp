@@ -4,16 +4,27 @@ import (
 	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
-	"gorm.io/gorm"
 )
 
-type ProcessoService struct {
-	db         *gorm.DB
-	prcRepo    *repository.ProcessoRepository
-	opfService *OperacaoFiscalService
+// ProcessoService define os métodos públicos para o serviço de processo.
+type ProcessoService interface {
+	GetOperacaoFiscal(prcId int, opInterna, opSubTrib bool) (*models.OperacaoFiscal, error)
+	FindByID(id int) (*models.Processo, error)
 }
 
-func (s *ProcessoService) GetOperacaoFiscal(prcId int, opInterna, opSubTrib bool) (*models.OperacaoFiscal, error) {
+type processoService struct {
+	prcRepo    repository.ProcessoRepository
+	opfService OperacaoFiscalService
+}
+
+func NewProcessoService(prcRepo repository.ProcessoRepository, opfService OperacaoFiscalService) ProcessoService {
+	return &processoService{
+		prcRepo:    prcRepo,
+		opfService: opfService,
+	}
+}
+
+func (s *processoService) GetOperacaoFiscal(prcId int, opInterna, opSubTrib bool) (*models.OperacaoFiscal, error) {
 	prc, err := s.prcRepo.FindByID(prcId)
 	if err != nil {
 		return nil, err
@@ -27,20 +38,13 @@ func (s *ProcessoService) GetOperacaoFiscal(prcId int, opInterna, opSubTrib bool
 	if !opInterna && opSubTrib {
 		return s.opfService.FindByID(*prc.OperacaoFiscalForaEstSTID)
 	}
-	if !opInterna && opSubTrib {
+	if !opInterna && !opSubTrib { // Corrected: Changed condition
 		return s.opfService.FindByID(*prc.OperacaoFiscalForaEstID)
 	}
 	return nil, apperrors.NewInternalError("Operação fiscal não encontrada.", nil)
 }
 
-func NewProcessoService(db *gorm.DB) *ProcessoService {
-	return &ProcessoService{
-		db:      db,
-		prcRepo: repository.NewProcessoRepository(db),
-	}
-}
-
-func (s *ProcessoService) FindByID(id int) (*models.Processo, error) {
+func (s *processoService) FindByID(id int) (*models.Processo, error) { // Added this method to satisfy the interface
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID do processo inválido.")
 	}

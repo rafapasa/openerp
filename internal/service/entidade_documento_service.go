@@ -10,17 +10,26 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
+
+// EntidadeDocumentoService define os métodos públicos para o serviço de documentos de entidade.
+type EntidadeDocumentoService interface {
+	Create(req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error)
+	GetByID(entidadeID, item int) (*models.EntidadeDocumento, error)
+	GetByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error)
+	Update(entidadeID, item int, req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error)
+	Delete(entidadeID, item int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error)
+}
 
 // ============================================================
 // TYPES
 // ============================================================
 
 // EntidadeDocumentoService é o serviço para documentos de entidade
-type EntidadeDocumentoService struct {
-	documentoRepo *repository.EntidadeDocumentoRepository
-	entidadeRepo  *repository.EntidadeRepository
+type entidadeDocumentoService struct {
+	documentoRepo   repository.EntidadeDocumentoRepository
+	entidadeService EntidadeService
 }
 
 // ============================================================
@@ -28,10 +37,10 @@ type EntidadeDocumentoService struct {
 // ============================================================
 
 // NewEntidadeDocumentoService cria uma nova instância
-func NewEntidadeDocumentoService(db *gorm.DB) *EntidadeDocumentoService {
-	return &EntidadeDocumentoService{
-		documentoRepo: repository.NewEntidadeDocumentoRepository(db),
-		entidadeRepo:  repository.NewEntidadeRepository(db),
+func NewEntidadeDocumentoService(docRepo repository.EntidadeDocumentoRepository, entService EntidadeService) EntidadeDocumentoService {
+	return &entidadeDocumentoService{
+		documentoRepo:   docRepo,
+		entidadeService: entService,
 	}
 }
 
@@ -39,8 +48,8 @@ func NewEntidadeDocumentoService(db *gorm.DB) *EntidadeDocumentoService {
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-// isDataValid realiza as validações básicas de um documento
-func (s *EntidadeDocumentoService) isDataValid(req *dto.EntidadeDocumentoRequest) error {
+// isDataValid realiza as validações básicas de um documento.
+func (s *entidadeDocumentoService) isDataValid(req *dto.EntidadeDocumentoRequest) error {
 	// 1. Validar campos obrigatórios
 	if err := s.validateRequiredFields(req); err != nil {
 		return err
@@ -55,7 +64,7 @@ func (s *EntidadeDocumentoService) isDataValid(req *dto.EntidadeDocumentoRequest
 }
 
 // validateRequiredFields valida campos obrigatórios
-func (s *EntidadeDocumentoService) validateRequiredFields(req *dto.EntidadeDocumentoRequest) error {
+func (s *entidadeDocumentoService) validateRequiredFields(req *dto.EntidadeDocumentoRequest) error {
 	if strings.TrimSpace(req.Arquivo) == "" {
 		return apperrors.NewValidationError("arquivo é obrigatório")
 
@@ -69,7 +78,7 @@ func (s *EntidadeDocumentoService) validateRequiredFields(req *dto.EntidadeDocum
 }
 
 // validateFile valida o arquivo (tamanho)
-func (s *EntidadeDocumentoService) validateFile(req *dto.EntidadeDocumentoRequest) error {
+func (s *entidadeDocumentoService) validateFile(req *dto.EntidadeDocumentoRequest) error {
 	// Validar tamanho máximo (ex: 10MB)
 	// O tamanho em Base64 é ~33% maior que o original
 	// 10MB * 1.33 ≈ 13.3MB em Base64
@@ -83,8 +92,8 @@ func (s *EntidadeDocumentoService) validateFile(req *dto.EntidadeDocumentoReques
 }
 
 // validateEntidadeExists verifica se a entidade existe
-func (s *EntidadeDocumentoService) validateEntidadeExists(entidadeID int) error {
-	_, err := s.entidadeRepo.FindByID(entidadeID)
+func (s *entidadeDocumentoService) validateEntidadeExists(entidadeID int) error {
+	_, err := s.entidadeService.GetByID(entidadeID)
 	if err != nil {
 		return fmt.Errorf("entidade não encontrada: %w", err)
 	}
@@ -92,7 +101,7 @@ func (s *EntidadeDocumentoService) validateEntidadeExists(entidadeID int) error 
 }
 
 // isCreateValid valida dados para criação
-func (s *EntidadeDocumentoService) isCreateValid(req *dto.EntidadeDocumentoRequest) error {
+func (s *entidadeDocumentoService) isCreateValid(req *dto.EntidadeDocumentoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -107,7 +116,7 @@ func (s *EntidadeDocumentoService) isCreateValid(req *dto.EntidadeDocumentoReque
 }
 
 // isUpdateValid valida dados para atualização
-func (s *EntidadeDocumentoService) isUpdateValid(entidadeID, item int, req *dto.EntidadeDocumentoRequest) error {
+func (s *entidadeDocumentoService) isUpdateValid(entidadeID, item int, req *dto.EntidadeDocumentoRequest) error {
 	// 1. Validações básicas
 	if err := s.isDataValid(req); err != nil {
 		return err
@@ -130,8 +139,8 @@ func (s *EntidadeDocumentoService) isUpdateValid(entidadeID, item int, req *dto.
 // MÉTODOS PRINCIPAIS (CRUD)
 // ============================================================
 
-// Create cria um novo documento para uma entidade
-func (s *EntidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error) {
+// Create cria um novo documento para uma entidade.
+func (s *entidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error) {
 	// 1. Validar dados
 	if err := s.isCreateValid(req); err != nil {
 		return nil, err
@@ -152,7 +161,7 @@ func (s *EntidadeDocumentoService) Create(req *dto.EntidadeDocumentoRequest) (*m
 }
 
 // GetByID busca um documento específico
-func (s *EntidadeDocumentoService) GetByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
+func (s *entidadeDocumentoService) GetByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
 		return nil, apperrors.NewValidationError(fmt.Sprintf("documento não encontrado: %v", err))
@@ -161,7 +170,7 @@ func (s *EntidadeDocumentoService) GetByID(entidadeID, item int) (*models.Entida
 }
 
 // GetByEntidadeID busca todos os documentos de uma entidade
-func (s *EntidadeDocumentoService) GetByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error) {
+func (s *entidadeDocumentoService) GetByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error) {
 	// Validar se a entidade existe
 	if err := s.validateEntidadeExists(entidadeID); err != nil {
 		return nil, err
@@ -176,7 +185,7 @@ func (s *EntidadeDocumentoService) GetByEntidadeID(entidadeID int) ([]models.Ent
 }
 
 // Update atualiza um documento existente
-func (s *EntidadeDocumentoService) Update(entidadeID, item int, req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error) {
+func (s *entidadeDocumentoService) Update(entidadeID, item int, req *dto.EntidadeDocumentoRequest) (*models.EntidadeDocumento, error) {
 	// 1. Validar dados
 	if err := s.isUpdateValid(entidadeID, item, req); err != nil {
 		return nil, err
@@ -226,7 +235,7 @@ func (s *EntidadeDocumentoService) Update(entidadeID, item int, req *dto.Entidad
 }
 
 // Delete exclui logicamente um documento
-func (s *EntidadeDocumentoService) Delete(entidadeID, item int) error {
+func (s *entidadeDocumentoService) Delete(entidadeID, item int) error {
 	// 1. Validar se o documento existe
 	documento, err := s.documentoRepo.FindByID(entidadeID, item)
 	if err != nil {
@@ -249,7 +258,7 @@ func (s *EntidadeDocumentoService) Delete(entidadeID, item int) error {
 }
 
 // List lista documentos com paginação e filtros
-func (s *EntidadeDocumentoService) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error) {
+func (s *entidadeDocumentoService) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error) {
 	// Validar parâmetros de paginação
 	if limit <= 0 {
 		limit = 10

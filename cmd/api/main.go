@@ -1,9 +1,11 @@
+// cmd/api/main.go
 package main
 
 import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -11,8 +13,6 @@ import (
 	"github.com/openerp/backend/internal/config"
 	"github.com/openerp/backend/internal/database"
 	"github.com/openerp/backend/internal/handler"
-	"github.com/openerp/backend/internal/routes"
-	"github.com/openerp/backend/internal/service"
 
 	_ "github.com/openerp/backend/docs"
 )
@@ -28,7 +28,12 @@ func main() {
 	cfg := config.LoadConfig()
 	log.Printf("🚀 Iniciando OpenERP API - Ambiente: %s", cfg.APIEnv)
 
-	// 2. Conectar ao banco de dados
+	// 2. Carregar .env (opcional, já que o config.LoadConfig() pode fazer isso)
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️  Arquivo .env não encontrado, usando variáveis de ambiente do sistema")
+	}
+
+	// 3. Conectar ao banco de dados
 	db, err := database.NewMySQL(cfg)
 	if err != nil {
 		log.Fatalf("❌ Erro ao conectar ao banco: %v", err)
@@ -36,97 +41,32 @@ func main() {
 	defer db.Close()
 	log.Println("✅ Conectado ao banco de dados!")
 
-	// 4. Inicializar serviços
-	authService := service.NewAuthService(db.GetDB(), cfg)
-	entidadeService := service.NewEntidadeService(db.GetDB())
-	entidadeEnderecoService := service.NewEntidadeEnderecoService(db.GetDB())
-	entidadeContatoService := service.NewEntidadeContatoService(db.GetDB())
-	entidadeDocumentoService := service.NewEntidadeDocumentoService(db.GetDB())
-	produtoMarcaService := service.NewProdutoMarcaService(db.GetDB())
-	produtoModeloService := service.NewProdutoModeloService(db.GetDB())
-	tabelaPrecoService := service.NewTabelaPrecoService(db.GetDB())
-	tabelaPrecoProdutoService := service.NewTabelaPrecoProdutoService(db.GetDB())
-	entidadeRegimeTributarioService := service.NewEntidadeRegimeTributarioService(db.GetDB())
-	entidadeLimiteCreditoService := service.NewEntidadeLimiteCreditoService(db.GetDB())
-	// Futuros serviços:
-	produtoService := service.NewProdutoService(db.GetDB())
-	produtoGrupoService := service.NewProdutoGrupoService(db.GetDB())
-	produtoSubgrupoService := service.NewProdutoSubgrupoService(db.GetDB())
-	// pedidoService := service.NewPedidoService(db.GetDB())
+	// 4. ✅ Inicializar com Wire - retorna o router pronto!
+	router, err := wire.InitializeRouter(db.GetDB(), cfg.JWTSecret)
+	if err != nil {
+		log.Fatalf("❌ Erro ao inicializar a aplicação com Wire: %v", err)
+	}
 
-	// 5. Inicializar handlers
-	authHandler := handler.NewAuthHandler(authService)
-	entidadeHandler := handler.NewEntidadeHandler(entidadeService)
-	entidadeEnderecoHandler := handler.NewEntidadeEnderecoHandler(entidadeEnderecoService)
-	entidadeContatoHandler := handler.NewEntidadeContatoHandler(entidadeContatoService)
-	entidadeDocumentoHandler := handler.NewEntidadeDocumentoHandler(entidadeDocumentoService)
-	produtoMarcaHandler := handler.NewProdutoMarcaHandler(produtoMarcaService)
-	produtoModeloHandler := handler.NewProdutoModeloHandler(produtoModeloService)
-	tabelaPrecoHandler := handler.NewTabelaPrecoHandler(tabelaPrecoService)
-	tabelaPrecoProdutoHandler := handler.NewTabelaPrecoProdutoHandler(tabelaPrecoProdutoService)
-	entidadeRegimeTributarioHandler := handler.NewEntidadeRegimeTributarioHandler(entidadeRegimeTributarioService)
-	entidadelimiteCreditoHandler := handler.NewEntidadeLimiteCreditoHandler(entidadeLimiteCreditoService)
-
-	// Futuros handlers:
-	produtoHandler := handler.NewProdutoHandler(produtoService)
-	produtoGrupoHandler := handler.NewProdutoGrupoHandler(produtoGrupoService)
-	produtoSubgrupoHandler := handler.NewProdutoSubgrupoHandler(produtoSubgrupoService)
-
-	// pedidoHandler := handler.NewPedidoHandler(pedidoService)
-
-	// 5. Configurar router
-	router := setupRouter(cfg,
-		db,
-		authHandler,
-		entidadeHandler,
-		entidadeEnderecoHandler,
-		entidadeContatoHandler,
-		entidadeDocumentoHandler,
-		entidadeRegimeTributarioHandler,
-		entidadelimiteCreditoHandler,
-		produtoHandler,
-		produtoGrupoHandler,
-		produtoSubgrupoHandler,
-		produtoMarcaHandler,
-		produtoModeloHandler,
-		tabelaPrecoHandler,
-		tabelaPrecoProdutoHandler,
-	)
+	// 5. Configurar Swagger e Health Checks (rotas que não dependem do Wire)
+	setupPublicRoutes(router, cfg, db)
 
 	// 6. Iniciar servidor
 	port := cfg.APIPort
 	log.Printf("🌐 Servidor iniciado em http://localhost:%s", port)
+	log.Printf("📚 Swagger disponível em http://localhost:%s/swagger/index.html", port)
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("❌ Erro ao iniciar servidor: %v", err)
 	}
 }
 
-// setupRouter configura o router com todas as rotas
-func setupRouter(
-	cfg *config.Config,
-	db *database.MySQL,
-	authHandler *handler.AuthHandler,
-	entidadeHandler *handler.EntidadeHandler,
-	entidadeEnderecoHandler *handler.EntidadeEnderecoHandler,
-	entidadeContatoHandler *handler.EntidadeContatoHandler,
-	entidadeDocumentoHandler *handler.EntidadeDocumentoHandler,
-	entidadeRegimeTributarioHandler *handler.EntidadeRegimeTributarioHandler,
-	entidadeLimiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
-	produtoHandler *handler.ProdutoHandler,
-	produtoGrupoHandler *handler.ProdutoGrupoHandler,
-	produtoSubgrupoHandler *handler.ProdutoSubgrupoHandler,
-	produtoMarcaHandler *handler.ProdutoMarcaHandler,
-	produtoModeloHandler *handler.ProdutoModeloHandler,
-	tabelaPrecoHandler *handler.TabelaPrecoHandler,
-	tabelaPrecoProdutoHandler *handler.TabelaPrecoProdutoHandler,
-) *gin.Engine {
+// setupPublicRoutes configura rotas públicas que não dependem de autenticação/injeção
+func setupPublicRoutes(router *gin.Engine, cfg *config.Config, db *database.MySQL) {
 	// Configurar modo do Gin
 	if cfg.APIEnv == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	router := gin.Default()
-
+	// Middlewares globais
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
@@ -135,27 +75,5 @@ func setupRouter(
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Health checks
-	routes.RegisterHealthRoutes(router, cfg, db)
-
-	// Registrar todas as rotas
-	routes.RegisterRoutes(router, &routes.RouteConfig{
-		// Handlers
-		AuthHandler:                     authHandler,
-		EntidadeHandler:                 entidadeHandler,
-		EntidadeEnderecoHandler:         entidadeEnderecoHandler,
-		EntidadeContatoHandler:          entidadeContatoHandler,
-		EntidadeDocumentoHandler:        entidadeDocumentoHandler,
-		EntidadeRegimeTributarioHandler: entidadeRegimeTributarioHandler,
-		EntidadeLimiteCreditoHandler:    entidadeLimiteCreditoHandler,
-		ProdutoHandler:                  produtoHandler,
-		ProdutoGrupoHandler:             produtoGrupoHandler,
-		ProdutoSubgrupoHandler:          produtoSubgrupoHandler,
-		ProdutoMarcaHandler:             produtoMarcaHandler,
-		ProdutoModeloHandler:            produtoModeloHandler,
-		TabelaPrecoHandler:              tabelaPrecoHandler,
-		TabelaPrecoProdutoHandler:       tabelaPrecoProdutoHandler,
-		JWTSecret:                       cfg.JWTSecret,
-	})
-
-	return router
+	handler.RegisterHealthRoutes(router, cfg, db)
 }

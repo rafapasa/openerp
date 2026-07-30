@@ -11,17 +11,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type ProdutoMarcaService struct {
+// ProdutoMarcaService define os métodos públicos para o serviço de marca de produto.
+type ProdutoMarcaService interface {
+	Create(req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error)
+	GetByID(id int) (*models.ProdutoMarca, error)
+	Update(id int, req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoMarca, int64, error)
+}
+
+type produtoMarcaService struct {
 	repo *repository.ProdutoMarcaRepository
 }
 
-func NewProdutoMarcaService(db *gorm.DB) *ProdutoMarcaService {
-	return &ProdutoMarcaService{
+func NewProdutoMarcaService(db *gorm.DB) ProdutoMarcaService {
+	return &produtoMarcaService{
 		repo: repository.NewProdutoMarcaRepository(db),
 	}
 }
 
-func (s *ProdutoMarcaService) Create(req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error) {
+func (s *produtoMarcaService) Create(req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -47,11 +56,11 @@ func (s *ProdutoMarcaService) Create(req *dto.ProdutoMarcaRequest) (*models.Prod
 	return marca, nil
 }
 
-func (s *ProdutoMarcaService) GetByID(id int) (*models.ProdutoMarca, error) {
+func (s *produtoMarcaService) GetByID(id int) (*models.ProdutoMarca, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *ProdutoMarcaService) Update(id int, req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error) {
+func (s *produtoMarcaService) Update(id int, req *dto.ProdutoMarcaRequest) (*models.ProdutoMarca, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -81,7 +90,7 @@ func (s *ProdutoMarcaService) Update(id int, req *dto.ProdutoMarcaRequest) (*mod
 	return marca, nil
 }
 
-func (s *ProdutoMarcaService) Delete(id int) error {
+func (s *produtoMarcaService) Delete(id int) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return err
 	}
@@ -97,7 +106,7 @@ func (s *ProdutoMarcaService) Delete(id int) error {
 	return s.repo.Delete(id)
 }
 
-func (s *ProdutoMarcaService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoMarca, int64, error) {
+func (s *produtoMarcaService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoMarca, int64, error) {
 	if limit <= 0 {
 		limit = 10
 	}

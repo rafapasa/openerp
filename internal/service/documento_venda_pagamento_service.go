@@ -11,19 +11,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type DocumentoVendaPagamentoService struct {
-	db      *gorm.DB
-	dvpRepo *repository.DocumentoVendaPagamentoRepository
+// DocumentoVendaPagamentoService define o contrato para as operações de serviço de pagamento de documento de venda.
+type DocumentoVendaPagamentoService interface {
+	Create(req *dto.DocumentoVendaPagamentoRequest) error
+	Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error
+	Delete(ddvId, dvpItem int) error
+	ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error)
+	FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error)
 }
 
-func NewDocumentoVendaPagamentoService(db *gorm.DB) *DocumentoVendaPagamentoService {
-	return &DocumentoVendaPagamentoService{
+type documentoVendaPagamentoService struct {
+	db      *gorm.DB
+	dvpRepo repository.DocumentoVendaPagamentoRepository
+}
+
+func NewDocumentoVendaPagamentoService(db *gorm.DB, dvpRepo repository.DocumentoVendaPagamentoRepository) DocumentoVendaPagamentoService {
+	return &documentoVendaPagamentoService{
 		db:      db,
-		dvpRepo: repository.NewDocumentoVendaPagamentoRepository(db),
+		dvpRepo: dvpRepo,
 	}
 }
 
-func (s *DocumentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamentoRequest) error {
+func (s *documentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamentoRequest) error { // Renamed from NewdocumentoVendaPagamentoService
 	pagamento := &models.DocumentoVendaPagamento{}
 	if err := utils.MapToModel(req, pagamento); err != nil {
 		return apperrors.NewInternalError("Erro ao mapear dados do pagamento.", err)
@@ -32,7 +41,7 @@ func (s *DocumentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamento
 	return s.dvpRepo.Create(pagamento)
 }
 
-func (s *DocumentoVendaPagamentoService) Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error {
+func (s *documentoVendaPagamentoService) Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error {
 	pagamento, err := s.dvpRepo.FindByID(ddvId, dvpItem)
 	if err != nil {
 		return apperrors.NewNotFoundError(fmt.Sprintf("Pagamento %d do documento %d não encontrado.", dvpItem, ddvId))
@@ -45,14 +54,14 @@ func (s *DocumentoVendaPagamentoService) Update(ddvId, dvpItem int, req *dto.Doc
 	return s.dvpRepo.Update(ddvId, dvpItem, pagamento)
 }
 
-func (s *DocumentoVendaPagamentoService) Delete(ddvId, dvpItem int) error {
+func (s *documentoVendaPagamentoService) Delete(ddvId, dvpItem int) error {
 	return s.dvpRepo.Delete(ddvId, dvpItem)
 }
 
-func (s *DocumentoVendaPagamentoService) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
+func (s *documentoVendaPagamentoService) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
 	return s.dvpRepo.ListByDocumentoVendaID(limit, offset, ddvId)
 }
 
-func (s *DocumentoVendaPagamentoService) FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error) {
+func (s *documentoVendaPagamentoService) FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error) {
 	return s.dvpRepo.FindByID(ddvId, dvpItem)
 }

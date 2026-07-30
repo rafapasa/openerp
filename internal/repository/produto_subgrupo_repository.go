@@ -1,70 +1,121 @@
+// internal/repository/produto_subgrupo_repository.go
 package repository
 
 import (
 	"errors"
 	"fmt"
 
+	"gorm.io/gorm"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
 // ============================================================
-// TYPES
+// INTERFACE
 // ============================================================
 
-// ProdutoSubgrupoRepository é o repositório para ProdutoSubgrupo.
-type ProdutoSubgrupoRepository struct {
+// ProdutoSubgrupoRepository define o contrato para operações de banco
+type ProdutoSubgrupoRepository interface {
+	// CRUD Básico
+	Create(subgrupo *models.ProdutoSubgrupo) error
+	Update(id int, subgrupo *models.ProdutoSubgrupo) error
+	Delete(id int) error
+	FindByID(id int) (*models.ProdutoSubgrupo, error)
+	GetByID(id int) (*models.ProdutoSubgrupo, error)
+
+	// Buscas Específicas
+	FindByDescricao(descricao string, limit int) ([]models.ProdutoSubgrupo, error)
+	FindBySituacao(situacao int) ([]models.ProdutoSubgrupo, error)
+	FindActive() ([]models.ProdutoSubgrupo, error)
+
+	// Listagem com Filtros
+	List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error)
+	ListWithProdutos(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error)
+	FindAll() ([]models.ProdutoSubgrupo, error)
+
+	// Consultas de Validação (APENAS CONSULTAS)
+	ExistsByDescricao(descricao string, excludeID int) (bool, error)
+	ExistsByID(id int) (bool, error)
+	Count() (int64, error)
+	CountProdutosBySubgrupo(subgrupoID int) (int64, error)
+
+	// Operações em Lote
+	BulkUpdateStatus(ids []int, situacao int) error
+	BulkDelete(ids []int) error
+
+	// Consultas de Dependências
+	HasDependentRecords(id int) (bool, error)
+	CountDependentRecords(id int) (map[string]int64, error)
+}
+
+// ============================================================
+// IMPLEMENTAÇÃO CONCRETA (privada)
+// ============================================================
+
+type produtoSubgrupoRepository struct {
 	db *gorm.DB
 }
 
-// ============================================================
-// CONSTRUCTOR
-// ============================================================
-
-// NewProdutoSubgrupoRepository cria uma nova instância.
-func NewProdutoSubgrupoRepository(db *gorm.DB) *ProdutoSubgrupoRepository {
-	return &ProdutoSubgrupoRepository{db: db}
+// NewProdutoSubgrupoRepository cria uma nova instância (retorna a interface)
+func NewProdutoSubgrupoRepository(db *gorm.DB) ProdutoSubgrupoRepository {
+	return &produtoSubgrupoRepository{db: db}
 }
 
 // ============================================================
-// MÉTODOS CRUD
+// MÉTODOS CRUD (APENAS PERSISTÊNCIA)
 // ============================================================
 
-// Create salva um novo subgrupo de produto.
-func (r *ProdutoSubgrupoRepository) Create(subgrupo *models.ProdutoSubgrupo) error {
+// Create salva um novo subgrupo de produto
+func (r *produtoSubgrupoRepository) Create(subgrupo *models.ProdutoSubgrupo) error {
 	return r.db.Create(subgrupo).Error
 }
 
-// Update atualiza um subgrupo de produto existente.
-func (r *ProdutoSubgrupoRepository) Update(id int, subgrupo *models.ProdutoSubgrupo) error {
-	return r.db.Model(&models.ProdutoSubgrupo{}).Where("prosg_id = ?", id).Updates(subgrupo).Error
+// Update atualiza um subgrupo de produto existente
+func (r *produtoSubgrupoRepository) Update(id int, subgrupo *models.ProdutoSubgrupo) error {
+	return r.db.
+		Omit("Produtos", "created_at", "deleted_at").
+		Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_id = ?", id).
+		Updates(subgrupo).Error
 }
 
-// Delete realiza a exclusão lógica.
-func (r *ProdutoSubgrupoRepository) Delete(id int) error {
-	subgrupo, err := r.FindByID(id)
-	if err != nil {
-		return err
-	}
-	if subgrupo.IsDeleted() {
-		return fmt.Errorf("subgrupo de produto '%s' já está deletado", subgrupo.Descricao)
-	}
-	subgrupo.SoftDelete()
-	return r.Update(id, subgrupo)
+// Delete realiza exclusão lógica
+func (r *produtoSubgrupoRepository) Delete(id int) error {
+	return r.db.
+		Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_id = ?", id).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
 }
 
-// ============================================================
-// MÉTODOS DE BUSCA
-// ============================================================
-
-// FindByID busca um subgrupo de produto pelo ID.
-func (r *ProdutoSubgrupoRepository) FindByID(id int) (*models.ProdutoSubgrupo, error) {
+// FindByID busca um subgrupo de produto pelo ID com relacionamentos
+func (r *produtoSubgrupoRepository) FindByID(id int) (*models.ProdutoSubgrupo, error) {
 	var subgrupo models.ProdutoSubgrupo
-	err := r.db.Where("prosg_id = ? AND deleted_at IS NULL", id).First(&subgrupo).Error
+	err := r.db.
+		Preload("Produtos", "deleted_at IS NULL").
+		Where("prosg_id = ? AND deleted_at IS NULL", id).
+		First(&subgrupo).Error
+
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("subgrupo de produto não encontrado")
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("subgrupo de produto com ID %d não encontrado", id))
+		}
+		return nil, err
+	}
+	return &subgrupo, nil
+}
+
+// GetByID busca um subgrupo de produto pelo ID (sem relacionamentos)
+func (r *produtoSubgrupoRepository) GetByID(id int) (*models.ProdutoSubgrupo, error) {
+	var subgrupo models.ProdutoSubgrupo
+	err := r.db.
+		Where("prosg_id = ? AND deleted_at IS NULL", id).
+		First(&subgrupo).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("subgrupo de produto com ID %d não encontrado", id))
 		}
 		return nil, err
 	}
@@ -72,11 +123,58 @@ func (r *ProdutoSubgrupoRepository) FindByID(id int) (*models.ProdutoSubgrupo, e
 }
 
 // ============================================================
+// MÉTODOS DE BUSCA ESPECÍFICOS
+// ============================================================
+
+// FindByDescricao busca subgrupos de produto pela descrição (autocomplete)
+func (r *produtoSubgrupoRepository) FindByDescricao(descricao string, limit int) ([]models.ProdutoSubgrupo, error) {
+	var subgrupos []models.ProdutoSubgrupo
+	err := r.db.
+		Where("prosg_descricao LIKE ? AND deleted_at IS NULL", "%"+descricao+"%").
+		Order("prosg_descricao ASC").
+		Limit(limit).
+		Find(&subgrupos).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return subgrupos, nil
+}
+
+// FindBySituacao busca subgrupos de produto por situação
+func (r *produtoSubgrupoRepository) FindBySituacao(situacao int) ([]models.ProdutoSubgrupo, error) {
+	var subgrupos []models.ProdutoSubgrupo
+	err := r.db.
+		Where("prosg_situacao = ? AND deleted_at IS NULL", situacao).
+		Order("prosg_descricao ASC").
+		Find(&subgrupos).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return subgrupos, nil
+}
+
+// FindActive busca todos os subgrupos de produto ativos
+func (r *produtoSubgrupoRepository) FindActive() ([]models.ProdutoSubgrupo, error) {
+	var subgrupos []models.ProdutoSubgrupo
+	err := r.db.
+		Where("prosg_situacao = 1 AND deleted_at IS NULL").
+		Order("prosg_descricao ASC").
+		Find(&subgrupos).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return subgrupos, nil
+}
+
+// ============================================================
 // MÉTODOS DE LISTAGEM
 // ============================================================
 
-// List retorna uma lista de subgrupos com paginação e filtros.
-func (r *ProdutoSubgrupoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
+// List retorna uma lista de subgrupos de produto com paginação e filtros
+func (r *produtoSubgrupoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
 	var subgrupos []models.ProdutoSubgrupo
 	var total int64
 
@@ -87,7 +185,12 @@ func (r *ProdutoSubgrupoRepository) List(limit, offset int, filters map[string]i
 		return nil, 0, err
 	}
 
-	err := query.Limit(limit).Offset(offset).Order("prosg_id DESC").Find(&subgrupos).Error
+	err := query.
+		Limit(limit).
+		Offset(offset).
+		Order("prosg_descricao ASC").
+		Find(&subgrupos).Error
+
 	if err != nil {
 		return nil, 0, err
 	}
@@ -95,19 +198,164 @@ func (r *ProdutoSubgrupoRepository) List(limit, offset int, filters map[string]i
 	return subgrupos, total, nil
 }
 
+// ListWithProdutos retorna subgrupos de produto com contagem de produtos
+func (r *produtoSubgrupoRepository) ListWithProdutos(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
+	var subgrupos []models.ProdutoSubgrupo
+	var total int64
+
+	query := r.db.Model(&models.ProdutoSubgrupo{}).Where("deleted_at IS NULL")
+	query = utils.ApplyFilters(query, models.ProdutoSubgrupo{}, filters)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Select(`
+			prosg.*,
+			(
+				SELECT COUNT(*) 
+				FROM produto 
+				WHERE prosg_id = produto.prosg_id 
+				AND deleted_at IS NULL
+			) as total_produtos
+		`).
+		Limit(limit).
+		Offset(offset).
+		Order("prosg_descricao ASC").
+		Find(&subgrupos).Error
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return subgrupos, total, nil
+}
+
+// FindAll busca todos os subgrupos de produto
+func (r *produtoSubgrupoRepository) FindAll() ([]models.ProdutoSubgrupo, error) {
+	var subgrupos []models.ProdutoSubgrupo
+	err := r.db.
+		Where("deleted_at IS NULL").
+		Order("prosg_descricao ASC").
+		Find(&subgrupos).Error
+	if err != nil {
+		return nil, err
+	}
+	return subgrupos, nil
+}
+
 // ============================================================
-// MÉTODO ADICIONAL: Verificar duplicidade
+// MÉTODOS DE CONSULTA PARA VALIDAÇÕES (APENAS CONSULTAS)
 // ============================================================
 
-// ExistsByDescricao verifica se já existe um subgrupo com a mesma descrição.
-func (r *ProdutoSubgrupoRepository) ExistsByDescricao(descricao string, excludeID int) (bool, error) {
+// ExistsByDescricao verifica se já existe um subgrupo com a descrição
+func (r *produtoSubgrupoRepository) ExistsByDescricao(descricao string, excludeID int) (bool, error) {
+	if descricao == "" {
+		return false, nil
+	}
+
 	var count int64
-	query := r.db.Model(&models.ProdutoSubgrupo{}).Where("prosg_descricao = ? AND deleted_at IS NULL", descricao)
+	query := r.db.Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_descricao = ? AND deleted_at IS NULL", descricao)
+
 	if excludeID > 0 {
 		query = query.Where("prosg_id != ?", excludeID)
 	}
+
 	if err := query.Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// ExistsByID verifica se um subgrupo de produto existe pelo ID
+func (r *produtoSubgrupoRepository) ExistsByID(id int) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_id = ? AND deleted_at IS NULL", id).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// Count retorna o total de subgrupos de produto
+func (r *produtoSubgrupoRepository) Count() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.ProdutoSubgrupo{}).
+		Where("deleted_at IS NULL").
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// CountProdutosBySubgrupo retorna a quantidade de produtos de um subgrupo
+func (r *produtoSubgrupoRepository) CountProdutosBySubgrupo(subgrupoID int) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Produto{}).
+		Where("prosg_id = ? AND deleted_at IS NULL", subgrupoID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// ============================================================
+// OPERAÇÕES EM LOTE
+// ============================================================
+
+// BulkUpdateStatus atualiza a situação de múltiplos subgrupos
+func (r *produtoSubgrupoRepository) BulkUpdateStatus(ids []int, situacao int) error {
+	return r.db.Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_id IN ? AND deleted_at IS NULL", ids).
+		Update("prosg_situacao", situacao).Error
+}
+
+// BulkDelete realiza exclusão lógica de múltiplos subgrupos
+func (r *produtoSubgrupoRepository) BulkDelete(ids []int) error {
+	return r.db.Model(&models.ProdutoSubgrupo{}).
+		Where("prosg_id IN ? AND deleted_at IS NULL", ids).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
+}
+
+// ============================================================
+// MÉTODOS DE CONSULTA DE DEPENDÊNCIAS
+// ============================================================
+
+// HasDependentRecords verifica se o subgrupo tem registros dependentes
+func (r *produtoSubgrupoRepository) HasDependentRecords(id int) (bool, error) {
+	counts, err := r.CountDependentRecords(id)
+	if err != nil {
+		return false, err
+	}
+
+	for _, count := range counts {
+		if count > 0 {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// CountDependentRecords retorna a contagem de registros dependentes por tipo
+func (r *produtoSubgrupoRepository) CountDependentRecords(id int) (map[string]int64, error) {
+	result := make(map[string]int64)
+
+	// Verifica produtos associados
+	var countProdutos int64
+	if err := r.db.Model(&models.Produto{}).
+		Where("prosg_id = ? AND deleted_at IS NULL", id).
+		Count(&countProdutos).Error; err != nil {
+		return nil, err
+	}
+	if countProdutos > 0 {
+		result["produtos"] = countProdutos
+	}
+
+	return result, nil
 }

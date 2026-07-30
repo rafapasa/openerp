@@ -1,3 +1,4 @@
+// internal/repository/entidade_documento_repository.go
 package repository
 
 import (
@@ -9,69 +10,66 @@ import (
 )
 
 // ============================================================
-// TYPES
+// INTERFACE
 // ============================================================
 
-// EntidadeDocumentoRepository é o repositório para documentos de entidade
-type EntidadeDocumentoRepository struct {
+// EntidadeDocumentoRepository define o contrato para operações de banco
+type EntidadeDocumentoRepository interface {
+	// CRUD Básico
+	Create(documento *models.EntidadeDocumento) error
+	Update(documento *models.EntidadeDocumento) error
+	Delete(entidadeID, item int) error
+	FindByID(entidadeID, item int) (*models.EntidadeDocumento, error)
+
+	// Buscas Específicas
+	FindByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error)
+	FindByEntidadeIDAndTipo(entidadeID int, tipo string) ([]models.EntidadeDocumento, error)
+
+	// Listagem com Filtros
+	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error)
+
+	// Consultas de Validação (APENAS CONSULTAS)
+	GetNextItemNumber(entidadeID int) (int, error)
+	CountByEntidadeID(entidadeID int) (int64, error)
+	ExistsByEntidadeIDAndTipo(entidadeID int, tipo string, excludeItem int) (bool, error)
+}
+
+// ============================================================
+// IMPLEMENTAÇÃO CONCRETA (privada)
+// ============================================================
+
+// entidadeDocumentoRepository é a implementação concreta
+type entidadeDocumentoRepository struct {
 	db *gorm.DB
 }
 
-// ============================================================
-// CONSTRUCTOR
-// ============================================================
-
-// NewEntidadeDocumentoRepository cria uma nova instância
-func NewEntidadeDocumentoRepository(db *gorm.DB) *EntidadeDocumentoRepository {
-	return &EntidadeDocumentoRepository{db: db}
+// NewEntidadeDocumentoRepository cria uma nova instância (retorna a interface)
+func NewEntidadeDocumentoRepository(db *gorm.DB) EntidadeDocumentoRepository {
+	return &entidadeDocumentoRepository{db: db}
 }
 
 // ============================================================
-// MÉTODOS CRUD
+// MÉTODOS CRUD (APENAS PERSISTÊNCIA)
 // ============================================================
 
 // Create salva um novo documento com sequencial manual
-func (r *EntidadeDocumentoRepository) Create(documento *models.EntidadeDocumento) error {
-	// 1. Buscar o próximo número para esta entidade
-	var maxItem int
-	err := r.db.Model(&models.EntidadeDocumento{}).
-		Where("ent_id = ?", documento.EntidadeID).
-		Select("COALESCE(MAX(edoc_item), 0) + 1").
-		Scan(&maxItem).Error
-	if err != nil {
-		return err
-	}
-
-	// 2. Atribuir o próximo número
-	documento.Item = maxItem
-
-	// 3. Salvar
+func (r *entidadeDocumentoRepository) Create(documento *models.EntidadeDocumento) error {
 	return r.db.Create(documento).Error
 }
 
 // Update atualiza um documento existente
-func (r *EntidadeDocumentoRepository) Update(documento *models.EntidadeDocumento) error {
-	return r.db.Save(documento).Error
+func (r *entidadeDocumentoRepository) Update(documento *models.EntidadeDocumento) error {
+	return r.db.
+		Omit("created_at", "deleted_at").
+		Save(documento).Error
 }
 
 // Delete realiza exclusão lógica de um documento
-func (r *EntidadeDocumentoRepository) Delete(entidadeID, item int) error {
-	// 1. Buscar o documento
-	documento, err := r.FindByID(entidadeID, item)
-	if err != nil {
-		return err
-	}
-
-	// 2. Verificar se já foi deletado
-	if documento.IsDeleted() {
-		return errors.New("documento já foi deletado")
-	}
-
-	// 3. Realizar soft delete
-	documento.SoftDelete()
-
-	// 4. Salvar
-	return r.db.Save(documento).Error
+func (r *entidadeDocumentoRepository) Delete(entidadeID, item int) error {
+	return r.db.
+		Model(&models.EntidadeDocumento{}).
+		Where("ent_id = ? AND edoc_item = ?", entidadeID, item).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
 }
 
 // ============================================================
@@ -79,7 +77,7 @@ func (r *EntidadeDocumentoRepository) Delete(entidadeID, item int) error {
 // ============================================================
 
 // FindByID busca um documento pelo ID composto (ent_id + edoc_item)
-func (r *EntidadeDocumentoRepository) FindByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
+func (r *entidadeDocumentoRepository) FindByID(entidadeID, item int) (*models.EntidadeDocumento, error) {
 	var documento models.EntidadeDocumento
 	err := r.db.
 		Where("ent_id = ? AND edoc_item = ? AND deleted_at IS NULL", entidadeID, item).
@@ -95,10 +93,24 @@ func (r *EntidadeDocumentoRepository) FindByID(entidadeID, item int) (*models.En
 }
 
 // FindByEntidadeID busca todos os documentos de uma entidade
-func (r *EntidadeDocumentoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error) {
+func (r *entidadeDocumentoRepository) FindByEntidadeID(entidadeID int) ([]models.EntidadeDocumento, error) {
 	var documentos []models.EntidadeDocumento
 	err := r.db.
 		Where("ent_id = ? AND deleted_at IS NULL", entidadeID).
+		Order("edoc_item ASC").
+		Find(&documentos).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return documentos, nil
+}
+
+// FindByEntidadeIDAndTipo busca documentos de uma entidade por tipo
+func (r *entidadeDocumentoRepository) FindByEntidadeIDAndTipo(entidadeID int, tipo string) ([]models.EntidadeDocumento, error) {
+	var documentos []models.EntidadeDocumento
+	err := r.db.
+		Where("ent_id = ? AND edoc_tipo = ? AND deleted_at IS NULL", entidadeID, tipo).
 		Order("edoc_item ASC").
 		Find(&documentos).Error
 
@@ -113,22 +125,17 @@ func (r *EntidadeDocumentoRepository) FindByEntidadeID(entidadeID int) ([]models
 // ============================================================
 
 // List retorna uma lista de documentos com paginação e filtros
-func (r *EntidadeDocumentoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error) {
+func (r *entidadeDocumentoRepository) List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeDocumento, int64, error) {
 	var documentos []models.EntidadeDocumento
 	var total int64
 
-	// Construir query base
 	query := r.db.Model(&models.EntidadeDocumento{}).Where("deleted_at IS NULL")
-
-	// Aplicar filtros
 	query = r.applyFilters(query, filters)
 
-	// Contar total
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// Buscar com paginação
 	err := query.
 		Limit(limit).
 		Offset(offset).
@@ -143,11 +150,56 @@ func (r *EntidadeDocumentoRepository) List(limit, offset int, filters map[string
 }
 
 // ============================================================
-// MÉTODOS AUXILIARES
+// MÉTODOS DE CONSULTA PARA VALIDAÇÕES (APENAS CONSULTAS)
+// ============================================================
+
+// GetNextItemNumber retorna o próximo número de item para uma entidade
+func (r *entidadeDocumentoRepository) GetNextItemNumber(entidadeID int) (int, error) {
+	var maxItem int
+	err := r.db.Model(&models.EntidadeDocumento{}).
+		Where("ent_id = ?", entidadeID).
+		Select("COALESCE(MAX(edoc_item), 0) + 1").
+		Scan(&maxItem).Error
+	if err != nil {
+		return 0, err
+	}
+	return maxItem, nil
+}
+
+// CountByEntidadeID retorna a quantidade de documentos de uma entidade
+func (r *entidadeDocumentoRepository) CountByEntidadeID(entidadeID int) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.EntidadeDocumento{}).
+		Where("ent_id = ? AND deleted_at IS NULL", entidadeID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// ExistsByEntidadeIDAndTipo verifica se a entidade já possui um documento do tipo especificado
+func (r *entidadeDocumentoRepository) ExistsByEntidadeIDAndTipo(entidadeID int, tipo string, excludeItem int) (bool, error) {
+	var count int64
+	query := r.db.Model(&models.EntidadeDocumento{}).
+		Where("ent_id = ? AND edoc_tipo = ? AND deleted_at IS NULL", entidadeID, tipo)
+
+	if excludeItem > 0 {
+		query = query.Where("edoc_item != ?", excludeItem)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// ============================================================
+// MÉTODOS AUXILIARES (FILTROS)
 // ============================================================
 
 // applyFilters aplica os filtros à query
-func (r *EntidadeDocumentoRepository) applyFilters(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
+func (r *entidadeDocumentoRepository) applyFilters(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
 	for key, value := range filters {
 		if value == nil || value == "" {
 			continue

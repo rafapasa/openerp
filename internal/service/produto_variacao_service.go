@@ -8,31 +8,37 @@ import (
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
-	"gorm.io/gorm"
 )
 
+// ProdutoVariacaoService define os métodos públicos para o serviço de variações de produto.
+type ProdutoVariacaoService interface {
+	Create(req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
+	GetByID(id int) (*dto.ProdutoVariacaoResponse, error)
+	Update(id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoVariacaoResponse, int64, error)
+}
+
 // ProdutoVariacaoService gerencia a lógica de negócios para variações de produto.
-type ProdutoVariacaoService struct {
-	db          *gorm.DB
-	repo        *repository.ProdutoVariacaoRepository
-	produtoRepo *repository.ProdutoRepository
-	corRepo     *repository.ProdutoCorRepository
-	tamanhoRepo *repository.ProdutoTamanhoRepository
+type produtoVariacaoService struct {
+	provRepo    repository.ProdutoVariacaoRepository
+	proService  ProdutoService
+	corService  ProdutoCorService     // Renamed from procService
+	tamanhoService ProdutoTamanhoService // Renamed from protService
 }
 
 // NewProdutoVariacaoService cria uma nova instância de ProdutoVariacaoService.
 func NewProdutoVariacaoService(
-	db *gorm.DB,
-	produtoRepo *repository.ProdutoRepository,
-	corRepo *repository.ProdutoCorRepository,
-	tamanhoRepo *repository.ProdutoTamanhoRepository,
-) *ProdutoVariacaoService {
-	return &ProdutoVariacaoService{
-		db:          db,
-		repo:        repository.NewProdutoVariacaoRepository(db),
-		produtoRepo: produtoRepo,
-		corRepo:     corRepo,
-		tamanhoRepo: tamanhoRepo,
+	proService ProdutoService,
+	procService ProdutoCorService,
+	protService ProdutoTamanhoService,
+	provRepo repository.ProdutoVariacaoRepository, // Changed parameter name to provRepo
+) ProdutoVariacaoService {
+	return &produtoVariacaoService{
+		provRepo:    provRepo,
+		proService:  proService,
+		corService:  procService, // Assigned to new field name
+		tamanhoService: protService, // Assigned to new field name
 	}
 }
 
@@ -40,7 +46,7 @@ func NewProdutoVariacaoService(
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-func (s *ProdutoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariacaoRequest, isUpdate bool) error {
+func (s *produtoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariacaoRequest, isUpdate bool) error {
 	if req.ProdutoID <= 0 {
 		return apperrors.NewValidationError("O campo 'produto_id' é obrigatório e deve ser um valor positivo.")
 	}
@@ -61,7 +67,7 @@ func (s *ProdutoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 	}
 
 	// Verificar se o Produto existe
-	produto, err := s.produtoRepo.FindByID(req.ProdutoID)
+	produto, err := s.proService.FindById(req.ProdutoID)
 	if err != nil {
 		return apperrors.NewInternalError("Erro ao verificar produto.", err)
 	}
@@ -70,8 +76,8 @@ func (s *ProdutoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 	}
 
 	// Verificar se Cor existe (se informada)
-	if req.CorID != nil && *req.CorID > 0 {
-		cor, err := s.corRepo.FindByID(*req.CorID)
+	if req.CorID != nil && *req.CorID > 0 { // Changed from s.corRepo to s.corService
+		cor, err := s.corService.FindByID(*req.CorID)
 		if err != nil {
 			return apperrors.NewInternalError(fmt.Sprintf("Erro ao verificar cor com ID %d.", *req.CorID), err)
 		}
@@ -81,8 +87,8 @@ func (s *ProdutoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 	}
 
 	// Verificar se Tamanho existe (se informada)
-	if req.TamanhoID != nil && *req.TamanhoID > 0 {
-		tamanho, err := s.tamanhoRepo.FindByID(*req.TamanhoID)
+	if req.TamanhoID != nil && *req.TamanhoID > 0 { // Changed from s.tamanhoRepo to s.tamanhoService
+		tamanho, err := s.tamanhoService.FindByID(*req.TamanhoID)
 		if err != nil {
 			return apperrors.NewInternalError(fmt.Sprintf("Erro ao verificar tamanho com ID %d.", *req.TamanhoID), err)
 		}
@@ -108,7 +114,7 @@ func (s *ProdutoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 }
 
 // mapModelToResponse mapeia um modelo ProdutoVariacao para um DTO de resposta.
-func (s *ProdutoVariacaoService) mapModelToResponse(variacao *models.ProdutoVariacao) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) mapModelToResponse(variacao *models.ProdutoVariacao) (*dto.ProdutoVariacaoResponse, error) {
 	resp := &dto.ProdutoVariacaoResponse{}
 	if err := utils.MapToModel(variacao, resp); err != nil {
 		return nil, apperrors.NewInternalError("Erro ao mapear modelo para DTO de resposta.", err)
@@ -137,7 +143,7 @@ func (s *ProdutoVariacaoService) mapModelToResponse(variacao *models.ProdutoVari
 // ============================================================
 
 // Create cria uma nova variação de produto.
-func (s *ProdutoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
 	if err := s.validateProdutoVariacao(req, false); err != nil {
 		return nil, err
 	}
@@ -160,7 +166,7 @@ func (s *ProdutoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.P
 }
 
 // GetByID busca uma variação de produto pelo ID.
-func (s *ProdutoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
@@ -177,7 +183,7 @@ func (s *ProdutoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, 
 }
 
 // Update atualiza uma variação de produto existente.
-func (s *ProdutoVariacaoService) Update(id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) Update(id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
@@ -212,7 +218,7 @@ func (s *ProdutoVariacaoService) Update(id int, req *dto.ProdutoVariacaoRequest)
 }
 
 // Delete realiza a exclusão lógica de uma variação de produto.
-func (s *ProdutoVariacaoService) Delete(id int) error {
+func (s *produtoVariacaoService) Delete(id int) error {
 	if id <= 0 {
 		return apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
@@ -232,7 +238,7 @@ func (s *ProdutoVariacaoService) Delete(id int) error {
 }
 
 // List lista variações de produto com paginação e filtros.
-func (s *ProdutoVariacaoService) List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoVariacaoResponse, int64, error) {
+func (s *produtoVariacaoService) List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoVariacaoResponse, int64, error) {
 	if limit < 0 || limit > 100 {
 		limit = 10
 	}

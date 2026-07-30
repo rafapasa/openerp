@@ -11,11 +11,20 @@ import (
 	"gorm.io/gorm"
 )
 
+// ProdutoSubgrupoService define os métodos públicos para o serviço de subgrupo de produto.
+type ProdutoSubgrupoService interface {
+	Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
+	GetByID(id int) (*models.ProdutoSubgrupo, error)
+	Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
+	Delete(id int) error
+	List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error)
+}
+
 // ============================================================
 // TYPES
 // ============================================================
 
-type ProdutoSubgrupoService struct {
+type produtoSubgrupoService struct {
 	repo *repository.ProdutoSubgrupoRepository
 }
 
@@ -23,8 +32,8 @@ type ProdutoSubgrupoService struct {
 // CONSTRUCTOR
 // ============================================================
 
-func NewProdutoSubgrupoService(db *gorm.DB) *ProdutoSubgrupoService {
-	return &ProdutoSubgrupoService{
+func NewProdutoSubgrupoService(db *gorm.DB) ProdutoSubgrupoService {
+	return &produtoSubgrupoService{
 		repo: repository.NewProdutoSubgrupoRepository(db),
 	}
 }
@@ -34,7 +43,7 @@ func NewProdutoSubgrupoService(db *gorm.DB) *ProdutoSubgrupoService {
 // ============================================================
 
 // Create cria um novo subgrupo de produto.
-func (s *ProdutoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+func (s *produtoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -61,12 +70,12 @@ func (s *ProdutoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*model
 }
 
 // GetByID busca um subgrupo de produto por ID.
-func (s *ProdutoSubgrupoService) GetByID(id int) (*models.ProdutoSubgrupo, error) {
+func (s *produtoSubgrupoService) GetByID(id int) (*models.ProdutoSubgrupo, error) {
 	return s.repo.FindByID(id)
 }
 
 // Update atualiza um subgrupo de produto.
-func (s *ProdutoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+func (s *produtoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
 	subgrupo, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -93,7 +102,7 @@ func (s *ProdutoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest)
 }
 
 // Delete exclui um subgrupo de produto.
-func (s *ProdutoSubgrupoService) Delete(id int) error {
+func (s *produtoSubgrupoService) Delete(id int) error {
 	if _, err := s.repo.FindByID(id); err != nil {
 		return err
 	}
@@ -107,7 +116,7 @@ func (s *ProdutoSubgrupoService) Delete(id int) error {
 }
 
 // List lista todos os subgrupos de produto.
-func (s *ProdutoSubgrupoService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
+func (s *produtoSubgrupoService) List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error) {
 	if limit <= 0 {
 		limit = 10
 	}
