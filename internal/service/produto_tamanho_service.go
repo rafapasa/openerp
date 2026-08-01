@@ -35,13 +35,13 @@ func NewProdutoTamanhoService(repo repository.ProdutoTamanhoRepository) ProdutoT
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-func (s *produtoTamanhoService) validateProdutoTamanho(req *dto.ProdutoTamanhoRequest, isUpdate bool) error {
+func (s *produtoTamanhoService) validateProdutoTamanho(id int, req *dto.ProdutoTamanhoRequest) error {
 	if err := req.Validate(); err != nil {
 		return err
 	}
 
 	// Validar unicidade da sigla
-	exists, err := s.repo.ExistsBySigla(req.Sigla, req.EmpresaFilialID, req.ID)
+	exists, err := s.repo.ExistsBySigla(req.Sigla, req.EmpresaFilialID, id)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (s *produtoTamanhoService) mapModelToResponse(tamanho *models.ProdutoTamanh
 
 // Create cria um novo tamanho de produto.
 func (s *produtoTamanhoService) Create(req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error) {
-	if err := s.validateProdutoTamanho(req, false); err != nil {
+	if err := s.validateProdutoTamanho(0, req); err != nil {
 		return nil, err
 	}
 
@@ -121,7 +121,7 @@ func (s *produtoTamanhoService) Update(id int, req *dto.ProdutoTamanhoRequest) (
 	}
 
 	req.ID = id // Garante que o ID da requisição corresponde ao ID da URL
-	if err := s.validateProdutoTamanho(req, true); err != nil {
+	if err := s.validateProdutoTamanho(0, req); err != nil {
 		return nil, err
 	}
 

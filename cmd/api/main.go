@@ -55,7 +55,7 @@ func main() {
 	router.Use(gin.Logger())
 
 	// 5. ✅ Rotas públicas (não autenticadas)
-	setupPublicRoutes(router, cfg, db, container.AuthHandler)
+	setupPublicRoutes(router, container.AuthHandler)
 
 	// 6. ✅ Rotas protegidas (autenticadas)
 	setupProtectedRoutes(router, container, cfg)
@@ -72,8 +72,6 @@ func main() {
 // setupPublicRoutes configura rotas públicas que não dependem de autenticação
 func setupPublicRoutes(
 	router *gin.Engine,
-	cfg *config.Config,
-	db *database.MySQL,
 	authHandler *handler.AuthHandler,
 ) {
 	// Swagger

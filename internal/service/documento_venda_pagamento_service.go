@@ -14,7 +14,7 @@ type DocumentoVendaPagamentoService interface {
 	Create(req *dto.DocumentoVendaPagamentoRequest) error
 	Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error
 	Delete(ddvId, dvpItem int) error
-	ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error)
+	ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaPagamento, int64, error)
 	FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error)
 }
 
@@ -68,8 +68,8 @@ func (s *documentoVendaPagamentoService) Delete(ddvId, dvpItem int) error {
 	return s.dvpRepo.Delete(ddvId, dvpItem)
 }
 
-func (s *documentoVendaPagamentoService) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
-	return s.dvpRepo.ListByDocumentoVendaID(limit, offset, ddvId)
+func (s *documentoVendaPagamentoService) ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
+	return s.dvpRepo.ListByDocumentoVendaID(ddvId)
 }
 
 func (s *documentoVendaPagamentoService) FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error) {

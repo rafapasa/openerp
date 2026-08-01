@@ -170,8 +170,6 @@ func (h *DocumentoVendaItemHandler) Delete(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        documento_venda_id  path      int  true  "ID do Documento de Venda"
-// @Param        limit               query     int  false  "Número de registros por página"
-// @Param        offset              query     int  false  "Offset para a paginação"
 // @Success      200                 {object}  dto.DocumentoVendaItemListResponse
 // @Failure      500                 {object}  utils.ErrorResponse "Erro interno do servidor"
 // @Router       /documentos/venda/{documento_venda_id}/itens [get]
@@ -181,13 +179,7 @@ func (h *DocumentoVendaItemHandler) List(c *gin.Context) {
 		return
 	}
 
-	limit := utils.GetQueryInt(c, "limit", 10)
-	offset := utils.GetQueryInt(c, "offset", 0)
-
-	// Filters can be added here if needed, for now, it's just by documentoVendaID
-	filters := make(map[string]interface{})
-
-	items, total, err := h.service.List(limit, offset, documentoVendaID, filters)
+	items, total, err := h.service.List(documentoVendaID)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -200,13 +192,13 @@ func (h *DocumentoVendaItemHandler) List(c *gin.Context) {
 		respItems[i] = respItem
 	}
 
-	totalPages := int((total + int64(limit) - 1) / int64(limit))
+	
 
 	utils.RespondWithOK(c, dto.DocumentoVendaItemListResponse{
 		Items:      respItems,
 		Total:      total,
-		Page:       offset/limit + 1,
-		Limit:      limit,
-		TotalPages: totalPages,
+		Page:       1,
+		Limit:      0,
+		TotalPages: 1,
 	})
 }

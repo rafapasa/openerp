@@ -23,7 +23,7 @@ type DocumentoVendaItemRepository interface {
 	GetByID(ddvId, dviItem int) (*models.DocumentoVendaItem, error)
 
 	// Listagem com Filtros
-	ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaItem, int64, error)
+	ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaItem, int64, error)
 
 	// Consultas de Validação (APENAS CONSULTAS)
 	GetNextItemNumber(ddvId int) (int, error)
@@ -111,31 +111,25 @@ func (r *documentoVendaItemRepository) GetByID(ddvId, dviItem int) (*models.Docu
 // ============================================================
 
 // ListByDocumentoVendaID lista todos os itens de um documento de venda com paginação
-func (r *documentoVendaItemRepository) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaItem, int64, error) {
+func (r *documentoVendaItemRepository) ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaItem, int64, error) {
 	var items []models.DocumentoVendaItem
 	var total int64
 
-	query := r.db.Model(&models.DocumentoVendaItem{}).
-		Where("ddv_id = ? AND deleted_at IS NULL", ddvId)
-
-	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	err := query.
+	err := r.db.Model(&models.DocumentoVendaItem{}).
+		Where("ddv_id = ? AND deleted_at IS NULL", ddvId).
 		Preload("produto").
 		Preload("operacaofiscal").
 		Preload("cst_icms").
 		Preload("cst_ipi").
 		Preload("cst_pis_cofins").
-		Limit(limit).
-		Offset(offset).
 		Order("dvi_item ASC").
 		Find(&items).Error
 
 	if err != nil {
 		return nil, 0, err
 	}
+
+	total = int64(len(items))
 
 	return items, total, nil
 }

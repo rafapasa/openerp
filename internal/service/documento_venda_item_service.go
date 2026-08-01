@@ -23,7 +23,7 @@ type DocumentoVendaItemService interface {
 	Create(req *dto.DocumentoVendaItemRequest) error
 	Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error
 	GetByID(ddvId, dviItem int) (*models.DocumentoVendaItem, error)
-	List(limit, offset, ddvId int, filters map[string]interface{}) ([]models.DocumentoVendaItem, int64, error)
+	List(ddvId int) ([]models.DocumentoVendaItem, int64, error)
 	Delete(ddvId, dviItem int) error
 }
 
@@ -31,19 +31,16 @@ type DocumentoVendaItemService interface {
 type documentoVendaItemServiceFactory struct {
 	// Dependências fixas (não mudam com a transação)
 	tbppService   TabelaPrecoProdutoService
-	prcService    ProcessoService
 	configService ConfiguracaoService
 }
 
 // NewDocumentoVendaItemServiceFactory cria a fábrica com as dependências injetadas
 func NewDocumentoVendaItemServiceFactory(
 	tbppService TabelaPrecoProdutoService,
-	prcService ProcessoService,
 	configService ConfiguracaoService,
 ) DocumentoVendaItemServiceFactory {
 	return &documentoVendaItemServiceFactory{
 		tbppService:   tbppService,
-		prcService:    prcService,
 		configService: configService,
 	}
 }
@@ -57,30 +54,22 @@ func (f *documentoVendaItemServiceFactory) CreateWithTx(tx *gorm.DB) DocumentoVe
 	return &documentoVendaItemService{
 		dviRepo:       dviRepo,
 		tbppService:   f.tbppService,
-		prcService:    f.prcService,
-		configService: f.configService,
-	}
+		configService: f.configService}
 }
 
 // documentoVendaItemService é a implementação concreta de DocumentoVendaItemServiceInterface.
 type documentoVendaItemService struct {
-	ddvService    DocumentoVendaService
 	dviRepo       repository.DocumentoVendaItemRepository
 	tbppService   TabelaPrecoProdutoService
-	prcService    ProcessoService
 	configService ConfiguracaoService
 }
 
-func NewDocumentoVendaItemService(ddvService DocumentoVendaService,
-	dviRepo repository.DocumentoVendaItemRepository,
+func NewDocumentoVendaItemService(dviRepo repository.DocumentoVendaItemRepository,
 	tbppService TabelaPrecoProdutoService,
-	prcService ProcessoService,
 	configService ConfiguracaoService) DocumentoVendaItemService {
 	return &documentoVendaItemService{
-		ddvService:    ddvService,
 		dviRepo:       dviRepo,
 		tbppService:   tbppService,
-		prcService:    prcService,
 		configService: configService}
 }
 
@@ -111,25 +100,6 @@ func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 	}
 
 	s.recalcularValoresItem(dvi)
-
-	ddv, err := s.ddvService.GetByID(req.DocumentoVendaID)
-	if err != nil {
-		return err
-	}
-
-	opInterna := true
-	opSubTrib := true
-
-	prcId := ddv.ProcessoID
-	opf, err := s.prcService.GetOperacaoFiscal(prcId, opInterna, opSubTrib)
-	if err != nil {
-		return apperrors.NewInternalError("Erro ao buscar operação fiscal.", err)
-	}
-
-	dvi.OperacaoFiscalID = opf.ID
-	dvi.CSTICMSID = *opf.CSTICMSID
-	dvi.CSTIPIID = *opf.CSTIPIID
-	dvi.CSTPISCOFINSID = *opf.CSTPISCOFINSID
 
 	return s.dviRepo.Create(dvi)
 }
@@ -171,8 +141,8 @@ func (s *documentoVendaItemService) GetByID(ddvId, dviItem int) (*models.Documen
 }
 
 // List lista itens de documento de venda com paginação e filtros.
-func (s *documentoVendaItemService) List(limit, offset, ddvId int, filters map[string]interface{}) ([]models.DocumentoVendaItem, int64, error) {
-	return s.dviRepo.ListByDocumentoVendaID(limit, offset, ddvId)
+func (s *documentoVendaItemService) List(ddvId int) ([]models.DocumentoVendaItem, int64, error) {
+	return s.dviRepo.ListByDocumentoVendaID(ddvId)
 }
 
 // recalcularValoresItem calcula os totais do item.

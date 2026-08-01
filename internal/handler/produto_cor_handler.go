@@ -155,15 +155,10 @@ func (h *ProdutoCorHandler) List(c *gin.Context) {
 		return
 	}
 
-	items := make([]dto.ProdutoCorResponse, len(cores))
-	for i, cor := range cores {
-		items[i] = cor
-	}
-
 	totalPages := utils.CalculateTotalPages(int(total), limit)
 
 	utils.RespondWithOK(c, dto.ProdutoCorListResponse{
-		Items:      items,
+		Items:      cores,
 		Total:      total,
 		Page:       offset/limit + 1,
 		Limit:      limit,

@@ -1,0 +1,16 @@
+# Na raiz do projeto
+wire gen ./internal/wire
+
+# O Wire vai gerar: internal/wire/wire_gen.go
+# Verifique se o arquivo foi criado
+ls -la internal/wire/wire_gen.go
+
+go build ./...
+
+wire check ./internal/wire
+
+# Remover ou comentar o RouteConfig antigo de internal/routes/routes.go
+# Agora usamos o container do Wire
+
+# Verificar se todos os imports estão corretos
+go mod tidy

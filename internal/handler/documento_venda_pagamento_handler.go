@@ -12,7 +12,7 @@ import (
 
 // DocumentoVendaPagamentoHandler gerencia as requisições HTTP para pagamentos de documento de venda.
 type DocumentoVendaPagamentoHandler struct {
-	documentoVendaService         service.DocumentoVendaService
+	documentoVendaService          service.DocumentoVendaService
 	documentoVendaPagamentoService service.DocumentoVendaPagamentoService
 }
 
@@ -22,7 +22,7 @@ func NewDocumentoVendaPagamentoHandler(
 	dvpService service.DocumentoVendaPagamentoService,
 ) *DocumentoVendaPagamentoHandler {
 	return &DocumentoVendaPagamentoHandler{
-		documentoVendaService:         ddvService,
+		documentoVendaService:          ddvService,
 		documentoVendaPagamentoService: dvpService,
 	}
 }
@@ -174,8 +174,6 @@ func (h *DocumentoVendaPagamentoHandler) Delete(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        documento_venda_id  path      int  true  "ID do Documento de Venda"
-// @Param        limit               query     int  false  "Número de registros por página"
-// @Param        offset              query     int  false  "Offset para a paginação"
 // @Success      200                 {object}  dto.DocumentoVendaPagamentoListResponse
 // @Failure      500                 {object}  utils.ErrorResponse "Erro interno do servidor"
 // @Router       /documentos/venda/{documento_venda_id}/pagamentos [get]
@@ -184,11 +182,7 @@ func (h *DocumentoVendaPagamentoHandler) List(c *gin.Context) {
 	if !ok {
 		return
 	}
-
-	limit := utils.GetQueryInt(c, "limit", 10)
-	offset := utils.GetQueryInt(c, "offset", 0)
-
-	payments, total, err := h.documentoVendaPagamentoService.ListByDocumentoVendaID(limit, offset, documentoVendaID)
+	payments, total, err := h.documentoVendaPagamentoService.ListByDocumentoVendaID(documentoVendaID)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -201,13 +195,11 @@ func (h *DocumentoVendaPagamentoHandler) List(c *gin.Context) {
 		respPayments[i] = respPayment //
 	}
 
-	totalPages := int((total + int64(limit) - 1) / int64(limit))
-
 	utils.RespondWithOK(c, dto.DocumentoVendaPagamentoListResponse{
 		Items:      respPayments,
 		Total:      total,
-		Page:       offset/limit + 1,
-		Limit:      limit,
-		TotalPages: totalPages,
+		Page:       1,
+		Limit:      0,
+		TotalPages: 1,
 	})
 }

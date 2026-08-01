@@ -21,9 +21,11 @@ type DocumentoVendaService interface {
 	Update(id int, req *dto.DocumentoVendaRequest) (*models.DocumentoVenda, error)
 	List(limit, offset int, filters map[string]any) ([]models.DocumentoVenda, int64, error)
 	Delete(id int) error
+	ListItem(ddvId int) ([]models.DocumentoVendaItem, error)
 	AddItem(reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error)
 	EditItem(ddvId, dviItem int, reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error)
 	DeleteItem(ddvId, dviItem int) (*models.DocumentoVenda, error)
+	ListPagamento(ddvId int) ([]models.DocumentoVendaPagamento, error)
 	AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error)
 	EditPagamento(ddvId, dvpItem int, reqPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error)
 	DeletePagamento(ddvId, dvpItem int) (*models.DocumentoVenda, error)
@@ -31,12 +33,13 @@ type DocumentoVendaService interface {
 
 // documentoVendaService é a implementação concreta de DocumentoVendaService.
 type documentoVendaService struct {
-	db                *gorm.DB
-	ddvRepo           repository.DocumentoVendaRepository
-	dviService        DocumentoVendaItemService
-	dvpService        DocumentoVendaPagamentoService
-	entService        EntidadeService
-	proService        ProdutoService
+	db         *gorm.DB
+	ddvRepo    repository.DocumentoVendaRepository
+	dviService DocumentoVendaItemService
+	dvpService DocumentoVendaPagamentoService
+	entService EntidadeService
+	// proService        ProdutoService
+	prcService        ProcessoService
 	dviServiceFactory DocumentoVendaItemServiceFactory
 }
 
@@ -45,15 +48,17 @@ func NewDocumentoVendaService(db *gorm.DB,
 	dviService DocumentoVendaItemService,
 	dvpService DocumentoVendaPagamentoService,
 	entService EntidadeService,
-	proService ProdutoService,
+	// proService ProdutoService,
+	prcService ProcessoService,
 	dviServiceFactory DocumentoVendaItemServiceFactory) DocumentoVendaService {
 	return &documentoVendaService{
-		db:                db,
-		ddvRepo:           ddvRepo,
-		dviService:        dviService,
-		dvpService:        dvpService,
-		entService:        entService,
-		proService:        proService,
+		db:         db,
+		ddvRepo:    ddvRepo,
+		dviService: dviService,
+		dvpService: dvpService,
+		entService: entService,
+		// proService:        proService,
+		prcService:        prcService,
 		dviServiceFactory: dviServiceFactory,
 	}
 }
@@ -90,20 +95,20 @@ func (s *documentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUp
 		return apperrors.NewValidationError("O documento deve ter pelo menos um item.")
 	}
 
-	for i, item := range req.Itens {
-		if err := item.Validate(); err != nil {
-			return fmt.Errorf("validação do item %d falhou: %w", i+1, err)
-		}
+	// for i, item := range req.Itens {
+	// 	if err := item.Validate(); err != nil {
+	// 		return fmt.Errorf("validação do item %d falhou: %w", i+1, err)
+	// 	}
 
-		// Valida se o produto existe e está ativo
-		produto, err := s.proService.GetByID(item.ProdutoID)
-		if err != nil {
-			return err
-		}
-		if produto == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado para o item %d.", item.ProdutoID, i+1))
-		}
-	}
+	// 	// Valida se o produto existe e está ativo
+	// 	produto, err := s.proService.GetByID(item.ProdutoID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	if produto == nil {
+	// 		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado para o item %d.", item.ProdutoID, i+1))
+	// 	}
+	// }
 
 	return nil
 }
@@ -305,7 +310,37 @@ func (s *documentoVendaService) executarOperacaoItem(docVendaID int,
 	return doc, nil
 }
 
+func (s *documentoVendaService) ListItem(ddvId int) ([]models.DocumentoVendaItem, error) {
+	if ddvId <= 0 {
+		return nil, apperrors.NewValidationError("ID do documento inválido.")
+	}
+	itens, _, err := s.dviService.List(ddvId)
+	if err != nil {
+		return nil, err
+	}
+	return itens, nil
+}
+
 func (s *documentoVendaService) AddItem(reqItem *dto.DocumentoVendaItemRequest) (*models.DocumentoVenda, error) {
+	ddv, err := s.GetByID(reqItem.DocumentoVendaID)
+	if err != nil {
+		return nil, err
+	}
+
+	opInterna := true
+	opSubTrib := true
+
+	prcId := ddv.ProcessoID
+	opf, err := s.prcService.GetOperacaoFiscal(prcId, opInterna, opSubTrib)
+	if err != nil {
+		return nil,apperrors.NewInternalError("Erro ao buscar operação fiscal.", err)
+	}
+
+	reqItem.OperacaoFiscalID = utils.IntPtr(opf.ID)
+	reqItem.CstIcmsId = utils.IntPtr(*opf.CSTICMSID)
+	reqItem.CstIpiId = utils.IntPtr(*opf.CSTIPIID)
+	reqItem.CstPisCofinsId = utils.IntPtr(*opf.CSTPISCOFINSID)
+
 	return s.executarOperacaoItem(reqItem.DocumentoVendaID, func(dviService DocumentoVendaItemService) error {
 		// A função `Create` do dviService precisa ser criada ou ajustada para receber o DTO.
 		// Assumindo que ela exista:
@@ -374,6 +409,17 @@ func (s *documentoVendaService) executarOperacaoPagamento(
 	}
 
 	return doc, nil
+}
+
+func (s *documentoVendaService) ListPagamento(ddvId int) ([]models.DocumentoVendaPagamento, error) {
+	if ddvId <= 0 {
+		return nil, apperrors.NewValidationError("ID do documento inválido.")
+	}
+	pagamentos, _, err := s.dvpService.ListByDocumentoVendaID(ddvId)
+	if err != nil {
+		return nil, err
+	}
+	return pagamentos, nil
 }
 
 func (s *documentoVendaService) AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {

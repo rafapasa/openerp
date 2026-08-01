@@ -24,7 +24,7 @@ type DocumentoVendaPagamentoRepository interface {
 	FindByID(ddvId, dvpItem int) (*models.DocumentoVendaPagamento, error)
 
 	// Listagem com Filtros
-	ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error)
+	ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaPagamento, int64, error)
 
 	// Consultas de Validação (APENAS CONSULTAS)
 	GetNextItemNumber(ddvId int) (int, error)
@@ -92,26 +92,23 @@ func (r *documentoVendaPagamentoRepository) FindByID(ddvId, dvpItem int) (*model
 // ============================================================
 
 // ListByDocumentoVendaID lista todos os pagamentos de um documento de venda com paginação
-func (r *documentoVendaPagamentoRepository) ListByDocumentoVendaID(limit, offset int, ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
+func (r *documentoVendaPagamentoRepository) ListByDocumentoVendaID(ddvId int) ([]models.DocumentoVendaPagamento, int64, error) {
 	var pagamentos []models.DocumentoVendaPagamento
 	var total int64
 
-	query := r.db.Model(&models.DocumentoVendaPagamento{}).
-		Where("ddv_id = ? AND deleted_at IS NULL", ddvId)
-
-	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	err := query.
-		Limit(limit).
-		Offset(offset).
+	err := r.db.Model(&models.DocumentoVendaPagamento{}).
+		Preload("Portador").
+		Preload("FormaPagamento").
+		Preload("DocumentoVenda").
+		Where("ddv_id = ? AND deleted_at IS NULL", ddvId).
 		Order("dvp_item ASC").
 		Find(&pagamentos).Error
 
 	if err != nil {
 		return nil, 0, err
 	}
+
+	total = int64(len(pagamentos))
 
 	return pagamentos, total, nil
 }

@@ -155,15 +155,10 @@ func (h *ProdutoTamanhoHandler) List(c *gin.Context) {
 		return
 	}
 
-	items := make([]dto.ProdutoTamanhoResponse, len(tamanhos))
-	for i, tamanho := range tamanhos {
-		items[i] = tamanho
-	}
-
 	totalPages := utils.CalculateTotalPages(int(total), limit)
 
 	utils.RespondWithOK(c, dto.ProdutoTamanhoListResponse{
-		Items:      items,
+		Items:      tamanhos,
 		Total:      total,
 		Page:       offset/limit + 1,
 		Limit:      limit,

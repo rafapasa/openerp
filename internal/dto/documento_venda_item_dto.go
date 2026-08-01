@@ -27,6 +27,10 @@ type DocumentoVendaItemRequest struct {
 	DescricaoProduto   *string  `json:"descricao_produto,omitempty"`
 	PesoBruto          *float64 `json:"peso_bruto,omitempty"`
 	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
+	OperacaoFiscalID   *int     `json:"operacao_fiscal_id,omitempty"`
+	CstIcmsId          *int     `json:"cst_icms_id,omitempty"`
+	CstIpiId           *int     `json:"cst_ipi_id,omitempty"`
+	CstPisCofinsId     *int     `json:"cst_pis_cofins_id,omitempty"`
 	CreatedBy          *int     `json:"created_by,omitempty"`
 	UpdatedBy          *int     `json:"updated_by,omitempty"`
 }
