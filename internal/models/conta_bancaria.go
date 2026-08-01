@@ -74,6 +74,11 @@ func (m *ContaBancaria) SoftDelete() {
 	m.DeletedAt = &now
 }
 
+// IsActive verifica se a conta bancária está ativa (não deletada)
+func (m *ContaBancaria) IsActive() bool {
+	return m.DeletedAt == nil
+}
+
 func (m *ContaBancaria) HasAgencia() bool {
 	return m.Agencia != nil && *m.Agencia != ""
 }

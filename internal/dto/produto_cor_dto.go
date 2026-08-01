@@ -1,57 +1,87 @@
 package dto
 
 import (
-	"strings"
-	"time"
+	"fmt"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 )
 
-// ProdutoCorRequest representa a estrutura de dados para criar ou atualizar uma cor de produto.
+// ============================================================
+// REQUESTS
+// ============================================================
+
+// ProdutoCorRequest representa a requisição para criar/atualizar uma cor de produto.
 type ProdutoCorRequest struct {
 	ID              int    `json:"id"`
-	EmpresaFilialID int    `json:"empresa_filial_id" validate:"required,gt=0"`
-	Sigla           string `json:"sigla" validate:"required,min=1,max=20"`
-	Nome            string `json:"nome" validate:"required,min=3,max=255"`
+	EmpresaFilialID int    `json:"empresa_filial_id" binding:"required"`
+	Descricao       string `json:"descricao" binding:"required,max=255"`
+	Sigla           string `json:"sigla,omitempty" binding:"max=10"`
 	CreatedBy       *int   `json:"created_by,omitempty"`
 	UpdatedBy       *int   `json:"updated_by,omitempty"`
 }
 
-// Validate valida os campos da requisição.
-func (r *ProdutoCorRequest) Validate() error {
-	if err := utils.ValidateMandatoryFields(r); err != nil {
-		return err
-	}
-	r.Sigla = strings.TrimSpace(r.Sigla)
-	r.Nome = strings.TrimSpace(r.Nome)
-	return nil
-}
+// ============================================================
+// RESPONSES
+// ============================================================
 
-// ToModel converte um ProdutoCorRequest para um modelo ProdutoCor.
-func (r *ProdutoCorRequest) ToModel() (*models.ProdutoCor, error) {
-	if err := r.Validate(); err != nil {
-		return nil, err
-	}
-	return &models.ProdutoCor{
-		ID:              r.ID,
-		EmpresaFilialID: r.EmpresaFilialID,
-		Sigla:           r.Sigla,
-		Nome:            r.Nome,
-		CreatedBy:       r.CreatedBy,
-		UpdatedBy:       r.UpdatedBy,
-	}, nil
-}
-
-// ProdutoCorResponse representa a estrutura de dados de resposta para uma cor de produto.
+// ProdutoCorResponse representa a resposta de uma cor de produto.
 type ProdutoCorResponse struct {
-	ID                int        `json:"id"`
-	EmpresaFilialID   int        `json:"empresa_filial_id"`
-	EmpresaFilialNome string     `json:"empresa_filial_nome,omitempty"`
-	Sigla             string     `json:"sigla"`
-	Nome              string     `json:"nome"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
-	CreatedBy         *int       `json:"created_by,omitempty"`
-	UpdatedBy         *int       `json:"updated_by,omitempty"`
+	ID                int    `json:"id"`
+	EmpresaFilialID   int    `json:"empresa_filial_id"`
+	EmpresaFilialNome string `json:"empresa_filial_nome,omitempty"`
+	Descricao         string `json:"descricao"`
+	Sigla             string `json:"sigla,omitempty"`
+	CreatedAt         string `json:"created_at"`
+	UpdatedAt         string `json:"updated_at"`
+	CreatedBy         *int   `json:"created_by,omitempty"`
+	UpdatedBy         *int   `json:"updated_by,omitempty"`
+}
+
+// ProdutoCorListResponse representa a resposta de listagem de cores de produto.
+type ProdutoCorListResponse struct {
+	Items      []ProdutoCorResponse `json:"items"`
+	Total      int64                `json:"total"`
+	Page       int                  `json:"page"`
+	Limit      int                  `json:"limit"`
+	TotalPages int                  `json:"total_pages"`
+}
+
+// ============================================================
+// MÉTODOS DE CONVERSÃO
+// ============================================================
+
+// ToModel converte ProdutoCorRequest para models.ProdutoCor.
+func (r *ProdutoCorRequest) ToModel() (*models.ProdutoCor, error) {
+	if r == nil {
+		return nil, nil
+	}
+	cor := &models.ProdutoCor{}
+	if err := utils.MapToModel(r, cor); err != nil {
+		return nil, fmt.Errorf("erro ao mapear DTO para modelo de cor de produto: %w", err)
+	}
+
+	return cor, nil
+}
+
+// FromModel converte models.ProdutoCor para ProdutoCorResponse.
+func (r *ProdutoCorResponse) FromModel(cor *models.ProdutoCor) {
+	if cor == nil {
+		return
+	}
+	_ = utils.MapToDTO(cor, r) // Ignora erro por enquanto, assume que o mapeamento direto é suficiente
+
+	r.CreatedAt = utils.FormatDateTime(cor.CreatedAt)
+	r.UpdatedAt = utils.FormatDateTime(cor.UpdatedAt)
+}
+
+// ============================================================
+// MÉTODOS DE VALIDAÇÃO
+// ============================================================
+
+// Validate valida o ProdutoCorRequest.
+func (r *ProdutoCorRequest) Validate() error {
+	validate := validator.New()
+	return validate.Struct(r)
 }

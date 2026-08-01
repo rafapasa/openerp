@@ -36,7 +36,7 @@ func NewEntidadeRegimeTributarioHandler(service service.EntidadeRegimeTributario
 // ============================================================
 
 func (h *EntidadeRegimeTributarioHandler) getEntidadeID(c *gin.Context) (int, bool) {
-	entidadeID, err := strconv.Atoi(c.Param("id"))
+	entidadeID, err := strconv.Atoi(c.Param("entidade_id"))
 	if err != nil {
 		utils.RespondWithValidationError(c, "ID da entidade inválido")
 		return 0, false

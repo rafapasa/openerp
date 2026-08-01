@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/openerp/backend/internal/dto"
+	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/middleware"
 	"github.com/openerp/backend/internal/service"
 	"github.com/openerp/backend/internal/utils"
@@ -39,13 +40,38 @@ func (h *ProdutoHandler) Create(c *gin.Context) {
 	req.CreatedBy = &userID
 	req.UpdatedBy = &userID
 	produto, err := h.service.Create(&req)
-	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+	if err != nil { //
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 	var resp dto.ProdutoResponse
 	resp.FromModel(produto)
 	utils.RespondWithCreated(c, resp)
+}
+
+// @Summary      Busca um produto por ID
+// @Description  Retorna os detalhes de um produto específico.
+// @Tags         Produtos
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "ID do Produto"
+// @Success      200  {object}  dto.ProdutoResponse
+// @Failure      404  {object}  utils.ErrorResponse "Produto não encontrado"
+// @Router       /produtos/{id} [get]
+func (h *ProdutoHandler) GetByCodigoBarras(c *gin.Context) {
+	codBarras := utils.GetQueryString(c, "codigo_barras", "")
+	if codBarras == "" {
+		utils.RespondWithErrorAny(c, apperrors.NewBadRequestError("Parametro 'codigo_barras' é obrigatório."))
+		return
+	}
+	produto, err := h.service.GetByCodigoBarras(codBarras)
+	if err != nil {
+		utils.RespondWithNotFoundError(c, err.Error())
+		return
+	}
+	var resp dto.ProdutoResponse
+	resp.FromModel(produto)
+	utils.RespondWithOK(c, resp)
 }
 
 // @Summary      Busca um produto por ID
@@ -96,7 +122,7 @@ func (h *ProdutoHandler) Update(c *gin.Context) {
 	req.UpdatedBy = &userID
 	produto, err := h.service.Update(id, &req)
 	if err != nil {
-		utils.RespondWithNotFoundError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 	var resp dto.ProdutoResponse
@@ -120,7 +146,7 @@ func (h *ProdutoHandler) Delete(c *gin.Context) {
 	}
 	err := h.service.Delete(id)
 	if err != nil {
-		utils.RespondWithNotFoundError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 	utils.RespondWithNoContent(c)

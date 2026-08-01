@@ -84,6 +84,11 @@ func (g *GradeProdutoItem) SoftDelete() {
 	g.DeletedAt = &now
 }
 
+// IsActive verifica se o item da grade está ativo (não deletado)
+func (g *GradeProdutoItem) IsActive() bool {
+	return g.DeletedAt == nil
+}
+
 // GetNomeCompleto retorna o nome completo da combinação (Cor + Tamanho)
 func (g *GradeProdutoItem) GetNomeCompleto() string {
 	corNome := ""

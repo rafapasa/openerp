@@ -72,3 +72,8 @@ func (m *EntidadeDocumento) SoftDelete() {
 	now := time.Now()
 	m.DeletedAt = &now
 }
+
+// IsActive verifica se o documento está ativo (não deletado)
+func (m *EntidadeDocumento) IsActive() bool {
+	return m.DeletedAt == nil
+}

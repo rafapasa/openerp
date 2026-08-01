@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/middleware"
@@ -8,13 +10,15 @@ import (
 	"github.com/openerp/backend/internal/utils"
 )
 
+// ProdutoModeloHandler gerencia as requisições HTTP para modelos de produto.
 type ProdutoModeloHandler struct {
 	service service.ProdutoModeloService
 }
 
-func NewProdutoModeloHandler(service service.ProdutoModeloService) *ProdutoModeloHandler {
+// NewProdutoModeloHandler cria uma nova instância de ProdutoModeloHandler.
+func NewProdutoModeloHandler(s service.ProdutoModeloService) *ProdutoModeloHandler {
 	return &ProdutoModeloHandler{
-		service: service,
+		service: s,
 	}
 }
 
@@ -27,7 +31,7 @@ func NewProdutoModeloHandler(service service.ProdutoModeloService) *ProdutoModel
 // @Success      201     {object}  dto.ProdutoModeloResponse
 // @Failure      400     {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      500     {object}  utils.ErrorResponse "Erro interno do servidor"
-// @Router       /produto-modelos [post]
+// @Router       /produtos/modelos [post]
 func (h *ProdutoModeloHandler) Create(c *gin.Context) {
 	var req dto.ProdutoModeloRequest
 	if !utils.BindAndValidateOrRespond(c, &req) {
@@ -40,7 +44,7 @@ func (h *ProdutoModeloHandler) Create(c *gin.Context) {
 
 	modelo, err := h.service.Create(&req)
 	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
@@ -57,7 +61,7 @@ func (h *ProdutoModeloHandler) Create(c *gin.Context) {
 // @Param        id   path      int  true  "ID do Modelo de Produto"
 // @Success      200  {object}  dto.ProdutoModeloResponse
 // @Failure      404  {object}  utils.ErrorResponse "Modelo de produto não encontrado"
-// @Router       /produto-modelos/{id} [get]
+// @Router       /produtos/modelos/{id} [get]
 func (h *ProdutoModeloHandler) GetByID(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -66,7 +70,7 @@ func (h *ProdutoModeloHandler) GetByID(c *gin.Context) {
 
 	modelo, err := h.service.GetByID(id)
 	if err != nil {
-		utils.RespondWithNotFoundError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
@@ -80,12 +84,12 @@ func (h *ProdutoModeloHandler) GetByID(c *gin.Context) {
 // @Tags         Produto - Modelos
 // @Accept       json
 // @Produce      json
-// @Param        id      path      int                       true  "ID do Modelo de Produto"
+// @Param        id      path      int                         true  "ID do Modelo de Produto"
 // @Param        modelo  body      dto.ProdutoModeloRequest  true  "Dados para atualizar o modelo de produto"
 // @Success      200     {object}  dto.ProdutoModeloResponse
 // @Failure      400     {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      404     {object}  utils.ErrorResponse "Modelo de produto não encontrado"
-// @Router       /produto-modelos/{id} [put]
+// @Router       /produtos/modelos/{id} [put]
 func (h *ProdutoModeloHandler) Update(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -102,7 +106,7 @@ func (h *ProdutoModeloHandler) Update(c *gin.Context) {
 
 	modelo, err := h.service.Update(id, &req)
 	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
@@ -119,7 +123,7 @@ func (h *ProdutoModeloHandler) Update(c *gin.Context) {
 // @Param        id   path      int  true  "ID do Modelo de Produto"
 // @Success      204  "Nenhum conteúdo"
 // @Failure      400  {object}  utils.ErrorResponse "Erro ao excluir"
-// @Router       /produto-modelos/{id} [delete]
+// @Router       /produtos/modelos/{id} [delete]
 func (h *ProdutoModeloHandler) Delete(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -127,11 +131,11 @@ func (h *ProdutoModeloHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.service.Delete(id); err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
-	utils.RespondWithNoContent(c)
+	c.Status(http.StatusNoContent)
 }
 
 // @Summary      Lista os modelos de produto
@@ -139,37 +143,32 @@ func (h *ProdutoModeloHandler) Delete(c *gin.Context) {
 // @Tags         Produto - Modelos
 // @Accept       json
 // @Produce      json
-// @Param        limit     query     int  false  "Número de registros por página"
-// @Param        offset    query     int  false  "Offset para a paginação"
-// @Param        descricao query     string  false  "Filtrar por descrição"
-// @Param        situacao  query     int  false  "Filtrar por situação (1=Ativo, 2=Inativo)"
-// @Success      200       {object}  dto.ProdutoModeloListResponse
-// @Router       /produto-modelos [get]
+// @Param        limit      query     int     false  "Número de registros por página"
+// @Param        offset     query     int     false  "Offset para a paginação"
+// @Param        descricao  query     string  false  "Filtrar por descrição"
+// @Param        situacao   query     int     false  "Filtrar por situação (1=Ativo, 2=Inativo)"
+// @Success      200        {object}  dto.ProdutoModeloListResponse
+// @Router       /produtos/modelos [get]
 func (h *ProdutoModeloHandler) List(c *gin.Context) {
 	limit := utils.GetQueryInt(c, "limit", 10)
 	offset := utils.GetQueryInt(c, "offset", 0)
-	filters := make(map[string]interface{})
-	descricao := utils.GetQueryString(c, "descricao", "")
-	if descricao != "" {
-		filters["prom_descricao"] = descricao
-	}
-	situacao := utils.GetQueryString(c, "situacao", "")
-	if situacao != "" {
-		filters["prom_situacao"] = situacao
-	}
+
+	filters := utils.QueryParamsToFilters(c)
 
 	modelos, total, err := h.service.List(limit, offset, filters)
 	if err != nil {
-		utils.RespondWithInternalError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
 	items := make([]dto.ProdutoModeloResponse, len(modelos))
 	for i, modelo := range modelos {
-		items[i].FromModel(&modelo)
+		var resp dto.ProdutoModeloResponse
+		resp.FromModel(&modelo)
+		items[i] = resp
 	}
 
-	totalPages := int((total + int64(limit) - 1) / int64(limit))
+	totalPages := utils.CalculateTotalPages(int(total), limit)
 
 	utils.RespondWithOK(c, dto.ProdutoModeloListResponse{
 		Items:      items,
@@ -178,5 +177,4 @@ func (h *ProdutoModeloHandler) List(c *gin.Context) {
 		Limit:      limit,
 		TotalPages: totalPages,
 	})
-
 }

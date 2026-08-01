@@ -161,6 +161,10 @@ func (s *produtoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.P
 	return s.mapModelToResponse(createdVariacao)
 }
 
+// Create cria uma nova variação de produto.
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
+
 // GetByID busca uma variação de produto pelo ID.
 func (s *produtoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, error) {
 	if id <= 0 {

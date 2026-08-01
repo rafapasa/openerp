@@ -48,6 +48,10 @@ func (s *tabelaPrecoProdutoService) validateDependencies(tabelaPrecoID, produtoI
 	return nil
 }
 
+// Create cria um novo item na tabela de preço.
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
+
 func (s *tabelaPrecoProdutoService) Create(req *dto.TabelaPrecoProdutoRequest) (*models.TabelaPrecoProduto, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err

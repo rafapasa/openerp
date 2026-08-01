@@ -85,7 +85,7 @@ func (h *DocumentoVendaItemHandler) GetByID(c *gin.Context) {
 	}
 
 	var resp dto.DocumentoVendaItemResponse
-	utils.MapToDTO(item, resp)
+	resp.FromModel(item)
 	utils.RespondWithOK(c, resp)
 }
 
@@ -132,7 +132,7 @@ func (h *DocumentoVendaItemHandler) Update(c *gin.Context) {
 		return
 	}
 	var resp dto.DocumentoVendaItemResponse
-	utils.MapToDTO(updatedItem, resp)
+	resp.FromModel(updatedItem)
 	utils.RespondWithOK(c, resp)
 }
 
@@ -196,7 +196,7 @@ func (h *DocumentoVendaItemHandler) List(c *gin.Context) {
 	respItems := make([]dto.DocumentoVendaItemResponse, len(items))
 	for i, item := range items {
 		var respItem dto.DocumentoVendaItemResponse
-		utils.MapToDTO(&item, &respItem)
+		respItem.FromModel(&item)
 		respItems[i] = respItem
 	}
 

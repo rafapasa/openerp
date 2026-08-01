@@ -78,6 +78,11 @@ func (f *FormatoProduto) SoftDelete() {
 	f.DeletedAt = &now
 }
 
+// IsActive verifica se o formato de produto está ativo (não deletado)
+func (f *FormatoProduto) IsActive() bool {
+	return f.DeletedAt == nil
+}
+
 // HasImage verifica se o formato possui imagem
 func (f *FormatoProduto) HasImage() bool {
 	return len(f.Imagem) > 0

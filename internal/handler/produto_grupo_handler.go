@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/middleware"
@@ -8,13 +10,15 @@ import (
 	"github.com/openerp/backend/internal/utils"
 )
 
+// ProdutoGrupoHandler gerencia as requisições HTTP para grupos de produto.
 type ProdutoGrupoHandler struct {
-	produtoGrupoService service.ProdutoGrupoService
+	service service.ProdutoGrupoService
 }
 
-func NewProdutoGrupoHandler(produtoGrupoService service.ProdutoGrupoService) *ProdutoGrupoHandler {
+// NewProdutoGrupoHandler cria uma nova instância de ProdutoGrupoHandler.
+func NewProdutoGrupoHandler(s service.ProdutoGrupoService) *ProdutoGrupoHandler {
 	return &ProdutoGrupoHandler{
-		produtoGrupoService: produtoGrupoService,
+		service: s,
 	}
 }
 
@@ -27,7 +31,7 @@ func NewProdutoGrupoHandler(produtoGrupoService service.ProdutoGrupoService) *Pr
 // @Success      201    {object}  dto.ProdutoGrupoResponse
 // @Failure      400    {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      500    {object}  utils.ErrorResponse "Erro interno do servidor"
-// @Router       /produto-grupos [post]
+// @Router       /produtos/grupos [post]
 func (h *ProdutoGrupoHandler) Create(c *gin.Context) {
 	var req dto.ProdutoGrupoRequest
 	if !utils.BindAndValidateOrRespond(c, &req) {
@@ -38,13 +42,15 @@ func (h *ProdutoGrupoHandler) Create(c *gin.Context) {
 	req.CreatedBy = &userID
 	req.UpdatedBy = &userID
 
-	grupo, err := h.produtoGrupoService.Create(&req)
+	grupo, err := h.service.Create(&req)
 	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
-	utils.RespondWithCreated(c, grupo)
+	var resp dto.ProdutoGrupoResponse
+	resp.FromModel(grupo)
+	utils.RespondWithCreated(c, resp)
 }
 
 // @Summary      Busca um grupo de produto por ID
@@ -55,16 +61,16 @@ func (h *ProdutoGrupoHandler) Create(c *gin.Context) {
 // @Param        id   path      int  true  "ID do Grupo de Produto"
 // @Success      200  {object}  dto.ProdutoGrupoResponse
 // @Failure      404  {object}  utils.ErrorResponse "Grupo de produto não encontrado"
-// @Router       /produto-grupos/{id} [get]
+// @Router       /produtos/grupos/{id} [get]
 func (h *ProdutoGrupoHandler) GetByID(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
 		return
 	}
 
-	grupo, err := h.produtoGrupoService.GetByID(id)
+	grupo, err := h.service.GetByID(id)
 	if err != nil {
-		utils.RespondWithNotFoundError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
@@ -78,12 +84,12 @@ func (h *ProdutoGrupoHandler) GetByID(c *gin.Context) {
 // @Tags         Produto - Grupos
 // @Accept       json
 // @Produce      json
-// @Param        id     path      int                      true  "ID do Grupo de Produto"
+// @Param        id     path      int                        true  "ID do Grupo de Produto"
 // @Param        grupo  body      dto.ProdutoGrupoRequest  true  "Dados para atualizar o grupo de produto"
 // @Success      200    {object}  dto.ProdutoGrupoResponse
 // @Failure      400    {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      404    {object}  utils.ErrorResponse "Grupo de produto não encontrado"
-// @Router       /produto-grupos/{id} [put]
+// @Router       /produtos/grupos/{id} [put]
 func (h *ProdutoGrupoHandler) Update(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
@@ -98,13 +104,15 @@ func (h *ProdutoGrupoHandler) Update(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	req.UpdatedBy = &userID
 
-	grupo, err := h.produtoGrupoService.Update(id, &req)
+	grupo, err := h.service.Update(id, &req)
 	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
-	utils.RespondWithOK(c, grupo)
+	var resp dto.ProdutoGrupoResponse
+	resp.FromModel(grupo)
+	utils.RespondWithOK(c, resp)
 }
 
 // @Summary      Exclui um grupo de produto
@@ -115,20 +123,19 @@ func (h *ProdutoGrupoHandler) Update(c *gin.Context) {
 // @Param        id   path      int  true  "ID do Grupo de Produto"
 // @Success      204  "Nenhum conteúdo"
 // @Failure      400  {object}  utils.ErrorResponse "Erro ao excluir"
-// @Router       /produto-grupos/{id} [delete]
+// @Router       /produtos/grupos/{id} [delete]
 func (h *ProdutoGrupoHandler) Delete(c *gin.Context) {
 	id, ok := utils.ParseIDParam(c, "id")
 	if !ok {
 		return
 	}
 
-	err := h.produtoGrupoService.Delete(id)
-	if err != nil {
-		utils.RespondWithValidationError(c, err.Error())
+	if err := h.service.Delete(id); err != nil {
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
-	utils.RespondWithNoContent(c)
+	c.Status(http.StatusNoContent)
 }
 
 // @Summary      Lista os grupos de produto
@@ -136,45 +143,32 @@ func (h *ProdutoGrupoHandler) Delete(c *gin.Context) {
 // @Tags         Produto - Grupos
 // @Accept       json
 // @Produce      json
-// @Param        limit                query     int  false  "Número de registros por página"
-// @Param        offset               query     int  false  "Offset para a paginação"
-// @Param        descricao            query     string  false  "Filtrar por descrição"
-// @Param        situacao             query     int  false  "Filtrar por situação (1=Ativo, 2=Inativo)"
-// @Param        visivel_frente_caixa query     int  false  "Filtrar por visibilidade no PDV (1=Sim, 2=Não)"
-// @Success      200                  {object}  dto.ProdutoGrupoListResponse
-// @Router       /produto-grupos [get]
+// @Param        limit      query     int     false  "Número de registros por página"
+// @Param        offset     query     int     false  "Offset para a paginação"
+// @Param        descricao  query     string  false  "Filtrar por descrição"
+// @Param        situacao   query     int     false  "Filtrar por situação (1=Ativo, 2=Inativo)"
+// @Success      200        {object}  dto.ProdutoGrupoListResponse
+// @Router       /produtos/grupos [get]
 func (h *ProdutoGrupoHandler) List(c *gin.Context) {
 	limit := utils.GetQueryInt(c, "limit", 10)
 	offset := utils.GetQueryInt(c, "offset", 0)
 
-	filters := make(map[string]any)
-	if descricao := utils.GetQueryString(c, "descricao", ""); descricao != "" {
-		filters["prog_descricao"] = descricao
-	}
-	if situacao := utils.GetQueryInt(c, "situacao", 0); situacao != 0 {
-		filters["prog_situacao"] = situacao
-	}
-	if visivelfrentecaixa := utils.GetQueryInt(c, "visivel_frente_caixa", 0); visivelfrentecaixa != 0 {
-		filters["prog_visivelfrentecaixa"] = visivelfrentecaixa
-	}
-	if agenda := utils.GetQueryInt(c, "agenda", 0); agenda != 0 {
-		filters["prog_agenda"] = agenda
-	}
+	filters := utils.QueryParamsToFilters(c)
 
-	produtoGrupos, total, err := h.produtoGrupoService.List(limit, offset, filters)
+	grupos, total, err := h.service.List(limit, offset, filters)
 	if err != nil {
-		utils.RespondWithInternalError(c, err.Error())
+		utils.RespondWithErrorAny(c, err)
 		return
 	}
 
-	items := make([]dto.ProdutoGrupoResponse, len(produtoGrupos))
-	for i, grupo := range produtoGrupos {
+	items := make([]dto.ProdutoGrupoResponse, len(grupos))
+	for i, grupo := range grupos {
 		var resp dto.ProdutoGrupoResponse
 		resp.FromModel(&grupo)
 		items[i] = resp
 	}
 
-	totalPages := int((total + int64(limit) - 1) / int64(limit))
+	totalPages := utils.CalculateTotalPages(int(total), limit)
 
 	utils.RespondWithOK(c, dto.ProdutoGrupoListResponse{
 		Items:      items,

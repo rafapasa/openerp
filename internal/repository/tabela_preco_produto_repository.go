@@ -211,7 +211,7 @@ func (r *tabelaPrecoProdutoRepository) FindByTabelaPrecoAndProduto(tabelaPrecoID
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil // Não encontrado, não é erro
+			return nil, apperrors.NewNotFoundError(fmt.Sprintf("Produto %d não encontrado na tabela de preço %d", produtoID, tabelaPrecoID))
 		}
 		return nil, apperrors.NewInternalError("Erro buscando item da tabela de preço", err)
 	}

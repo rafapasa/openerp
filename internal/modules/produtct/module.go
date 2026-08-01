@@ -46,14 +46,14 @@ func (m *ProductModule) Register(container *container.Container) error {
 	subgrupoService := service.NewProdutoSubgrupoService(subgrupoRepo)
 	marcaService := service.NewProdutoMarcaService(marcaRepo)
 	modeloService := service.NewProdutoModeloService(modeloRepo)
-	variacaoService := service.NewProdutoVariacaoService(variacaoRepo)
+	// variacaoService := service.NewProdutoVariacaoService(variacaoRepo)
 
 	container.RegisterService("produto", produtoService)
 	container.RegisterService("produto_grupo", grupoService)
 	container.RegisterService("produto_subgrupo", subgrupoService)
 	container.RegisterService("produto_marca", marcaService)
 	container.RegisterService("produto_modelo", modeloService)
-	container.RegisterService("produto_variacao", variacaoService)
+	// container.RegisterService("produto_variacao", variacaoService)
 
 	// 3. Handlers (usando os existentes)
 	produtoHandler := handler.NewProdutoHandler(produtoService)
@@ -61,14 +61,14 @@ func (m *ProductModule) Register(container *container.Container) error {
 	subgrupoHandler := handler.NewProdutoSubgrupoHandler(subgrupoService)
 	marcaHandler := handler.NewProdutoMarcaHandler(marcaService)
 	modeloHandler := handler.NewProdutoModeloHandler(modeloService)
-	variacaoHandler := handler.NewProdutoVariacaoHandler(variacaoService)
+	// variacaoHandler := handler.NewProdutoVariacaoHandler(variacaoService)
 
 	container.RegisterHandler("produto", produtoHandler)
 	container.RegisterHandler("produto_grupo", grupoHandler)
 	container.RegisterHandler("produto_subgrupo", subgrupoHandler)
 	container.RegisterHandler("produto_marca", marcaHandler)
 	container.RegisterHandler("produto_modelo", modeloHandler)
-	container.RegisterHandler("produto_variacao", variacaoHandler)
+	// container.RegisterHandler("produto_variacao", variacaoHandler)
 
 	// Armazena os handlers para acesso rápido
 	m.Handlers["produto"] = produtoHandler
@@ -76,7 +76,7 @@ func (m *ProductModule) Register(container *container.Container) error {
 	m.Handlers["produto_subgrupo"] = subgrupoHandler
 	m.Handlers["produto_marca"] = marcaHandler
 	m.Handlers["produto_modelo"] = modeloHandler
-	m.Handlers["produto_variacao"] = variacaoHandler
+	// m.Handlers["produto_variacao"] = variacaoHandler
 
 	return nil
 }

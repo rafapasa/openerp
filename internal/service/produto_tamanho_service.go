@@ -50,12 +50,12 @@ func (s *produtoTamanhoService) validateProdutoTamanho(req *dto.ProdutoTamanhoRe
 	}
 
 	// Validar unicidade do nome
-	exists, err = s.repo.ExistsByNome(req.Nome, req.EmpresaFilialID, req.ID)
+	exists, err = s.repo.ExistsByNome(req.Descricao, req.EmpresaFilialID, req.ID)
 	if err != nil {
 		return err
 	}
 	if exists {
-		return apperrors.NewConflictError(fmt.Sprintf("Já existe um tamanho com o nome '%s' para esta filial.", req.Nome))
+		return apperrors.NewConflictError(fmt.Sprintf("Já existe um tamanho com o nome '%s' para esta filial.", req.Descricao))
 	}
 
 	return nil

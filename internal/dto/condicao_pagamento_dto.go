@@ -1,14 +1,11 @@
-// ============================================================
-// FILE: condicao_pagamento_dto.go
-// PACKAGE: dto
-// ============================================================
-
 package dto
 
 import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
+
+	apperrors "github.com/openerp/backend/internal/erros"
 
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/models"
@@ -140,14 +137,14 @@ func (r *CondicaoPagamentoRequest) ToModel() (*models.CondicaoPagamento, error) 
 // ============================================================
 
 // FromModel converte models.CondicaoPagamento para CondicaoPagamentoResponse
-func (r *CondicaoPagamentoResponse) FromModel(condicao *models.CondicaoPagamento) (*CondicaoPagamentoResponse, error) {
+func (r *CondicaoPagamentoResponse) FromModel(condicao *models.CondicaoPagamento) error {
 	if condicao == nil {
-		return nil, nil
+		return apperrors.NewValidationError("condicao de pagamento não encontrada")
 	}
 
 	// 1. Usar o mapper para copiar campos
 	if err := utils.MapToDTO(condicao, r); err != nil {
-		return nil, err
+		return err
 	}
 
 	// 2. Preencher campos calculados (labels)
@@ -172,7 +169,7 @@ func (r *CondicaoPagamentoResponse) FromModel(condicao *models.CondicaoPagamento
 	r.CreatedAt = utils.FormatDateTime(condicao.CreatedAt)
 	r.UpdatedAt = utils.FormatDateTime(condicao.UpdatedAt)
 
-	return r, nil
+	return nil
 }
 
 // ============================================================

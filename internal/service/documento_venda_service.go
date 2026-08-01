@@ -46,7 +46,7 @@ func NewDocumentoVendaService(db *gorm.DB,
 	dvpService DocumentoVendaPagamentoService,
 	entService EntidadeService,
 	proService ProdutoService,
-	dviServiceFactory DocumentoVendaItemServiceFactory) *documentoVendaService {
+	dviServiceFactory DocumentoVendaItemServiceFactory) DocumentoVendaService {
 	return &documentoVendaService{
 		db:                db,
 		ddvRepo:           ddvRepo,
@@ -91,14 +91,8 @@ func (s *documentoVendaService) isDataValid(req *dto.DocumentoVendaRequest, isUp
 	}
 
 	for i, item := range req.Itens {
-		if item.ProdutoID <= 0 {
-			return apperrors.NewValidationError(fmt.Sprintf("O 'produto_id' é obrigatório para o item %d.", i+1))
-		}
-		if item.Quantidade <= 0 {
-			return apperrors.NewValidationError(fmt.Sprintf("A 'quantidade' deve ser maior que zero para o item %d.", i+1))
-		}
-		if item.ValorUnitario < 0 {
-			return apperrors.NewValidationError(fmt.Sprintf("O 'valor_unitario' não pode ser negativo para o item %d.", i+1))
+		if err := item.Validate(); err != nil {
+			return fmt.Errorf("validação do item %d falhou: %w", i+1, err)
 		}
 
 		// Valida se o produto existe e está ativo
@@ -197,6 +191,10 @@ func (s *documentoVendaService) Create(req *dto.DocumentoVendaRequest) (*models.
 
 	return s.GetByID(doc.ID)
 }
+
+// Create cria um novo documento de venda.
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
 
 func (s *documentoVendaService) FindByID(id int) (*models.DocumentoVenda, error) {
 	if id <= 0 {
@@ -380,6 +378,20 @@ func (s *documentoVendaService) executarOperacaoPagamento(
 
 func (s *documentoVendaService) AddPagamento(reqAddPagamento *dto.DocumentoVendaPagamentoRequest) (*models.DocumentoVenda, error) {
 	return s.executarOperacaoPagamento(reqAddPagamento.DocumentoVendaID, func(dvpServiceTx DocumentoVendaPagamentoService) error {
+		// The Create method of dvpServiceTx will handle the model conversion and date parsing
+		// No need to manually convert dates here, as ToModel in DTO already does it.
+		// However, the `dvpServiceTx.Create` expects a DTO, so we pass the original DTO.
+		// The DTO's ToModel method will be called internally by the service.
+		// If the service's Create method directly uses the DTO, then this is fine.
+		// If the service's Create method expects a model, then we need to convert here.
+		// Looking at `documento_venda_pagamento_service.go`, `Create` takes a DTO.
+
+		// Ensure DocumentoVendaID is set in the request before passing to service
+		// This is already done in the handler, but good to be explicit if this path changes.
+		// reqAddPagamento.DocumentoVendaID = docVendaID // Assuming docVendaID is available here
+
+		// The `dvpServiceTx.Create` method will handle the DTO to Model conversion and date parsing.
+		// So, we just pass the request DTO directly.
 		return dvpServiceTx.Create(reqAddPagamento)
 	})
 }

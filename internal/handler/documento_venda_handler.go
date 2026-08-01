@@ -45,8 +45,7 @@ func (h *DocumentoVendaHandler) Cancelar(c *gin.Context) {
 // @Router       /documentos-venda [post]
 func (h *DocumentoVendaHandler) Create(c *gin.Context) {
 	var req dto.DocumentoVendaRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.RespondWithErrorAny(c, err)
+	if !utils.BindAndValidateOrRespond(c, &req) {
 		return
 	}
 
@@ -56,7 +55,12 @@ func (h *DocumentoVendaHandler) Create(c *gin.Context) {
 		return
 	}
 
-	utils.RespondWithCreated(c, doc)
+	var resp dto.DocumentoVendaResponse
+	if _, err := resp.FromModel(doc); err != nil {
+		utils.RespondWithErrorAny(c, err)
+		return
+	}
+	utils.RespondWithCreated(c, resp)
 }
 
 // @Summary      Busca um documento de venda por ID
@@ -81,7 +85,9 @@ func (h *DocumentoVendaHandler) GetByID(c *gin.Context) {
 	}
 
 	var response dto.DocumentoVendaResponse
-	if err := utils.MapToModel(doc, &response); err != nil {
+	// Use the FromModel method of the DTO to populate the response
+	// This will also handle nested DTOs and labels
+	if _, err := response.FromModel(doc); err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
 	}
@@ -107,8 +113,7 @@ func (h *DocumentoVendaHandler) Update(c *gin.Context) {
 	}
 
 	var req dto.DocumentoVendaRequest
-	if utils.BindAndValidateOrRespond(c, &req) {
-		return
+	if !utils.BindAndValidateOrRespond(c, &req) {
 	}
 
 	doc, err := h.service.Update(id, &req)

@@ -87,6 +87,11 @@ func (m *FormaContato) SoftDelete() {
 	m.DeletedAt = &now
 }
 
+// IsActive verifica se a forma de contato está ativa (não deletada)
+func (m *FormaContato) IsActive() bool {
+	return m.DeletedAt == nil
+}
+
 func (m *FormaContato) IsTelefone() bool {
 	return m.Tipo == 1 || m.Tipo == 2
 }

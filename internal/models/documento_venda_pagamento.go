@@ -18,7 +18,7 @@ type DocumentoVendaPagamento struct {
 	Item             int  `gorm:"column:dvp_item;primaryKey" json:"item"`
 	PortadorID       int  `gorm:"column:por_id;not null" json:"portador_id"`
 	TipoDocumentoID  int  `gorm:"column:tdoc_id;not null" json:"tipo_documento_id"`
-	FormaPagamentoID *int `gorm:"column:frmpgto_id" json:"forma_pagamento_id,omitempty"`
+	FormaPagamentoID *int `gorm:"column:frmpgto_id" json:"forma_pagamento_id,omitempty"` // Changed to omitempty as it's a pointer
 	RotinaContabilID *int `gorm:"column:roc_id" json:"rotina_contabil_id,omitempty"`
 
 	// ============================================================

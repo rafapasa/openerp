@@ -90,6 +90,11 @@ func (m *EntidadeContato) SoftDelete() {
 	m.DeletedAt = &now
 }
 
+// IsActive verifica se o contato está ativo (não deletado)
+func (m *EntidadeContato) IsActive() bool {
+	return m.DeletedAt == nil
+}
+
 func (m *EntidadeContato) IsWhatsApp() bool {
 	return m.FormaContatoID == 4
 }

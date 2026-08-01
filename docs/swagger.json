@@ -4255,6 +4255,12 @@
             ]
         },
         "dto.DocumentoVendaItemRequest": {
+            "description": "DocumentoVendaItemRequest representa um item no request de um documento de venda.",
+            "type": "object",
+            "required": [
+                "produto_id",
+                "quantidade"
+            ],
             "type": "object",
             "required": [
                 "produto_id",
@@ -4342,6 +4348,9 @@
             }
         },
         "dto.DocumentoVendaListResponse": {
+            "description": "DocumentoVendaListResponse representa a resposta de listagem de documentos de venda",
+            "type": "object",
+            "properties": {
             "type": "object",
             "properties": {
                 "items": {
@@ -4365,48 +4374,68 @@
             }
         },
         "dto.DocumentoVendaPagamentoRequest": {
+            "description": "DocumentoVendaPagamentoRequest representa um pagamento no request",
             "type": "object",
             "required": [
                 "forma_pagamento_id",
                 "valor"
             ],
+            "type": "object",
+            "required": [
+                "forma_pagamento_id",
+                "portador_id",
+                "tipo_documento_id",
+                "data_vencimento",
+                "valor"
+            ],
             "properties": {
-                "data_pagamento": {
+                "autorizacao": {
                     "type": "string"
                 },
-                "data_vencimento": {
+                "bandeira_cartao": {
                     "type": "string"
+                },
+                "codigo_autorizacao": {
+                    "type": "string"
+                },
+                "coo": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_vencimento": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "documento": {
+                    "type": "string"
+                },
+                "documento_venda_id": {
+                    "description": "Changed from \"id\"",
+                    "type": "integer"
                 },
                 "forma_pagamento_id": {
                     "type": "integer"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "numero_parcelas": {
-                    "type": "integer"
-                },
-                "observacao": {
+                "nsu": {
                     "type": "string"
                 },
-                "parcela_atual": {
+                "portador_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_id": {
                     "type": "integer"
                 },
                 "valor": {
-                    "type": "number"
-                },
-                "valor_desconto": {
-                    "type": "number"
-                },
-                "valor_juros": {
-                    "type": "number"
-                },
-                "valor_multa": {
                     "type": "number"
                 }
             }
         },
         "dto.DocumentoVendaPagamentoResponse": {
+            "description": "DocumentoVendaPagamentoResponse representa a resposta de um pagamento",
+            "type": "object",
+            "properties": {
             "type": "object",
             "properties": {
                 "data_pagamento": {
@@ -4430,9 +4459,6 @@
                 "numero_parcelas": {
                     "type": "integer"
                 },
-                "observacao": {
-                    "type": "string"
-                },
                 "parcela_atual": {
                     "type": "integer"
                 },
@@ -4442,21 +4468,34 @@
                 "status_label": {
                     "type": "string"
                 },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "tipo_documento_nome": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                },
                 "valor": {
-                    "type": "number"
-                },
-                "valor_desconto": {
-                    "type": "number"
-                },
-                "valor_juros": {
-                    "type": "number"
-                },
-                "valor_multa": {
                     "type": "number"
                 }
             }
         },
         "dto.DocumentoVendaRequest": {
+            "description": "DocumentoVendaRequest representa o request para criar/atualizar um documento de venda.",
+            "type": "object",
+            "required": [
+                "condicao_pagamento_id",
+                "empresa_filial_id",
+                "itens",
+                "tabela_preco_id",
+                "tipo_documento",
+                "tipo_operacao"
+            ],
             "type": "object",
             "required": [
                 "condicao_pagamento_id",
@@ -4475,11 +4514,12 @@
                     "type": "integer"
                 },
                 "data_previsao": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                 },
                 "data_validade": {
-                    "description": "============================================================\nDATAS\n============================================================",
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                 },
                 "empresa_filial_id": {
                     "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
@@ -4500,10 +4540,10 @@
                     "type": "integer"
                 },
                 "observacoes_adm": {
-                    "type": "string"
+                    "type": "string",
                 },
                 "observacoes_cliente": {
-                    "type": "string"
+                    "type": "string",
                 },
                 "observacoes_interna": {
                     "description": "============================================================\nOBSERVAÇÕES\n============================================================",
@@ -4511,7 +4551,7 @@
                 },
                 "pagamentos": {
                     "type": "array",
-                    "items": {
+                    "items": { //
                         "$ref": "#/definitions/dto.DocumentoVendaPagamentoRequest"
                     }
                 },
@@ -4550,6 +4590,9 @@
             }
         },
         "dto.DocumentoVendaResponse": {
+            "description": "DocumentoVendaResponse representa a resposta de um documento de venda.",
+            "type": "object",
+            "properties": {
             "type": "object",
             "properties": {
                 "condicao_pagamento_descricao": {
@@ -4570,10 +4613,12 @@
                     "type": "string"
                 },
                 "data_previsao": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                 },
                 "data_validade": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date"
                 },
                 "empresa_filial_id": {
                     "type": "integer"
@@ -4602,10 +4647,10 @@
                     "type": "integer"
                 },
                 "observacoes_adm": {
-                    "type": "string"
+                    "type": "string",
                 },
                 "observacoes_cliente": {
-                    "type": "string"
+                    "type": "string",
                 },
                 "observacoes_interna": {
                     "description": "============================================================\nOBSERVAÇÕES\n============================================================",
@@ -4613,7 +4658,7 @@
                 },
                 "pagamentos": {
                     "type": "array",
-                    "items": {
+                    "items": { //
                         "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
                     }
                 },

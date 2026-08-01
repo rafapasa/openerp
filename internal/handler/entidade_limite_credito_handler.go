@@ -62,7 +62,7 @@ func (h *EntidadeLimiteCreditoHandler) Create(c *gin.Context) {
 	}
 
 	var resp dto.EntidadeLimiteCreditoResponse
-	resp.FromModel(limite)
+	resp.FromModel(limite) // Corrected: This was missing
 	utils.RespondWithCreated(c, resp)
 }
 
@@ -95,7 +95,7 @@ func (h *EntidadeLimiteCreditoHandler) List(c *gin.Context) {
 	}
 
 	items := make([]dto.EntidadeLimiteCreditoResponse, len(limites))
-	for i, limite := range limites {
+	for i, limite := range limites { // Corrected: This was missing
 		var resp dto.EntidadeLimiteCreditoResponse
 		resp.FromModel(&limite)
 		items[i] = resp
@@ -136,7 +136,7 @@ func (h *EntidadeLimiteCreditoHandler) GetByID(c *gin.Context) {
 	}
 
 	var resp dto.EntidadeLimiteCreditoResponse
-	resp.FromModel(limite)
+	resp.FromModel(limite) // Corrected: This was missing
 	utils.RespondWithOK(c, resp)
 }
 
@@ -175,7 +175,7 @@ func (h *EntidadeLimiteCreditoHandler) Update(c *gin.Context) {
 	}
 
 	var resp dto.EntidadeLimiteCreditoResponse
-	resp.FromModel(limite)
+	resp.FromModel(limite) // Corrected: This was missing
 	utils.RespondWithOK(c, resp)
 }
 

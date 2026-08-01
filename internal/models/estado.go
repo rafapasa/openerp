@@ -78,6 +78,11 @@ func (m *Estado) SoftDelete() {
 	m.DeletedAt = &now
 }
 
+// IsActive verifica se o estado está ativo (não deletado)
+func (m *Estado) IsActive() bool {
+	return m.DeletedAt == nil
+}
+
 func (m *Estado) GetAliquotaICMS() float64 {
 	return m.AliquotaICMS
 }

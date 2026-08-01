@@ -37,7 +37,7 @@ func NewEntidadeContatoHandler(service service.EntidadeContatoService) *Entidade
 
 // getEntidadeID extrai e valida o ID da entidade da URL
 func (h *EntidadeContatoHandler) getEntidadeID(c *gin.Context) (int, bool) {
-	entidadeID, err := strconv.Atoi(c.Param("id"))
+	entidadeID, err := strconv.Atoi(c.Param("entidade_id"))
 	if err != nil {
 		utils.RespondWithValidationError(c, "ID da entidade inválido")
 		return 0, false

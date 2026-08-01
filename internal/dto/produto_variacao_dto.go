@@ -1,7 +1,12 @@
 package dto
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/openerp/backend/internal/models"
+	"github.com/openerp/backend/internal/utils"
 )
 
 // ============================================================
@@ -68,4 +73,57 @@ type ProdutoVariacaoListResponse struct {
 	Limit      int                       `json:"limit"`
 	Page       int                       `json:"page"`
 	TotalPages int                       `json:"total_pages"`
+}
+
+// ============================================================
+// MÉTODOS DE CONVERSÃO
+// ============================================================
+
+// ToModel converte ProdutoVariacaoRequest para models.ProdutoVariacao.
+func (r *ProdutoVariacaoRequest) ToModel() (*models.ProdutoVariacao, error) {
+	if r == nil {
+		return nil, nil
+	}
+	variacao := &models.ProdutoVariacao{}
+	if err := utils.MapToModel(r, variacao); err != nil {
+		return nil, fmt.Errorf("erro ao mapear DTO para modelo de variação de produto: %w", err)
+	}
+	return variacao, nil
+}
+
+// FromModel converte models.ProdutoVariacao para ProdutoVariacaoResponse.
+func (r *ProdutoVariacaoResponse) FromModel(variacao *models.ProdutoVariacao) {
+	if variacao == nil {
+		return
+	}
+	_ = utils.MapToDTO(variacao, r) // Ignora erro por enquanto, assume que o mapeamento direto é suficiente
+
+	if variacao.Produto != nil {
+		r.ProdutoNome = variacao.Produto.Nome
+	}
+	if variacao.EmpresaFilial != nil {
+		r.EmpresaFilialNome = variacao.EmpresaFilial.Nome
+	}
+	if variacao.Cor != nil {
+		r.CorNome = variacao.Cor.Nome
+		r.CorSigla = variacao.Cor.Sigla
+	}
+	if variacao.Tamanho != nil {
+		r.TamanhoNome = variacao.Tamanho.Nome
+		r.TamanhoSigla = variacao.Tamanho.Sigla
+	}
+
+	r.CreatedAt = variacao.CreatedAt
+	r.UpdatedAt = variacao.UpdatedAt
+	r.DeletedAt = variacao.DeletedAt
+}
+
+// ============================================================
+// MÉTODOS DE VALIDAÇÃO
+// ============================================================
+
+// Validate valida o ProdutoVariacaoRequest.
+func (r *ProdutoVariacaoRequest) Validate() error {
+	validate := validator.New()
+	return validate.Struct(r)
 }

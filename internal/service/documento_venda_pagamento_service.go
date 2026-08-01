@@ -31,6 +31,10 @@ func NewDocumentoVendaPagamentoService(db *gorm.DB, dvpRepo repository.Documento
 }
 
 func (s *documentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamentoRequest) error { // Renamed from NewdocumentoVendaPagamentoService
+	if err := req.Validate(); err != nil {
+		return err
+	}
+
 	pagamento := &models.DocumentoVendaPagamento{}
 	if err := utils.MapToModel(req, pagamento); err != nil {
 		return apperrors.NewInternalError("Erro ao mapear dados do pagamento.", err)
@@ -39,7 +43,15 @@ func (s *documentoVendaPagamentoService) Create(req *dto.DocumentoVendaPagamento
 	return s.dvpRepo.Create(pagamento)
 }
 
+// Create cria um novo pagamento de documento de venda.
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
+
 func (s *documentoVendaPagamentoService) Update(ddvId, dvpItem int, req *dto.DocumentoVendaPagamentoRequest) error {
+	if err := req.Validate(); err != nil {
+		return err
+	}
+
 	pagamento, err := s.dvpRepo.FindByID(ddvId, dvpItem)
 	if err != nil {
 		return err //

@@ -75,3 +75,8 @@ func (d *DocumentoVendaOrdemServico) SoftDelete() {
 	now := time.Now()
 	d.DeletedAt = &now
 }
+
+// IsActive verifica se o relacionamento está ativo (não deletado)
+func (d *DocumentoVendaOrdemServico) IsActive() bool {
+	return d.DeletedAt == nil
+}

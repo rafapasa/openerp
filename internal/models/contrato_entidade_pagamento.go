@@ -98,6 +98,11 @@ func (c *ContratoEntidadePagamento) GetValorLiquido() float64 {
 	return valor
 }
 
+// IsActive verifica se o pagamento está ativo (não deletado)
+func (c *ContratoEntidadePagamento) IsActive() bool {
+	return c.DeletedAt == nil
+}
+
 // IsVencido verifica se o pagamento está vencido
 func (c *ContratoEntidadePagamento) IsVencido() bool {
 	return time.Now().After(c.DataVencimento)

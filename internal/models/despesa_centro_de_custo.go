@@ -66,3 +66,8 @@ func (d *DespesaCentroDeCusto) SoftDelete() {
 	now := time.Now()
 	d.DeletedAt = &now
 }
+
+// IsActive verifica se o relacionamento despesa-centro de custo está ativo (não deletado)
+func (d *DespesaCentroDeCusto) IsActive() bool {
+	return d.DeletedAt == nil
+}

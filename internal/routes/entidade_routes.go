@@ -1,78 +1,81 @@
+// internal/routes/entidade_routes.go
 package routes
 
 import (
 	"github.com/gin-gonic/gin"
-
-	"github.com/openerp/backend/internal/handler"
+	"github.com/openerp/backend/internal/appwire"
 )
 
-// RegisterEntidadeRoutes registra as rotas de entidade e seus sub-recursos
-func RegisterEntidadeRoutes(
-	router *gin.RouterGroup,
-	entidadeHandler *handler.EntidadeHandler,
-	enderecoHandler *handler.EntidadeEnderecoHandler,
-	contatoHandler *handler.EntidadeContatoHandler,
-	documentoHandler *handler.EntidadeDocumentoHandler,
-	regimeHandler *handler.EntidadeRegimeTributarioHandler,
-	limiteCreditoHandler *handler.EntidadeLimiteCreditoHandler,
-) {
-	entidades := router.Group("/entidades")
+func RegisterEntidadeRoutes(router *gin.RouterGroup, container *appwire.Container) {
+	// Grupo de rotas de entidade
+	entidade := router.Group("/entidades")
 	{
-		// ============================================================
-		// ROTAS MAIS ESPECÍFICAS (primeiro)
-		// ============================================================
-		entidades.GET("/documento/:documento", entidadeHandler.GetByDocumento)
+		entidade.GET("", container.EntidadeHandler.List)
+		entidade.POST("", container.EntidadeHandler.Create)
+		entidade.GET("/:id", container.EntidadeHandler.GetByID)
+		entidade.PUT("/:id", container.EntidadeHandler.Update)
+		entidade.DELETE("/:id", container.EntidadeHandler.Delete) // Corrected: This was missing
+		// entidade.GET("/documento/:documento", container.EntidadeHandler.GetByDocumento)
+	}
 
-		// ============================================================
-		// SUB-RECURSOS: ENDEREÇOS
-		// ============================================================
-		enderecos := entidades.Group("/:id/enderecos")
-		{
-			enderecos.POST("/", enderecoHandler.Create)
-			enderecos.GET("/", enderecoHandler.List)
-			enderecos.GET("/:item", enderecoHandler.GetByID)
-			enderecos.PUT("/:item", enderecoHandler.Update)
-			enderecos.DELETE("/:item", enderecoHandler.Delete)
-		}
+	// Endereços
+	endereco := router.Group("/entidades/:entidade_id/enderecos")
+	{
+		endereco.GET("", container.EntidadeEnderecoHandler.List)
+		endereco.POST("", container.EntidadeEnderecoHandler.Create)
+		endereco.GET("/:item", container.EntidadeEnderecoHandler.GetByID)
+		endereco.PUT("/:item", container.EntidadeEnderecoHandler.Update)
+		endereco.DELETE("/:item", container.EntidadeEnderecoHandler.Delete)
+	}
 
-		// ============================================================
-		// SUB-RECURSOS: CONTATOS
-		// ============================================================
-		contatos := entidades.Group("/:id/contatos")
-		{
-			contatos.POST("/", contatoHandler.Create)
-			contatos.GET("/", contatoHandler.List)
-			contatos.GET("/:item", contatoHandler.GetByID)
-			contatos.PUT("/:item", contatoHandler.Update)
-			contatos.DELETE("/:item", contatoHandler.Delete)
-		}
+	// Contatos
+	contato := router.Group("/entidades/:entidade_id/contatos")
+	{
+		contato.GET("", container.EntidadeContatoHandler.List)
+		contato.POST("", container.EntidadeContatoHandler.Create)
+		contato.GET("/:item", container.EntidadeContatoHandler.GetByID)
+		contato.PUT("/:item", container.EntidadeContatoHandler.Update)
+		contato.DELETE("/:item", container.EntidadeContatoHandler.Delete)
+	}
 
-		// ============================================================
-		// SUB-RECURSOS: DOCUMENTOS
-		// ============================================================
-		documentos := entidades.Group("/:id/documentos")
-		{
-			documentos.POST("/", documentoHandler.Create)
-			documentos.GET("/", documentoHandler.List)
-			documentos.GET("/:item", documentoHandler.GetByID)
-			documentos.PUT("/:item", documentoHandler.Update)
-			documentos.DELETE("/:item", documentoHandler.Delete)
-			documentos.GET("/:item/download", documentoHandler.Download) // Download do arquivo
-		}
+	// Documentos
+	documento := router.Group("/entidades/:entidade_id/documentos")
+	{
+		documento.GET("", container.EntidadeDocumentoHandler.List)
+		documento.POST("", container.EntidadeDocumentoHandler.Create)
+		documento.GET("/:item", container.EntidadeDocumentoHandler.GetByID)
+		documento.PUT("/:item", container.EntidadeDocumentoHandler.Update) // Corrected: This was missing
+		documento.DELETE("/:item", container.EntidadeDocumentoHandler.Delete)
+		documento.GET("/:item/download", container.EntidadeDocumentoHandler.Download)
+	}
 
-		// ============================================================
-		// SUB-RECURSOS: REGIMES TRIBUTÁRIOS
-		// ============================================================
-		RegisterEntidadeRegimeTributarioRoutes(entidades, regimeHandler)
-		RegisterEntidadeLimiteCreditoRoutes(entidades, limiteCreditoHandler) // Limites de crédito
+	// Limites de Crédito
+	limite := router.Group("/entidades/:entidade_id/limites-credito")
+	{
+		limite.GET("", container.EntidadeLimiteCreditoHandler.List)
+		limite.POST("", container.EntidadeLimiteCreditoHandler.Create)
+		limite.GET("/:id", container.EntidadeLimiteCreditoHandler.GetByID) // Corrected: This was missing
+		limite.PUT("/:id", container.EntidadeLimiteCreditoHandler.Update)
+		limite.DELETE("/:id", container.EntidadeLimiteCreditoHandler.Delete)
+	}
 
-		// ============================================================
-		// ROTAS PRINCIPAIS (mais genéricas, por último)
-		// ============================================================
-		entidades.POST("/", entidadeHandler.Create)
-		entidades.GET("/", entidadeHandler.List)
-		entidades.GET("/:id", entidadeHandler.GetByID)
-		entidades.PUT("/:id", entidadeHandler.Update)
-		entidades.DELETE("/:id", entidadeHandler.Delete)
+	// Regimes Tributários
+	regime := router.Group("/entidades/:entidade_id/regimes-tributarios")
+	{
+		regime.GET("", container.EntidadeRegimeTributarioHandler.List)
+		regime.POST("", container.EntidadeRegimeTributarioHandler.Create) // Corrected: This was missing
+		regime.GET("/:item", container.EntidadeRegimeTributarioHandler.GetByID)
+		regime.PUT("/:item", container.EntidadeRegimeTributarioHandler.Update)
+		regime.DELETE("/:item", container.EntidadeRegimeTributarioHandler.Delete)
+	}
+
+	// Grupos de Entidade
+	grupo := router.Group("/grupos-entidade")
+	{
+		grupo.GET("", container.GrupoEntidadeHandler.List) // Corrected: This was missing
+		grupo.POST("", container.GrupoEntidadeHandler.Create)
+		grupo.GET("/:id", container.GrupoEntidadeHandler.GetByID)
+		grupo.PUT("/:id", container.GrupoEntidadeHandler.Update)
+		grupo.DELETE("/:id", container.GrupoEntidadeHandler.Delete)
 	}
 }

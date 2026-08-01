@@ -35,13 +35,13 @@ func NewProdutoCorService(repo repository.ProdutoCorRepository) ProdutoCorServic
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-func (s *produtoCorService) validateProdutoCor(req *dto.ProdutoCorRequest, isUpdate bool) error {
+func (s *produtoCorService) validateProdutoCor(id int, req *dto.ProdutoCorRequest) error {
 	if err := req.Validate(); err != nil {
 		return err
 	}
 
 	// Validar unicidade da sigla
-	exists, err := s.repo.ExistsBySigla(req.Sigla, req.EmpresaFilialID, req.ID)
+	exists, err := s.repo.ExistsBySigla(req.Sigla, req.EmpresaFilialID, id)
 	if err != nil {
 		return err
 	}
@@ -50,12 +50,12 @@ func (s *produtoCorService) validateProdutoCor(req *dto.ProdutoCorRequest, isUpd
 	}
 
 	// Validar unicidade do nome
-	exists, err = s.repo.ExistsByNome(req.Nome, req.EmpresaFilialID, req.ID)
+	exists, err = s.repo.ExistsByNome(req.Descricao, req.EmpresaFilialID, id)
 	if err != nil {
 		return err
 	}
 	if exists {
-		return apperrors.NewConflictError(fmt.Sprintf("Já existe uma cor com o nome '%s' para esta filial.", req.Nome))
+		return apperrors.NewConflictError(fmt.Sprintf("Já existe uma cor com o nome '%s' para esta filial.", req.Descricao))
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func (s *produtoCorService) mapModelToResponse(cor *models.ProdutoCor) (*dto.Pro
 
 // Create cria uma nova cor de produto.
 func (s *produtoCorService) Create(req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error) {
-	if err := s.validateProdutoCor(req, false); err != nil {
+	if err := s.validateProdutoCor(0, req); err != nil {
 		return nil, err
 	}
 
@@ -121,7 +121,7 @@ func (s *produtoCorService) Update(id int, req *dto.ProdutoCorRequest) (*dto.Pro
 	}
 
 	req.ID = id // Garante que o ID da requisição corresponde ao ID da URL
-	if err := s.validateProdutoCor(req, true); err != nil {
+	if err := s.validateProdutoCor(id, req); err != nil {
 		return nil, err
 	}
 

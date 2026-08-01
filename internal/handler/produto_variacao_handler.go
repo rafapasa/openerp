@@ -35,9 +35,8 @@ func NewProdutoVariacaoHandler(s service.ProdutoVariacaoService) *ProdutoVariaca
 // @Failure 500 {object} utils.ErrorResponse "Erro interno do servidor"
 // @Router /produto-variacoes [post]
 func (h *ProdutoVariacaoHandler) Create(c *gin.Context) {
-	var req dto.ProdutoVariacaoRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.RespondWithErrorAny(c, apperrors.NewValidationError(fmt.Sprintf("Dados inválidos para a variação de produto: %v", err)))
+	var req dto.ProdutoVariacaoRequest //
+	if !utils.BindAndValidateOrRespond(c, &req) {
 		return
 	}
 
@@ -103,9 +102,8 @@ func (h *ProdutoVariacaoHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req dto.ProdutoVariacaoRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.RespondWithErrorAny(c, apperrors.NewValidationError(fmt.Sprintf("Dados inválidos para a variação de produto: %v", err)))
+	var req dto.ProdutoVariacaoRequest //
+	if !utils.BindAndValidateOrRespond(c, &req) {
 		return
 	}
 

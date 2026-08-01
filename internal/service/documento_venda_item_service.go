@@ -30,19 +30,19 @@ type DocumentoVendaItemService interface {
 // documentoVendaItemServiceFactory implementa a fábrica
 type documentoVendaItemServiceFactory struct {
 	// Dependências fixas (não mudam com a transação)
-	proService    ProdutoService
+	tbppService   TabelaPrecoProdutoService
 	prcService    ProcessoService
 	configService ConfiguracaoService
 }
 
 // NewDocumentoVendaItemServiceFactory cria a fábrica com as dependências injetadas
 func NewDocumentoVendaItemServiceFactory(
-	proService ProdutoService,
+	tbppService TabelaPrecoProdutoService,
 	prcService ProcessoService,
 	configService ConfiguracaoService,
 ) DocumentoVendaItemServiceFactory {
 	return &documentoVendaItemServiceFactory{
-		proService:    proService,
+		tbppService:   tbppService,
 		prcService:    prcService,
 		configService: configService,
 	}
@@ -56,7 +56,7 @@ func (f *documentoVendaItemServiceFactory) CreateWithTx(tx *gorm.DB) DocumentoVe
 	// Cria o service com as dependências fixas + repositório transacional
 	return &documentoVendaItemService{
 		dviRepo:       dviRepo,
-		proService:    f.proService,
+		tbppService:   f.tbppService,
 		prcService:    f.prcService,
 		configService: f.configService,
 	}
@@ -66,20 +66,20 @@ func (f *documentoVendaItemServiceFactory) CreateWithTx(tx *gorm.DB) DocumentoVe
 type documentoVendaItemService struct {
 	ddvService    DocumentoVendaService
 	dviRepo       repository.DocumentoVendaItemRepository
-	proService    ProdutoService
+	tbppService   TabelaPrecoProdutoService
 	prcService    ProcessoService
 	configService ConfiguracaoService
 }
 
 func NewDocumentoVendaItemService(ddvService DocumentoVendaService,
 	dviRepo repository.DocumentoVendaItemRepository,
-	proService ProdutoService,
+	tbppService TabelaPrecoProdutoService,
 	prcService ProcessoService,
 	configService ConfiguracaoService) DocumentoVendaItemService {
 	return &documentoVendaItemService{
 		ddvService:    ddvService,
 		dviRepo:       dviRepo,
-		proService:    proService,
+		tbppService:   tbppService,
 		prcService:    prcService,
 		configService: configService}
 }
@@ -90,7 +90,7 @@ func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 	}
 
 	configEditValUnit, err := s.configService.GetConfig(constants.CONFIG_VALOR_UNITARIO_VENDA_HABILITADO)
-	configTbpId, err := s.configService.GetConfig(constants.CONFIG_TABELA_PRECO_PADRAO)
+	configTbpId, err := s.getTabelaPrecoPadrao()
 	if err != nil {
 		return err
 	}
@@ -101,11 +101,11 @@ func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 	}
 
 	if configEditValUnit.(int) != constants.SIM {
-		valor, err := s.proService.GetValorUnitario(configTbpId.(int), req.ProdutoID)
+		itemTabelaPreco, err := s.tbppService.GetByProduto(configTbpId, req.ProdutoID)
 		if err != nil {
 			return err
 		}
-		dvi.ValorUnitario = valor
+		dvi.ValorUnitario = itemTabelaPreco.ValorPadrao
 	} else {
 		dvi.ValorUnitario = req.ValorUnitario
 	}
@@ -133,6 +133,10 @@ func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 
 	return s.dviRepo.Create(dvi)
 }
+
+// Create cria um novo item de documento de venda.
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
 
 func (s *documentoVendaItemService) Update(ddvId, dviItem int, req *dto.DocumentoVendaItemRequest) error {
 	if err := s.isDataValid(req); err != nil {
@@ -191,12 +195,25 @@ func (s *documentoVendaItemService) isDataValid(req *dto.DocumentoVendaItemReque
 		return apperrors.NewValidationError("A 'quantidade' deve ser maior que zero.")
 	}
 
-	produto, err := s.proService.FindById(req.ProdutoID)
+	configTbpId, err := s.getTabelaPrecoPadrao()
+	if err != nil {
+		return err
+	}
+	itemTabPreco, err := s.tbppService.GetByProduto(configTbpId, req.ProdutoID)
 	if err != nil { //
 		return apperrors.NewNotFoundError(fmt.Sprintf("Produto com ID %d não encontrado.", req.ProdutoID)) //
 	}
-	if !produto.IsActive() {
-		return apperrors.NewValidationError(fmt.Sprintf("O produto '%s' não está ativo.", produto.GetNomeCompleto())) //
+	if !itemTabPreco.Produto.IsActive() {
+		return apperrors.NewValidationError(fmt.Sprintf("O produto '%s' não está ativo.", itemTabPreco.Produto.GetNomeCompleto())) //
 	}
 	return nil
+}
+
+func (s *documentoVendaItemService) getTabelaPrecoPadrao() (int, error) {
+	configTbpId, err := s.configService.GetConfig(constants.CONFIG_TABELA_PRECO_PADRAO)
+	if err != nil {
+		return 0, err
+	}
+	return configTbpId.(int), nil
+
 }

@@ -198,7 +198,7 @@ func (h *DocumentoVendaPagamentoHandler) List(c *gin.Context) {
 	for i, payment := range payments {
 		var respPayment dto.DocumentoVendaPagamentoResponse
 		respPayment.FromModel(&payment)
-		respPayments[i] = respPayment
+		respPayments[i] = respPayment //
 	}
 
 	totalPages := int((total + int64(limit) - 1) / int64(limit))

@@ -249,6 +249,11 @@ func (t TipoOperacao) String() string {
 	}
 }
 
+func (t TipoOperacao) IsValid() bool {
+	return t == TipoOperacaoEntrada || t == TipoOperacaoSaida
+
+}
+
 // ============================================================
 // TIPO DE DOCUMENTO DE VENDA
 // ============================================================

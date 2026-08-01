@@ -30,7 +30,7 @@ type authService struct {
 	refreshExp time.Duration
 }
 
-func NewauthService(db *gorm.DB, cfg *config.Config) AuthService {
+func NewAuthService(db *gorm.DB, cfg *config.Config) AuthService {
 	return &authService{
 		userRepo:   repository.NewUsuarioRepository(db),
 		jwtSecret:  cfg.JWTSecret,

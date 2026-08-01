@@ -197,6 +197,10 @@ func (s *entidadeService) GetByDocumento(documento string) (*models.Entidade, er
 	return entidade, nil
 }
 
+// GetByDocumento busca uma entidade pelo documento (CPF/CNPJ).
+// Este método já existe no arquivo, apenas garantindo que a interface o referencie.
+// (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
+
 func (s *entidadeService) Update(id int, req *dto.EntidadeRequest) (*models.Entidade, error) {
 	if err := s.isUpdateValid(id, req); err != nil {
 		return nil, err

@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-playground/validator/v10"
-
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
@@ -20,8 +18,8 @@ import (
 // REQUESTS
 // ============================================================
 
-// DocumentoVendaItemRequest representa um item no request de um documento de venda.
-type DocumentoVendaItemRequest struct {
+// DocumentoVendaItemRequest (moved to documento_venda_item_dto.go)
+/*type DocumentoVendaItemRequest struct {
 	DocumentoVendaID   int      `json:"id,omitempty"`
 	ProdutoID          int      `json:"produto_id" binding:"required"`
 	Quantidade         float64  `json:"quantidade" binding:"required,gt=0"`
@@ -34,10 +32,10 @@ type DocumentoVendaItemRequest struct {
 	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
 	CreatedBy          *int     `json:"created_by,omitempty"`
 	UpdatedBy          *int     `json:"updated_by,omitempty"`
-}
+}*/
 
-// DocumentoVendaPagamentoRequest representa um pagamento no request
-type DocumentoVendaPagamentoRequest struct {
+// DocumentoVendaPagamentoRequest (moved to documento_venda_pagamento_dto.go)
+/*type DocumentoVendaPagamentoRequest struct {
 	DocumentoVendaID int        `json:"id,omitempty"`
 	FormaPagamentoID int        `json:"forma_pagamento_id" binding:"required"`
 	Valor            float64    `json:"valor" binding:"required,gt=0"`
@@ -47,9 +45,9 @@ type DocumentoVendaPagamentoRequest struct {
 	ValorMulta       *float64   `json:"valor_multa,omitempty"`
 	ValorDesconto    *float64   `json:"valor_desconto,omitempty"`
 	Observacao       *string    `json:"observacao,omitempty"`
-	CreatedBy        *int       `json:"created_by,omitempty"`
-	UpdatedBy        *int       `json:"updated_by,omitempty"`
-}
+	CreatedBy        *int `json:"created_by,omitempty"`
+	UpdatedBy        *int `json:"updated_by,omitempty"`
+}*/
 
 // DocumentoVendaRequest representa o request para criar/atualizar um documento de venda.
 type DocumentoVendaRequest struct {
@@ -93,7 +91,7 @@ type DocumentoVendaRequest struct {
 	// ============================================================
 	// LISTAS
 	// ============================================================
-	Itens      []DocumentoVendaItemRequest      `json:"itens" binding:"required,min=1,dive"`
+	Itens      []DocumentoVendaItemRequest      `json:"itens" binding:"min=1,dive"` // Removed "required" from binding, will be checked by ValidateMandatoryFields
 	Pagamentos []DocumentoVendaPagamentoRequest `json:"pagamentos,omitempty"`
 
 	// ============================================================
@@ -107,26 +105,8 @@ type DocumentoVendaRequest struct {
 // RESPONSES
 // ============================================================
 
-// DocumentoVendaItemResponse representa a resposta de um item de documento.
-type DocumentoVendaItemResponse struct {
-	DocumentoVendaID   int      `json:"documento_venda_id"`
-	Item               int      `json:"item"`
-	ProdutoID          int      `json:"produto_id"`
-	ProdutoNome        string   `json:"produto_nome,omitempty"`
-	ProdutoCodigo      int      `json:"produto_codigo,omitempty"`
-	Quantidade         float64  `json:"quantidade"`
-	ValorUnitario      float64  `json:"valor_unitario"`
-	PercentualDesconto *float64 `json:"percentual_desconto,omitempty"`
-	ValorDesconto      *float64 `json:"valor_desconto,omitempty"`
-	ValorFrete         *float64 `json:"valor_frete,omitempty"`
-	TotalItem          float64  `json:"total_item"`
-	TotalItemComFrete  float64  `json:"total_item_com_frete,omitempty"`
-	PesoBruto          *float64 `json:"peso_bruto,omitempty"`
-	PesoLiquido        *float64 `json:"peso_liquido,omitempty"`
-}
-
-// DocumentoVendaPagamentoResponse representa a resposta de um pagamento
-type DocumentoVendaPagamentoResponse struct {
+// DocumentoVendaItemResponse (moved to documento_venda_item_dto.go)
+/*type DocumentoVendaPagamentoResponse struct {
 	DocumentoVendaID   int      `json:"documento_venda_id"`
 	Item               int      `json:"item"`
 	FormaPagamentoID   int      `json:"forma_pagamento_id"`
@@ -138,9 +118,7 @@ type DocumentoVendaPagamentoResponse struct {
 	ValorMulta         *float64 `json:"valor_multa,omitempty"`
 	ValorDesconto      *float64 `json:"valor_desconto,omitempty"`
 	Observacao         *string  `json:"observacao,omitempty"`
-	// Status             int      `json:"status"` // Not in model
-	// StatusLabel        string   `json:"status_label,omitempty"` // Not in model
-}
+}*/
 
 // DocumentoVendaResponse representa a resposta de um documento de venda.
 type DocumentoVendaResponse struct {
@@ -226,60 +204,12 @@ type DocumentoVendaListResponse struct {
 }
 
 // ============================================================
-// MÉTODOS DE CONVERSÃO (FROM MODEL) para DocumentoVendaPagamentoResponse
-// ============================================================
-
-// FromModel converte models.DocumentoVendaPagamento para DocumentoVendaPagamentoResponse
-func (r *DocumentoVendaPagamentoResponse) FromModel(pagamento *models.DocumentoVendaPagamento) *DocumentoVendaPagamentoResponse {
-	if pagamento == nil {
-		return nil
-	}
-
-	r.DocumentoVendaID = pagamento.DocumentoVendaID
-	r.Item = pagamento.Item
-	// FormaPagamentoID is a pointer in model, dereference it if not nil
-	if pagamento.FormaPagamentoID != nil {
-		r.FormaPagamentoID = *pagamento.FormaPagamentoID
-	}
-	r.Valor = pagamento.Valor
-
-	if !pagamento.DataVencimento.IsZero() {
-		r.DataVencimento = utils.FormatDate(pagamento.DataVencimento)
-	}
-	if pagamento.DataPagamento != nil && !pagamento.DataPagamento.IsZero() {
-		r.DataPagamento = utils.FormatDate(*pagamento.DataPagamento)
-	}
-	r.ValorJuros = pagamento.ValorJuros
-	r.ValorMulta = pagamento.ValorMulta
-	r.ValorDesconto = pagamento.ValorDesconto
-	r.Observacao = pagamento.Observacao
-
-	if pagamento.FormaPagamento != nil {
-		r.FormaPagamentoNome = pagamento.FormaPagamento.Descricao
-	}
-	return r
-}
-
-type DocumentoVendaItemListResponse struct {
-	Items      []DocumentoVendaItemResponse `json:"items"`
-	Total      int64                        `json:"total"`
-	Page       int                          `json:"page"`
-	Limit      int                          `json:"limit"`
-	TotalPages int                          `json:"total_pages"`
-}
-
-// ============================================================
 // MÉTODOS DE VALIDAÇÃO
 // ============================================================
 
 // Validate valida o DocumentoVendaRequest
 func (r *DocumentoVendaRequest) Validate() error {
 	// 1. Validação com go-playground/validator
-	validate := validator.New()
-	if err := validate.Struct(r); err != nil {
-		return err
-	}
-
 	// 2. Validar campos obrigatórios usando utils
 	if err := utils.ValidateMandatoryFields(r); err != nil {
 		return err
@@ -287,12 +217,12 @@ func (r *DocumentoVendaRequest) Validate() error {
 
 	// 3. Validar TipoDocumento usando constantes
 	if err := validateTipoDocumentoVenda(r.TipoDocumento); err != nil {
-		return err
+		return err //
 	}
 
 	// 4. Validar TipoOperacao usando constantes
 	if err := validateTipoOperacao(r.TipoOperacao); err != nil {
-		return err
+		return err //
 	}
 
 	// 5. Validar TipoEntrega (se informado)
@@ -302,17 +232,17 @@ func (r *DocumentoVendaRequest) Validate() error {
 		}
 	}
 
-	// 6. Validar itens
+	// 6. Validar itens (using their own Validate method)
 	for i, item := range r.Itens {
-		if err := validateDocumentoVendaItem(&item); err != nil {
-			return fmt.Errorf("item %d: %w", i+1, err)
+		if err := item.Validate(); err != nil {
+			return fmt.Errorf("item %d: %w", i+1, err) //
 		}
 	}
 
-	// 7. Validar pagamentos
+	// 7. Validar pagamentos (using their own Validate method)
 	for i, pagamento := range r.Pagamentos {
-		if err := validateDocumentoVendaPagamento(&pagamento); err != nil {
-			return fmt.Errorf("pagamento %d: %w", i+1, err)
+		if err := pagamento.Validate(); err != nil {
+			return fmt.Errorf("pagamento %d: %w", i+1, err) //
 		}
 	}
 
@@ -321,32 +251,6 @@ func (r *DocumentoVendaRequest) Validate() error {
 		if r.DataValidade.Before(*r.DataPrevisao) {
 			return fmt.Errorf("data_validade deve ser posterior a data_previsao")
 		}
-	}
-
-	return nil
-}
-
-// validateDocumentoVendaItem valida um item
-func validateDocumentoVendaItem(item *DocumentoVendaItemRequest) error {
-	// Validar percentual de desconto (se informado)
-	if item.PercentualDesconto != nil && (*item.PercentualDesconto < 0 || *item.PercentualDesconto > 100) {
-		return fmt.Errorf("percentual_desconto deve estar entre 0 e 100, recebido: %.2f", *item.PercentualDesconto)
-	}
-
-	// Validar valor de desconto (se informado)
-	if item.ValorDesconto != nil && *item.ValorDesconto < 0 {
-		return fmt.Errorf("valor_desconto não pode ser negativo, recebido: %.2f", *item.ValorDesconto)
-	}
-
-	return nil
-}
-
-// validateDocumentoVendaPagamento valida um pagamento
-func validateDocumentoVendaPagamento(pagamento *DocumentoVendaPagamentoRequest) error {
-	// Validar número de parcelas
-	if pagamento.NumeroParcelas > 0 && pagamento.ParcelaAtual > pagamento.NumeroParcelas {
-		return fmt.Errorf("parcela_atual (%d) não pode ser maior que numero_parcelas (%d)",
-			pagamento.ParcelaAtual, pagamento.NumeroParcelas)
 	}
 
 	return nil
@@ -361,14 +265,14 @@ func validateTipoDocumentoVenda(valor int) error {
 	case constants.TipoDocumentoOrcamento, constants.TipoDocumentoPedido:
 		return nil
 	default:
-		return fmt.Errorf("tipo_documento inválido: %d. Deve ser 1 (Orçamento) ou 2 (Pedido)", valor)
+		return fmt.Errorf("tipo_documento inválido: %d. Deve ser 1 (Orçamento) ou 2 (Pedido)", valor) //
 	}
 }
 
 func validateTipoOperacao(valor int) error {
 	switch constants.TipoOperacao(valor) {
 	case constants.TipoOperacaoEntrada, constants.TipoOperacaoSaida:
-		return nil
+		return nil //
 	default:
 		return fmt.Errorf("tipo_operacao inválido: %d. Deve ser 0 (Entrada) ou 1 (Saída)", valor)
 	}
@@ -382,7 +286,7 @@ func validateTipoEntrega(valor string) error {
 	}
 
 	for _, v := range validValues {
-		if valor == v {
+		if valor == v { //
 			return nil
 		}
 	}
@@ -441,7 +345,7 @@ func (r *DocumentoVendaResponse) FromModel(doc *models.DocumentoVenda) (*Documen
 	r.SituacaoLabel = constants.SituacaoPedido(doc.Situacao).String()
 
 	// 4. Formatar datas
-	r.DataDocumento = utils.FormatDateTime(doc.CreatedAt)
+	r.DataDocumento = utils.FormatDate(doc.DataDocumento) // Use DataDocumento from model
 	r.CreatedAt = utils.FormatDateTime(doc.CreatedAt)
 	r.UpdatedAt = utils.FormatDateTime(doc.UpdatedAt)
 
@@ -453,108 +357,27 @@ func (r *DocumentoVendaResponse) FromModel(doc *models.DocumentoVenda) (*Documen
 		r.DataPrevisao = utils.FormatDate(*doc.DataPrevisao)
 	}
 
-	// 5. Calcular totais
-	calculateTotals(r, doc)
+	// 5. Converter itens
+	if len(doc.Itens) > 0 {
+		itensResponse := make([]DocumentoVendaItemResponse, len(doc.Itens))
+		for i, item := range doc.Itens {
+			var itemResp DocumentoVendaItemResponse
+			itemResp.FromModel(&item)
+			itensResponse[i] = itemResp
+		}
+		r.Itens = itensResponse
+	}
 
-	// 6. Converter itens
-	convertItems(r, doc)
-
-	// 7. Converter pagamentos
-	convertPayments(r, doc)
+	// 6. Converter pagamentos
+	if len(doc.Pagamentos) > 0 {
+		pagamentosResponse := make([]DocumentoVendaPagamentoResponse, len(doc.Pagamentos))
+		for i, pagamento := range doc.Pagamentos {
+			var pagResp DocumentoVendaPagamentoResponse
+			pagResp.FromModel(&pagamento)
+			pagamentosResponse[i] = pagResp
+		}
+		r.Pagamentos = pagamentosResponse
+	}
 
 	return r, nil
-}
-
-// ============================================================
-// FUNÇÕES AUXILIARES DE CONVERSÃO
-// ============================================================
-
-func calculateTotals(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
-	if len(doc.Itens) == 0 {
-		return
-	}
-
-	var totalProdutos, totalDescontos, totalFrete float64
-
-	for _, item := range doc.Itens {
-		totalProdutos += item.ValorUnitario * item.Quantidade
-		if item.ValorDesconto != nil {
-			totalDescontos += *item.ValorDesconto
-		}
-		if item.ValorFrete != nil {
-			totalFrete += *item.ValorFrete
-		}
-	}
-
-	r.TotalProdutos = totalProdutos
-	r.TotalDescontos = totalDescontos
-	r.TotalFrete = totalFrete
-	r.TotalLiquido = totalProdutos - totalDescontos + totalFrete
-}
-
-func convertItems(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
-	if len(doc.Itens) == 0 {
-		return
-	}
-
-	itensResponse := make([]DocumentoVendaItemResponse, len(doc.Itens))
-	for i, item := range doc.Itens {
-		itemResp := DocumentoVendaItemResponse{
-			DocumentoVendaID:   item.DocumentoVendaID,
-			Item:               item.Item,
-			ProdutoID:          item.ProdutoID,
-			Quantidade:         item.Quantidade,
-			ValorUnitario:      item.ValorUnitario,
-			TotalItem:          item.ValorUnitario * item.Quantidade,
-			PesoBruto:          utils.Float64Ptr(item.PesoBruto),
-			PesoLiquido:        utils.Float64Ptr(item.PesoLiquido),
-			PercentualDesconto: item.PercentualDesconto,
-			ValorDesconto:      item.ValorDesconto,
-			ValorFrete:         item.ValorFrete,
-		}
-
-		if item.Produto != nil {
-			itemResp.ProdutoNome = item.Produto.Nome
-			itemResp.ProdutoCodigo = item.Produto.Codigo
-		}
-		itensResponse[i] = itemResp
-	}
-	r.Itens = itensResponse
-}
-
-func convertPayments(r *DocumentoVendaResponse, doc *models.DocumentoVenda) {
-	if len(doc.Pagamentos) == 0 {
-		return
-	}
-
-	pagamentosResponse := make([]DocumentoVendaPagamentoResponse, len(doc.Pagamentos))
-	for i, pagamento := range doc.Pagamentos {
-		pagResp := DocumentoVendaPagamentoResponse{
-			DocumentoVendaID: pagamento.DocumentoVendaID,
-			Item:             pagamento.Item,
-			FormaPagamentoID: *pagamento.FormaPagamentoID,
-			Valor:            pagamento.Valor, //
-			ValorJuros:       pagamento.ValorJuros, //
-			ValorMulta:       pagamento.ValorMulta, //
-			ValorDesconto:    pagamento.ValorDesconto, //
-			Observacao:       pagamento.Observacao, //
-		}
-
-		if pagamento.FormaPagamento != nil {
-			pagResp.FormaPagamentoNome = pagamento.FormaPagamento.Descricao //
-		}
-
-		if !pagamento.DataVencimento.IsZero() {
-			pagResp.DataVencimento = utils.FormatDate(pagamento.DataVencimento) //
-		}
-		if pagamento.DataPagamento != nil && !pagamento.DataPagamento.IsZero() {
-			pagResp.DataPagamento = utils.FormatDate(*pagamento.DataPagamento) //
-		}
-
-		// Status label - usando constantes existentes
-		// pagResp.StatusLabel = getStatusPagamentoLabel(pagamento.Status)
-
-		pagamentosResponse[i] = pagResp
-	}
-	r.Pagamentos = pagamentosResponse
 }

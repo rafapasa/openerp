@@ -63,3 +63,8 @@ func (d *DocumentoVendaPagamentoCDC) BeforeUpdate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+// IsActive verifica se o relacionamento pagamento-centro de custo está ativo (não deletado)
+func (d *DocumentoVendaPagamentoCDC) IsActive() bool {
+	return d.DeletedAt == nil
+}

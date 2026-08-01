@@ -29,12 +29,10 @@ type ProdutoService interface {
 	Activate(id int) error
 	Deactivate(id int) error
 	FindById(id int) (*models.Produto, error)
-	GetValorUnitario(tbpId, proId int) (float64, error)
 }
 
 type produtoService struct {
-	proRepo     repository.ProdutoRepository
-	tbppService TabelaPrecoProdutoService
+	proRepo repository.ProdutoRepository
 	// estoqueRepo        *repository.EstoqueRepository
 	// documentoVendaItemRepo *repository.DocumentoVendaItemRepository
 }
@@ -52,10 +50,9 @@ const (
 	minLengthProdutoResumo = 3
 )
 
-func NewProdutoService(proRepo repository.ProdutoRepository, tbppService TabelaPrecoProdutoService) ProdutoService {
+func NewProdutoService(proRepo repository.ProdutoRepository) ProdutoService {
 	return &produtoService{
-		proRepo:     proRepo,
-		tbppService: tbppService,
+		proRepo: proRepo,
 	}
 }
 
@@ -254,7 +251,7 @@ func (s *produtoService) isCreateValid(req *dto.ProdutoRequest) error {
 	}
 
 	// 3. Validar duplicidade de código de barras
-	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, 0); err != nil { // Corrected: Passed req.CodigoBarras directly
+	if err := s.validateUniqueCodigoBarras(utils.StringPtr(req.CodigoBarras), 0); err != nil {
 		return err
 	}
 
@@ -274,7 +271,7 @@ func (s *produtoService) isUpdateValid(id int, req *dto.ProdutoRequest) error {
 	}
 
 	// 3. Validar duplicidade de código de barras (excluindo o próprio ID)
-	if err := s.validateUniqueCodigoBarras(&req.CodigoBarras, id); err != nil { // Corrected: Passed req.CodigoBarras directly
+	if err := s.validateUniqueCodigoBarras(utils.StringPtr(req.CodigoBarras), id); err != nil {
 		return err
 	}
 
@@ -511,18 +508,4 @@ func (s *produtoService) FindById(id int) (*models.Produto, error) {
 		return nil, apperrors.NewValidationError("O 'id' é obrigatório.")
 	}
 	return s.proRepo.FindByID(id)
-}
-
-func (s *produtoService) GetValorUnitario(tbpId, proId int) (float64, error) {
-	if tbpId <= 0 {
-		return 0, apperrors.NewValidationError("O 'tabela_preco_id' é obrigatório.")
-	}
-	if proId <= 0 {
-		return 0, apperrors.NewValidationError("O 'produto_id' é obrigatório.")
-	}
-	itemTabPreco, err := s.tbppService.GetByProduto(tbpId, proId)
-	if err != nil {
-		return 0, err
-	}
-	return itemTabPreco.ValorPadrao, nil
 }

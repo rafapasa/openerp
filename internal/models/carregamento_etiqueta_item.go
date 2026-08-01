@@ -81,6 +81,11 @@ func (c *CarregamentoEtiquetaItem) SoftDelete() {
 	c.DeletedAt = &now
 }
 
+// IsActive verifica se o item da etiqueta está ativo (não deletado)
+func (c *CarregamentoEtiquetaItem) IsActive() bool {
+	return c.DeletedAt == nil
+}
+
 // GetTotalPeso retorna o peso total (quantidade * peso unitário)
 func (c *CarregamentoEtiquetaItem) GetTotalPeso() float64 {
 	return c.QuantEmbalada * c.Peso

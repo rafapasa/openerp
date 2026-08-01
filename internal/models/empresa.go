@@ -52,3 +52,8 @@ func (e *Empresa) SoftDelete() {
 	now := time.Now()
 	e.DeletedAt = &now
 }
+
+// IsActive verifica se a empresa está ativa (não deletada)
+func (e *Empresa) IsActive() bool {
+	return e.DeletedAt == nil
+}

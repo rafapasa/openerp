@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"strings"
 
 	apperrors "github.com/openerp/backend/internal/erros"
@@ -62,8 +61,7 @@ func (s *entidadeLimiteCreditoService) Create(req *dto.EntidadeLimiteCreditoRequ
 	}
 
 	if err := s.limiteRepo.Create(limite); err != nil {
-		return nil, fmt.Errorf("erro ao criar limite de crédito: %w", err)
-		return nil, apperrors.NewInternalError("Erro ao criar limite de crédito.", err) //
+		return nil, err
 	}
 
 	return limite, nil

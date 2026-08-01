@@ -1,9 +1,11 @@
 package dto
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/openerp/backend/internal/models"
+	"github.com/openerp/backend/internal/utils"
 )
 
 // ============================================================
@@ -16,6 +18,24 @@ type EntidadeLimiteCreditoRequest struct {
 	Valor     float64 `json:"valor" binding:"required,gt=0"`
 	CreatedBy *int    `json:"-"`
 	UpdatedBy *int    `json:"-"`
+}
+
+// ToModel converte EntidadeLimiteCreditoRequest para models.EntidadeLimiteCredito.
+func (r *EntidadeLimiteCreditoRequest) ToModel() (*models.EntidadeLimiteCredito, error) {
+	if r == nil {
+		return nil, nil
+	}
+
+	limite := &models.EntidadeLimiteCredito{}
+	if err := utils.MapToModel(r, limite); err != nil {
+		return nil, fmt.Errorf("erro ao mapear DTO para modelo de limite de crédito: %w", err)
+	}
+
+	// Definir a data atual se não for fornecida (ou se for um campo obrigatório no modelo)
+	if limite.Data.IsZero() {
+		limite.Data = time.Now()
+	}
+	return limite, nil
 }
 
 // ============================================================

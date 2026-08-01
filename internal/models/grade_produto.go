@@ -72,6 +72,11 @@ func (g *GradeProduto) SoftDelete() {
 	g.DeletedAt = &now
 }
 
+// IsActive verifica se a grade de produto está ativa (não deletada)
+func (g *GradeProduto) IsActive() bool {
+	return g.DeletedAt == nil
+}
+
 func (g *GradeProduto) HasItens() bool {
 	return len(g.Itens) > 0
 }

@@ -63,10 +63,6 @@ func (g *GrupoUsuario) BeforeUpdate(tx *gorm.DB) error {
 // MÉTODOS AUXILIARES
 // ============================================================
 
-func (g *GrupoUsuario) IsActive() bool {
-	return g.Situacao == 1
-}
-
 // CORRIGIDO: IsDeleted com D maiúsculo
 func (g *GrupoUsuario) IsDeleted() bool {
 	return g.DeletedAt != nil
@@ -76,4 +72,9 @@ func (g *GrupoUsuario) SoftDelete() {
 	now := time.Now()
 	g.DeletedAt = &now
 	g.Situacao = 0 // Marca como inativo também
+}
+
+// IsActive verifica se o grupo de usuário está ativo (não deletado e situação ativa)
+func (g *GrupoUsuario) IsActive() bool {
+	return g.DeletedAt == nil && g.Situacao == 1
 }
