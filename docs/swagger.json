@@ -158,6 +158,233 @@
                 }
             }
         },
+        "/condicoes-pagamento": {
+            "get": {
+                "description": "Retorna uma lista paginada de condições de pagamento, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Lista as condições de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo de condição (0=À Vista, 1=À Prazo, 9=Sem Pagamento)",
+                        "name": "tipo_condicao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova condição de pagamento com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Cria uma nova condição de pagamento",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a condição de pagamento",
+                        "name": "condicao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/condicoes-pagamento/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma condição de pagamento específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Busca uma condição de pagamento por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Condição de pagamento não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma condição de pagamento existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Atualiza uma condição de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a condição de pagamento",
+                        "name": "condicao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Condição de pagamento não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma condição de pagamento.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Exclui uma condição de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/documentos-venda": {
             "get": {
                 "description": "Retorna uma lista paginada de documentos de venda, com suporte a filtros.",
@@ -378,6 +605,470 @@
                     },
                     "404": {
                         "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos/venda/{documento_venda_id}/itens": {
+            "get": {
+                "description": "Retorna uma lista paginada de itens para um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Itens"
+                ],
+                "summary": "Lista os itens de um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo item para um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Itens"
+                ],
+                "summary": "Cria um novo item para um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para criar o item do documento de venda",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos/venda/{documento_venda_id}/itens/{item}": {
+            "get": {
+                "description": "Retorna os detalhes de um item de documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Itens"
+                ],
+                "summary": "Busca um item de documento de venda por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um item de documento de venda existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Itens"
+                ],
+                "summary": "Atualiza um item de documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o item do documento de venda",
+                        "name": "item_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Exclui logicamente um item de documento de venda.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Itens"
+                ],
+                "summary": "Exclui um item de documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos/venda/{documento_venda_id}/pagamentos": {
+            "get": {
+                "description": "Retorna uma lista paginada de pagamentos para um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Pagamentos"
+                ],
+                "summary": "Lista os pagamentos de um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adiciona um novo pagamento a um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Pagamentos"
+                ],
+                "summary": "Adiciona um novo pagamento a um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para adicionar o pagamento",
+                        "name": "pagamento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos/venda/{documento_venda_id}/pagamentos/{item}": {
+            "get": {
+                "description": "Retorna os detalhes de um pagamento específico de um documento de venda.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Pagamentos"
+                ],
+                "summary": "Busca um pagamento de documento de venda por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item do Pagamento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Pagamento não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um pagamento existente de um documento de venda.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Pagamentos"
+                ],
+                "summary": "Atualiza um pagamento de documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item do Pagamento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o pagamento",
+                        "name": "pagamento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Pagamento não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Exclui logicamente um pagamento de um documento de venda.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda - Pagamentos"
+                ],
+                "summary": "Exclui um pagamento de documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_venda_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Número do Item do Pagamento",
+                        "name": "item",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -1321,7 +2012,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Arquivo do documento",
                         "schema": {
                             "type": "file"
                         }
@@ -2199,8 +2890,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "Filtrar por nome",
-                        "name": "nome",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
                         "in": "query"
                     }
                 ],
@@ -2389,6 +3080,9 @@
                     }
                 ],
                 "description": "Realiza a exclusão lógica de um grupo de entidade",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "GrupoEntidades"
                 ],
@@ -2669,7 +3363,1196 @@
                 }
             }
         },
-        "/produto-grupos": {
+        "/operacoes-fiscais": {
+            "get": {
+                "description": "Retorna uma lista paginada de operações fiscais, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Lista as operações fiscais",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por CFOP",
+                        "name": "cfop",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID da Empresa Filial",
+                        "name": "empresa_filial_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova operação fiscal com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Cria uma nova operação fiscal",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a operação fiscal",
+                        "name": "operacao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/operacoes-fiscais/cfop/{cfop}": {
+            "get": {
+                "description": "Retorna operações fiscais filtradas por CFOP.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Busca operações fiscais por CFOP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CFOP da Operação Fiscal",
+                        "name": "cfop",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "CFOP inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/operacoes-fiscais/filial/{filial_id}": {
+            "get": {
+                "description": "Retorna operações fiscais filtradas por ID da filial.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Busca operações fiscais por filial",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Filial",
+                        "name": "filial_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID da filial inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/operacoes-fiscais/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma operação fiscal específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Busca uma operação fiscal por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Operação Fiscal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma operação fiscal existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Atualiza uma operação fiscal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Operação Fiscal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a operação fiscal",
+                        "name": "operacao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma operação fiscal.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Exclui uma operação fiscal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Operação Fiscal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/processos": {
+            "get": {
+                "description": "Retorna uma lista paginada de processos, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Lista os processos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por código",
+                        "name": "codigo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo de operação (0=Entrada, 1=Saída)",
+                        "name": "tipo_operacao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo processo com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Cria um novo processo",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o processo",
+                        "name": "processo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/processos/codigo/{codigo}": {
+            "get": {
+                "description": "Retorna os detalhes de um processo específico pelo código.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Busca um processo por código",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Código do Processo",
+                        "name": "codigo",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Código inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Processo não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/processos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um processo específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Busca um processo por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Processo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Processo não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um processo existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Atualiza um processo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Processo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o processo",
+                        "name": "processo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Processo não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um processo.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Exclui um processo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Processo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produto-variacoes": {
+            "get": {
+                "description": "Retorna uma lista paginada de variações de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Variações"
+                ],
+                "summary": "Lista as variações de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID do Produto",
+                        "name": "produto_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID da Empresa Filial",
+                        "name": "empresa_filial_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID da Cor",
+                        "name": "cor_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID do Tamanho",
+                        "name": "tamanho_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por SKU",
+                        "name": "sku",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova variação de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Variações"
+                ],
+                "summary": "Cria uma nova variação de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a variação de produto",
+                        "name": "variacao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflito, por exemplo, SKU já existente",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produto-variacoes/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma variação de produto específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Variações"
+                ],
+                "summary": "Busca uma variação de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Variação de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "ID da variação de produto inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Variação de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma variação de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Variações"
+                ],
+                "summary": "Atualiza uma variação de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Variação de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a variação de produto",
+                        "name": "variacao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoVariacaoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Variação de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflito, por exemplo, SKU já existente",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma variação de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Variações"
+                ],
+                "summary": "Exclui uma variação de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Variação de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir (ex: variação com estoque)",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Variação de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos": {
+            "get": {
+                "description": "Retorna uma lista paginada de produtos, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Lista os produtos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome",
+                        "name": "nome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por código",
+                        "name": "codigo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por referência",
+                        "name": "referencia",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produtos"
+                ],
+                "summary": "Cria um novo produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o produto",
+                        "name": "produto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/cores": {
+            "get": {
+                "description": "Retorna uma lista paginada de cores de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Lista as cores de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova cor de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Cria uma nova cor de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a cor de produto",
+                        "name": "cor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/cores/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma cor de produto específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Busca uma cor de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Cor de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma cor de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Atualiza uma cor de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a cor de produto",
+                        "name": "cor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Cor de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma cor de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Exclui uma cor de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/grupos": {
             "get": {
                 "description": "Retorna uma lista paginada de grupos de produto, com suporte a filtros.",
                 "consumes": [
@@ -2705,12 +4588,6 @@
                         "type": "integer",
                         "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
                         "name": "situacao",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtrar por visibilidade no PDV (1=Sim, 2=Não)",
-                        "name": "visivel_frente_caixa",
                         "in": "query"
                     }
                 ],
@@ -2768,7 +4645,7 @@
                 }
             }
         },
-        "/produto-grupos/{id}": {
+        "/produtos/grupos/{id}": {
             "get": {
                 "description": "Retorna os detalhes de um grupo de produto específico.",
                 "consumes": [
@@ -2890,7 +4767,7 @@
                 }
             }
         },
-        "/produto-marcas": {
+        "/produtos/marcas": {
             "get": {
                 "description": "Retorna uma lista paginada de marcas de produto, com suporte a filtros.",
                 "consumes": [
@@ -2983,7 +4860,7 @@
                 }
             }
         },
-        "/produto-marcas/{id}": {
+        "/produtos/marcas/{id}": {
             "get": {
                 "description": "Retorna os detalhes de uma marca de produto específica.",
                 "consumes": [
@@ -3105,7 +4982,7 @@
                 }
             }
         },
-        "/produto-modelos": {
+        "/produtos/modelos": {
             "get": {
                 "description": "Retorna uma lista paginada de modelos de produto, com suporte a filtros.",
                 "consumes": [
@@ -3198,7 +5075,7 @@
                 }
             }
         },
-        "/produto-modelos/{id}": {
+        "/produtos/modelos/{id}": {
             "get": {
                 "description": "Retorna os detalhes de um modelo de produto específico.",
                 "consumes": [
@@ -3320,7 +5197,7 @@
                 }
             }
         },
-        "/produto-subgrupos": {
+        "/produtos/subgrupos": {
             "get": {
                 "description": "Retorna uma lista paginada de subgrupos de produto, com suporte a filtros.",
                 "consumes": [
@@ -3413,7 +5290,7 @@
                 }
             }
         },
-        "/produto-subgrupos/{id}": {
+        "/produtos/subgrupos/{id}": {
             "get": {
                 "description": "Retorna os detalhes de um subgrupo de produto específico.",
                 "consumes": [
@@ -3535,9 +5412,9 @@
                 }
             }
         },
-        "/produtos": {
+        "/produtos/tamanhos": {
             "get": {
-                "description": "Retorna uma lista paginada de produtos, com suporte a filtros.",
+                "description": "Retorna uma lista paginada de tamanhos de produto, com suporte a filtros.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3545,9 +5422,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Produtos"
+                    "Produto - Tamanhos"
                 ],
-                "summary": "Lista os produtos",
+                "summary": "Lista os tamanhos de produto",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3563,20 +5440,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "Filtrar por nome",
-                        "name": "nome",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtrar por código",
-                        "name": "codigo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filtrar por referência",
-                        "name": "referencia",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
                         "in": "query"
                     },
                     {
@@ -3590,13 +5455,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoListResponse"
+                            "$ref": "#/definitions/dto.ProdutoTamanhoListResponse"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Cria um novo produto com base nos dados fornecidos.",
+                "description": "Cria um novo tamanho de produto com base nos dados fornecidos.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3604,17 +5469,17 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Produtos"
+                    "Produto - Tamanhos"
                 ],
-                "summary": "Cria um novo produto",
+                "summary": "Cria um novo tamanho de produto",
                 "parameters": [
                     {
-                        "description": "Dados para criar o produto",
-                        "name": "produto",
+                        "description": "Dados para criar o tamanho de produto",
+                        "name": "tamanho",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoRequest"
+                            "$ref": "#/definitions/dto.ProdutoTamanhoRequest"
                         }
                     }
                 ],
@@ -3622,7 +5487,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoResponse"
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
                         }
                     },
                     "400": {
@@ -3633,6 +5498,128 @@
                     },
                     "500": {
                         "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/tamanhos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um tamanho de produto específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Busca um tamanho de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tamanho de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um tamanho de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Atualiza um tamanho de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o tamanho de produto",
+                        "name": "tamanho",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tamanho de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um tamanho de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Exclui um tamanho de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -4254,23 +6241,221 @@
                 "TipoPessoaJuridica"
             ]
         },
-        "dto.DocumentoVendaItemRequest": {
-            "description": "DocumentoVendaItemRequest representa um item no request de um documento de venda.",
+        "dto.CondicaoPagamentoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CondicaoPagamentoRequest": {
             "type": "object",
             "required": [
-                "produto_id",
-                "quantidade"
+                "descricao",
+                "portador_id",
+                "tipo_condicao",
+                "tipo_documento_id"
             ],
+            "properties": {
+                "comissao": {
+                    "type": "number"
+                },
+                "created_by": {
+                    "description": "============================================================\nUSUÁRIO (para auditoria)\n============================================================",
+                    "type": "integer"
+                },
+                "desconto": {
+                    "type": "number"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "dia_pagamento": {
+                    "type": "integer"
+                },
+                "dias_parcelas": {
+                    "type": "integer"
+                },
+                "entrada": {
+                    "type": "integer"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "juros": {
+                    "type": "number"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "portador_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "tipo_condicao": {
+                    "type": "integer"
+                },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CondicaoPagamentoResponse": {
+            "type": "object",
+            "properties": {
+                "comissao": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "desconto": {
+                    "type": "number"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "dia_pagamento": {
+                    "type": "integer"
+                },
+                "dias_parcelas": {
+                    "type": "integer"
+                },
+                "entrada": {
+                    "type": "integer"
+                },
+                "entrada_label": {
+                    "type": "string"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "forma_pagamento_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "juros": {
+                    "type": "number"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "portador_id": {
+                    "type": "integer"
+                },
+                "portador_nome": {
+                    "type": "string"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tipo_condicao": {
+                    "type": "integer"
+                },
+                "tipo_condicao_label": {
+                    "type": "string"
+                },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "tipo_documento_nome": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DocumentoVendaItemListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DocumentoVendaItemRequest": {
             "type": "object",
             "required": [
                 "produto_id",
                 "quantidade"
             ],
             "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
                 "descricao_produto": {
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_id": {
                     "type": "integer"
                 },
                 "percentual_desconto": {
@@ -4287,6 +6472,9 @@
                 },
                 "quantidade": {
                     "type": "number"
+                },
+                "updated_by": {
+                    "type": "integer"
                 },
                 "valor_desconto": {
                     "type": "number"
@@ -4348,9 +6536,6 @@
             }
         },
         "dto.DocumentoVendaListResponse": {
-            "description": "DocumentoVendaListResponse representa a resposta de listagem de documentos de venda",
-            "type": "object",
-            "properties": {
             "type": "object",
             "properties": {
                 "items": {
@@ -4373,19 +6558,35 @@
                 }
             }
         },
+        "dto.DocumentoVendaPagamentoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.DocumentoVendaPagamentoRequest": {
-            "description": "DocumentoVendaPagamentoRequest representa um pagamento no request",
             "type": "object",
             "required": [
-                "forma_pagamento_id",
-                "valor"
-            ],
-            "type": "object",
-            "required": [
-                "forma_pagamento_id",
+                "data_vencimento",
                 "portador_id",
                 "tipo_documento_id",
-                "data_vencimento",
                 "valor"
             ],
             "properties": {
@@ -4405,8 +6606,8 @@
                     "type": "integer"
                 },
                 "data_vencimento": {
-                    "type": "string",
-                    "format": "date"
+                    "description": "Changed to *string for parsing, and required",
+                    "type": "string"
                 },
                 "documento": {
                     "type": "string"
@@ -4416,6 +6617,7 @@
                     "type": "integer"
                 },
                 "forma_pagamento_id": {
+                    "description": "Changed to *int",
                     "type": "integer"
                 },
                 "nsu": {
@@ -4427,21 +6629,43 @@
                 "rotina_contabil_id": {
                     "type": "integer"
                 },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                },
                 "valor": {
                     "type": "number"
                 }
             }
         },
         "dto.DocumentoVendaPagamentoResponse": {
-            "description": "DocumentoVendaPagamentoResponse representa a resposta de um pagamento",
             "type": "object",
             "properties": {
-            "type": "object",
-            "properties": {
-                "data_pagamento": {
+                "autorizacao": {
                     "type": "string"
                 },
+                "bandeira_cartao": {
+                    "type": "string"
+                },
+                "codigo_autorizacao": {
+                    "type": "string"
+                },
+                "coo": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Formatted string",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
                 "data_vencimento": {
+                    "type": "string"
+                },
+                "documento": {
                     "type": "string"
                 },
                 "documento_venda_id": {
@@ -4454,18 +6678,27 @@
                     "type": "string"
                 },
                 "item": {
+                    "description": "Sequencial por documento",
                     "type": "integer"
                 },
-                "numero_parcelas": {
+                "nsu": {
+                    "type": "string"
+                },
+                "portador_id": {
                     "type": "integer"
                 },
-                "parcela_atual": {
+                "portador_nome": {
+                    "type": "string"
+                },
+                "rotina_contabil_id": {
                     "type": "integer"
                 },
                 "status": {
+                    "description": "Added from model",
                     "type": "integer"
                 },
                 "status_label": {
+                    "description": "Added for display",
                     "type": "string"
                 },
                 "tipo_documento_id": {
@@ -4475,6 +6708,7 @@
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "Formatted string",
                     "type": "string"
                 },
                 "updated_by": {
@@ -4486,21 +6720,10 @@
             }
         },
         "dto.DocumentoVendaRequest": {
-            "description": "DocumentoVendaRequest representa o request para criar/atualizar um documento de venda.",
             "type": "object",
             "required": [
                 "condicao_pagamento_id",
                 "empresa_filial_id",
-                "itens",
-                "tabela_preco_id",
-                "tipo_documento",
-                "tipo_operacao"
-            ],
-            "type": "object",
-            "required": [
-                "condicao_pagamento_id",
-                "empresa_filial_id",
-                "itens",
                 "tabela_preco_id",
                 "tipo_documento",
                 "tipo_operacao"
@@ -4514,12 +6737,11 @@
                     "type": "integer"
                 },
                 "data_previsao": {
-                    "type": "string",
-                    "format": "date"
+                    "type": "string"
                 },
                 "data_validade": {
-                    "type": "string",
-                    "format": "date"
+                    "description": "============================================================\nDATAS\n============================================================",
+                    "type": "string"
                 },
                 "empresa_filial_id": {
                     "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
@@ -4540,10 +6762,10 @@
                     "type": "integer"
                 },
                 "observacoes_adm": {
-                    "type": "string",
+                    "type": "string"
                 },
                 "observacoes_cliente": {
-                    "type": "string",
+                    "type": "string"
                 },
                 "observacoes_interna": {
                     "description": "============================================================\nOBSERVAÇÕES\n============================================================",
@@ -4551,7 +6773,7 @@
                 },
                 "pagamentos": {
                     "type": "array",
-                    "items": { //
+                    "items": {
                         "$ref": "#/definitions/dto.DocumentoVendaPagamentoRequest"
                     }
                 },
@@ -4590,9 +6812,6 @@
             }
         },
         "dto.DocumentoVendaResponse": {
-            "description": "DocumentoVendaResponse representa a resposta de um documento de venda.",
-            "type": "object",
-            "properties": {
             "type": "object",
             "properties": {
                 "condicao_pagamento_descricao": {
@@ -4613,12 +6832,10 @@
                     "type": "string"
                 },
                 "data_previsao": {
-                    "type": "string",
-                    "format": "date"
+                    "type": "string"
                 },
                 "data_validade": {
-                    "type": "string",
-                    "format": "date"
+                    "type": "string"
                 },
                 "empresa_filial_id": {
                     "type": "integer"
@@ -4647,10 +6864,10 @@
                     "type": "integer"
                 },
                 "observacoes_adm": {
-                    "type": "string",
+                    "type": "string"
                 },
                 "observacoes_cliente": {
-                    "type": "string",
+                    "type": "string"
                 },
                 "observacoes_interna": {
                     "description": "============================================================\nOBSERVAÇÕES\n============================================================",
@@ -4658,7 +6875,7 @@
                 },
                 "pagamentos": {
                     "type": "array",
-                    "items": { //
+                    "items": {
                         "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
                     }
                 },
@@ -5687,6 +7904,380 @@
                 }
             }
         },
+        "dto.OperacaoFiscalListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.OperacaoFiscalRequest": {
+            "type": "object",
+            "required": [
+                "cfop",
+                "cst_icms_id",
+                "cst_ipi_id",
+                "cst_pis_cofins_id",
+                "data_ini",
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "cfop": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "data_ini": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.OperacaoFiscalResponse": {
+            "type": "object",
+            "properties": {
+                "cfop": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "cst_icms_codigo": {
+                    "type": "string"
+                },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_codigo": {
+                    "type": "string"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_codigo": {
+                    "type": "string"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "type": "string"
+                },
+                "data_ini": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProcessoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoRequest": {
+            "type": "object",
+            "required": [
+                "codigo",
+                "descricao",
+                "empresa_filial_id",
+                "tipo_operacao"
+            ],
+            "properties": {
+                "codigo": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "despesa_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "natureza_operacao_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_st_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_st_id": {
+                    "type": "integer"
+                },
+                "plano_contas_financeiro_id": {
+                    "type": "integer"
+                },
+                "processo_nf_id": {
+                    "type": "integer"
+                },
+                "receita_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "tipo_operacao": {
+                    "description": "0-Entrada, 1-Saída",
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoResponse": {
+            "type": "object",
+            "properties": {
+                "codigo": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "despesa_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "natureza_operacao_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_st_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_st_id": {
+                    "type": "integer"
+                },
+                "plano_contas_financeiro_id": {
+                    "type": "integer"
+                },
+                "processo_nf_id": {
+                    "type": "integer"
+                },
+                "receita_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_descricao": {
+                    "type": "string"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tipo_operacao": {
+                    "type": "integer"
+                },
+                "tipo_operacao_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProdutoCorResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string",
+                    "maxLength": 10
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ProdutoGrupoListResponse": {
             "type": "object",
             "properties": {
@@ -6276,6 +8867,222 @@
                     "type": "integer"
                 },
                 "situacao_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string",
+                    "maxLength": 10
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoVariacaoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProdutoVariacaoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoVariacaoRequest": {
+            "type": "object",
+            "required": [
+                "empresa_filial_id",
+                "produto_id",
+                "sku"
+            ],
+            "properties": {
+                "cor_id": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "description": "AUDITORIA",
+                    "type": "integer"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "estoque_atual": {
+                    "description": "Para o estoque inicial",
+                    "type": "number"
+                },
+                "id": {
+                    "description": "CAMPOS PRINCIPAIS",
+                    "type": "integer"
+                },
+                "preco_adicional": {
+                    "type": "number"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "sku": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "tamanho_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoVariacaoResponse": {
+            "type": "object",
+            "properties": {
+                "cor_id": {
+                    "type": "integer"
+                },
+                "cor_nome": {
+                    "type": "string"
+                },
+                "cor_sigla": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "AUDITORIA",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "estoque_atual": {
+                    "type": "number"
+                },
+                "id": {
+                    "description": "DADOS PRINCIPAIS",
+                    "type": "integer"
+                },
+                "preco_adicional": {
+                    "type": "number"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "produto_nome": {
+                    "description": "RELACIONAMENTOS (apenas IDs e Nomes para evitar recursão)",
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "tamanho_id": {
+                    "type": "integer"
+                },
+                "tamanho_nome": {
+                    "type": "string"
+                },
+                "tamanho_sigla": {
                     "type": "string"
                 },
                 "updated_at": {

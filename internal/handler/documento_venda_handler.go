@@ -71,9 +71,9 @@ func (h *DocumentoVendaHandler) Create(c *gin.Context) {
 // @Param        id   path      int  true  "ID do Documento de Venda"
 // @Success      200  {object}  dto.DocumentoVendaResponse
 // @Failure      404  {object}  utils.ErrorResponse "Documento de venda não encontrado"
-// @Router       /documentos-venda/{id} [get]
+// @Router       /documentos-venda/{documento_id} [get]
 func (h *DocumentoVendaHandler) GetByID(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "documento_id")
 	if !ok {
 		return
 	}
@@ -105,9 +105,9 @@ func (h *DocumentoVendaHandler) GetByID(c *gin.Context) {
 // @Success      200        {object}  dto.DocumentoVendaResponse
 // @Failure      400        {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      404        {object}  utils.ErrorResponse "Documento de venda não encontrado"
-// @Router       /documentos-venda/{id} [put]
+// @Router       /documentos-venda/{documento_id} [put]
 func (h *DocumentoVendaHandler) Update(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "documento_id")
 	if !ok {
 		return
 	}
@@ -175,9 +175,9 @@ func (h *DocumentoVendaHandler) List(c *gin.Context) {
 // @Success      204  "Nenhum conteúdo"
 // @Failure      400  {object}  utils.ErrorResponse "Erro ao excluir"
 // @Failure      404  {object}  utils.ErrorResponse "Documento de venda não encontrado"
-// @Router       /documentos-venda/{id} [delete]
+// @Router       /documentos-venda/{documento_id} [delete]
 func (h *DocumentoVendaHandler) Delete(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "documento_id")
 	if !ok {
 		return
 	}

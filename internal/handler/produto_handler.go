@@ -84,7 +84,7 @@ func (h *ProdutoHandler) GetByCodigoBarras(c *gin.Context) {
 // @Failure      404  {object}  utils.ErrorResponse "Produto não encontrado"
 // @Router       /produtos/{id} [get]
 func (h *ProdutoHandler) GetByID(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "produto_id")
 	if !ok {
 		return
 	}
@@ -110,7 +110,7 @@ func (h *ProdutoHandler) GetByID(c *gin.Context) {
 // @Failure      404      {object}  utils.ErrorResponse "Produto não encontrado"
 // @Router       /produtos/{id} [put]
 func (h *ProdutoHandler) Update(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "produto_id")
 	if !ok {
 		return
 	}
@@ -140,7 +140,7 @@ func (h *ProdutoHandler) Update(c *gin.Context) {
 // @Failure      400  {object}  utils.ErrorResponse "Erro ao excluir"
 // @Router       /produtos/{id} [delete]
 func (h *ProdutoHandler) Delete(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "produto_id")
 	if !ok {
 		return
 	}

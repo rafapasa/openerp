@@ -1,5 +1,157 @@
 basePath: /api/v1
 definitions:
+  constants.Sexo:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - SexoMasculino
+    - SexoFeminino
+  constants.Status:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 9
+    type: integer
+    x-enum-varnames:
+    - StatusAtivo
+    - StatusInativo
+    - StatusBloqueado
+    - StatusCancelado
+  constants.TipoPessoa:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - TipoPessoaFisica
+    - TipoPessoaJuridica
+  dto.CondicaoPagamentoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.CondicaoPagamentoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.CondicaoPagamentoRequest:
+    properties:
+      comissao:
+        type: number
+      created_by:
+        description: |-
+          ============================================================
+          USUÁRIO (para auditoria)
+          ============================================================
+        type: integer
+      desconto:
+        type: number
+      descricao:
+        type: string
+      dia_pagamento:
+        type: integer
+      dias_parcelas:
+        type: integer
+      entrada:
+        type: integer
+      forma_pagamento_id:
+        type: integer
+      juros:
+        type: number
+      numero_parcelas:
+        type: integer
+      portador_id:
+        type: integer
+      rotina_contabil_id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      situacao:
+        type: integer
+      tipo_condicao:
+        type: integer
+      tipo_documento_id:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - descricao
+    - portador_id
+    - tipo_condicao
+    - tipo_documento_id
+    type: object
+  dto.CondicaoPagamentoResponse:
+    properties:
+      comissao:
+        type: number
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      desconto:
+        type: number
+      descricao:
+        type: string
+      dia_pagamento:
+        type: integer
+      dias_parcelas:
+        type: integer
+      entrada:
+        type: integer
+      entrada_label:
+        type: string
+      forma_pagamento_id:
+        type: integer
+      forma_pagamento_nome:
+        type: string
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      juros:
+        type: number
+      numero_parcelas:
+        type: integer
+      portador_id:
+        type: integer
+      portador_nome:
+        type: string
+      rotina_contabil_id:
+        type: integer
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      tipo_condicao:
+        type: integer
+      tipo_condicao_label:
+        type: string
+      tipo_documento_id:
+        type: integer
+      tipo_documento_nome:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
   dto.DocumentoVendaItemListResponse:
     properties:
       items:
@@ -19,9 +171,17 @@ definitions:
     properties:
       created_by:
         type: integer
+      cst_icms_id:
+        type: integer
+      cst_ipi_id:
+        type: integer
+      cst_pis_cofins_id:
+        type: integer
       descricao_produto:
         type: string
       id:
+        type: integer
+      operacao_fiscal_id:
         type: integer
       percentual_desconto:
         type: number
@@ -159,18 +319,17 @@ definitions:
       coo:
         type: integer
       created_at:
+        description: Formatted string
         type: string
       created_by:
         type: integer
       data_vencimento:
-        description: Formatted string
         type: string
       documento:
         type: string
       documento_venda_id:
         type: integer
       forma_pagamento_id:
-        description: Matches model
         type: integer
       forma_pagamento_nome:
         type: string
@@ -185,11 +344,18 @@ definitions:
         type: string
       rotina_contabil_id:
         type: integer
+      status:
+        description: Added from model
+        type: integer
+      status_label:
+        description: Added for display
+        type: string
       tipo_documento_id:
         type: integer
       tipo_documento_nome:
         type: string
       updated_at:
+        description: Formatted string
         type: string
       updated_by:
         type: integer
@@ -754,6 +920,21 @@ definitions:
       valor:
         type: number
     type: object
+  dto.EntidadeListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EntidadeResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   dto.EntidadeRegimeTributarioListResponse:
     properties:
       items:
@@ -848,6 +1029,202 @@ definitions:
       updated_by:
         type: integer
     type: object
+  dto.EntidadeRequest:
+    properties:
+      arquivo_imp_ddv:
+        type: string
+      casa_propria:
+        type: integer
+      classificacao:
+        type: integer
+      codigo:
+        type: integer
+      conjuje_cpf:
+        type: string
+      conjuje_nome:
+        type: string
+      conjuje_renda:
+        type: number
+      conjuje_rg:
+        type: string
+      created_by:
+        description: |-
+          ============================================================
+          USUÁRIO (para auditoria)
+          ============================================================
+        type: integer
+      data_cadastro:
+        description: |-
+          ============================================================
+          DADOS COMERCIAIS
+          ============================================================
+        type: string
+      data_nascimento:
+        description: |-
+          ============================================================
+          DADOS PESSOAIS
+          ============================================================
+        type: string
+      empresa_filial_id:
+        type: integer
+      estado_civil:
+        type: integer
+      grupo_entidade_id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      horario_id:
+        type: integer
+      inscricao_estadual:
+        type: string
+      inscricao_federal:
+        type: string
+      inscricao_municipal:
+        type: string
+      inscricao_produtor:
+        type: string
+      nome_da_mae:
+        type: string
+      nome_do_pai:
+        type: string
+      nome_fantasia:
+        type: string
+      observacao:
+        type: string
+      percentual_comissao:
+        type: number
+      quant_filhos:
+        type: integer
+      razao_social:
+        type: string
+      sexo:
+        $ref: '#/definitions/constants.Sexo'
+      situacao:
+        $ref: '#/definitions/constants.Status'
+      suframa:
+        type: string
+      tabela_desconto_id:
+        type: integer
+      tabela_preco_id:
+        type: integer
+      taxa_entrega:
+        type: number
+      tipo_pessoa:
+        allOf:
+        - $ref: '#/definitions/constants.TipoPessoa'
+        maximum: 2
+        minimum: 1
+      updated_by:
+        type: integer
+    required:
+    - empresa_filial_id
+    - inscricao_federal
+    - razao_social
+    - tipo_pessoa
+    type: object
+  dto.EntidadeResponse:
+    properties:
+      arquivo_imp_ddv:
+        type: string
+      casa_propria:
+        type: integer
+      classificacao:
+        type: integer
+      codigo:
+        type: integer
+      conjuje_cpf:
+        type: string
+      conjuje_nome:
+        type: string
+      conjuje_renda:
+        type: number
+      conjuje_rg:
+        type: string
+      created_at:
+        description: |-
+          ============================================================
+          AUDITORIA
+          ============================================================
+        type: string
+      created_by:
+        type: integer
+      data_cadastro:
+        description: |-
+          ============================================================
+          DADOS COMERCIAIS
+          ============================================================
+        type: string
+      data_nascimento:
+        description: |-
+          ============================================================
+          DADOS PESSOAIS
+          ============================================================
+        type: string
+      empresa_filial_id:
+        type: integer
+      estado_civil:
+        type: integer
+      estado_civil_label:
+        type: string
+      grupo_entidade_id:
+        type: integer
+      horario_id:
+        type: integer
+      id:
+        description: |-
+          ============================================================
+          DADOS PRINCIPAIS
+          ============================================================
+        type: integer
+      inscricao_estadual:
+        type: string
+      inscricao_federal:
+        type: string
+      inscricao_municipal:
+        type: string
+      inscricao_produtor:
+        type: string
+      nome_da_mae:
+        type: string
+      nome_do_pai:
+        type: string
+      nome_fantasia:
+        type: string
+      observacao:
+        type: string
+      percentual_comissao:
+        type: number
+      quant_filhos:
+        type: integer
+      razao_social:
+        type: string
+      sexo:
+        $ref: '#/definitions/constants.Sexo'
+      sexo_label:
+        type: string
+      situacao:
+        $ref: '#/definitions/constants.Status'
+      situacao_label:
+        type: string
+      suframa:
+        type: string
+      tabela_desconto_id:
+        type: integer
+      tabela_preco_id:
+        type: integer
+      taxa_entrega:
+        type: number
+      tipo_pessoa:
+        $ref: '#/definitions/constants.TipoPessoa'
+      tipo_pessoa_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
   dto.ErrorResponse:
     properties:
       code:
@@ -917,6 +1294,258 @@ definitions:
         type: string
       usuario:
         $ref: '#/definitions/dto.UsuarioInfo'
+    type: object
+  dto.OperacaoFiscalListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.OperacaoFiscalResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.OperacaoFiscalRequest:
+    properties:
+      cfop:
+        type: string
+      created_by:
+        type: integer
+      cst_icms_id:
+        type: integer
+      cst_ipi_id:
+        type: integer
+      cst_pis_cofins_id:
+        type: integer
+      data_fim:
+        description: 'Formato: YYYY-MM-DD'
+        type: string
+      data_ini:
+        description: 'Formato: YYYY-MM-DD'
+        type: string
+      descricao:
+        maxLength: 255
+        type: string
+      empresa_filial_id:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - cfop
+    - cst_icms_id
+    - cst_ipi_id
+    - cst_pis_cofins_id
+    - data_ini
+    - descricao
+    - empresa_filial_id
+    type: object
+  dto.OperacaoFiscalResponse:
+    properties:
+      cfop:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      cst_icms_codigo:
+        type: string
+      cst_icms_id:
+        type: integer
+      cst_ipi_codigo:
+        type: string
+      cst_ipi_id:
+        type: integer
+      cst_pis_cofins_codigo:
+        type: string
+      cst_pis_cofins_id:
+        type: integer
+      data_fim:
+        type: string
+      data_ini:
+        type: string
+      descricao:
+        type: string
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.ProcessoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProcessoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProcessoRequest:
+    properties:
+      codigo:
+        type: integer
+      created_by:
+        type: integer
+      descricao:
+        maxLength: 255
+        type: string
+      despesa_id:
+        type: integer
+      empresa_filial_id:
+        type: integer
+      natureza_operacao_id:
+        type: integer
+      operacao_fiscal_fora_est_id:
+        type: integer
+      operacao_fiscal_fora_est_st_id:
+        type: integer
+      operacao_fiscal_no_est_id:
+        type: integer
+      operacao_fiscal_no_est_st_id:
+        type: integer
+      plano_contas_financeiro_id:
+        type: integer
+      processo_nf_id:
+        type: integer
+      receita_id:
+        type: integer
+      rotina_contabil_id:
+        type: integer
+      situacao:
+        type: integer
+      tipo_operacao:
+        description: 0-Entrada, 1-Saída
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - codigo
+    - descricao
+    - empresa_filial_id
+    - tipo_operacao
+    type: object
+  dto.ProcessoResponse:
+    properties:
+      codigo:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      despesa_id:
+        type: integer
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      id:
+        type: integer
+      natureza_operacao_id:
+        type: integer
+      operacao_fiscal_fora_est_id:
+        type: integer
+      operacao_fiscal_fora_est_st_id:
+        type: integer
+      operacao_fiscal_no_est_id:
+        type: integer
+      operacao_fiscal_no_est_st_id:
+        type: integer
+      plano_contas_financeiro_id:
+        type: integer
+      processo_nf_id:
+        type: integer
+      receita_id:
+        type: integer
+      rotina_contabil_descricao:
+        type: string
+      rotina_contabil_id:
+        type: integer
+      situacao:
+        type: integer
+      situacao_label:
+        type: string
+      tipo_operacao:
+        type: integer
+      tipo_operacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
+  dto.ProdutoCorListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoCorResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoCorRequest:
+    properties:
+      created_by:
+        type: integer
+      descricao:
+        maxLength: 255
+        type: string
+      empresa_filial_id:
+        type: integer
+      id:
+        type: integer
+      sigla:
+        maxLength: 10
+        type: string
+      updated_by:
+        type: integer
+    required:
+    - descricao
+    - empresa_filial_id
+    type: object
+  dto.ProdutoCorResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      id:
+        type: integer
+      sigla:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
     type: object
   dto.ProdutoGrupoListResponse:
     properties:
@@ -1362,6 +1991,62 @@ definitions:
       updated_by:
         type: integer
     type: object
+  dto.ProdutoTamanhoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.ProdutoTamanhoResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ProdutoTamanhoRequest:
+    properties:
+      created_by:
+        type: integer
+      descricao:
+        maxLength: 255
+        type: string
+      empresa_filial_id:
+        type: integer
+      id:
+        type: integer
+      sigla:
+        maxLength: 10
+        type: string
+      updated_by:
+        type: integer
+    required:
+    - descricao
+    - empresa_filial_id
+    type: object
+  dto.ProdutoTamanhoResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      id:
+        type: integer
+      sigla:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+    type: object
   dto.ProdutoVariacaoListResponse:
     properties:
       items:
@@ -1731,6 +2416,157 @@ paths:
       summary: Renova o token de acesso
       tags:
       - Auth
+  /condicoes-pagamento:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de condições de pagamento, com suporte
+        a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      - description: Filtrar por tipo de condição (0=À Vista, 1=À Prazo, 9=Sem Pagamento)
+        in: query
+        name: tipo_condicao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CondicaoPagamentoListResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Lista as condições de pagamento
+      tags:
+      - Condições de Pagamento
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova condição de pagamento com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar a condição de pagamento
+        in: body
+        name: condicao
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CondicaoPagamentoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CondicaoPagamentoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria uma nova condição de pagamento
+      tags:
+      - Condições de Pagamento
+  /condicoes-pagamento/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de uma condição de pagamento.
+      parameters:
+      - description: ID da Condição de Pagamento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui uma condição de pagamento
+      tags:
+      - Condições de Pagamento
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de uma condição de pagamento específica.
+      parameters:
+      - description: ID da Condição de Pagamento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CondicaoPagamentoResponse'
+        "404":
+          description: Condição de pagamento não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca uma condição de pagamento por ID
+      tags:
+      - Condições de Pagamento
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma condição de pagamento existente.
+      parameters:
+      - description: ID da Condição de Pagamento
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar a condição de pagamento
+        in: body
+        name: condicao
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CondicaoPagamentoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CondicaoPagamentoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Condição de pagamento não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza uma condição de pagamento
+      tags:
+      - Condições de Pagamento
   /documentos-venda:
     get:
       consumes:
@@ -1894,14 +2730,6 @@ paths:
         name: documento_venda_id
         required: true
         type: integer
-      - description: Número de registros por página
-        in: query
-        name: limit
-        type: integer
-      - description: Offset para a paginação
-        in: query
-        name: offset
-        type: integer
       produces:
       - application/json
       responses:
@@ -2058,14 +2886,6 @@ paths:
         name: documento_venda_id
         required: true
         type: integer
-      - description: Número de registros por página
-        in: query
-        name: limit
-        type: integer
-      - description: Offset para a paginação
-        in: query
-        name: offset
-        type: integer
       produces:
       - application/json
       responses:
@@ -2212,6 +3032,89 @@ paths:
       summary: Atualiza um pagamento de documento de venda
       tags:
       - Documentos de Venda - Pagamentos
+  /entidades:
+    get:
+      description: Retorna uma lista paginada de entidades
+      parameters:
+      - default: 10
+        description: Limite de registros
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por nome (razao social)
+        in: query
+        name: nome
+        type: string
+      - description: Filtrar por documento
+        in: query
+        name: documento
+        type: string
+      - description: Filtrar por tipo (1-Física, 2-Jurídica)
+        in: query
+        name: tipo_pessoa
+        type: integer
+      - description: Filtrar por situação (1-Ativo, 2-Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lista entidades
+      tags:
+      - Entidades
+    post:
+      consumes:
+      - application/json
+      description: Cadastra uma nova entidade (cliente/fornecedor)
+      parameters:
+      - description: Dados da entidade
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cria uma nova entidade
+      tags:
+      - Entidades
   /entidades/{entidadeId}/contatos:
     get:
       description: Retorna todos os contatos de uma entidade
@@ -2700,7 +3603,7 @@ paths:
       - application/octet-stream
       responses:
         "200":
-          description: OK
+          description: Arquivo do documento
           schema:
             type: file
         "400":
@@ -2961,6 +3864,115 @@ paths:
       summary: Atualiza um endereço
       tags:
       - EntidadeEnderecos
+  /entidades/{id}:
+    delete:
+      description: Realiza a exclusão lógica de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui uma entidade
+      tags:
+      - Entidades
+    get:
+      description: Retorna os dados de uma entidade específica
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca entidade por ID
+      tags:
+      - Entidades
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma entidade existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza uma entidade
+      tags:
+      - Entidades
   /entidades/{id}/regimes-tributarios:
     get:
       description: Retorna todos os regimes tributários de uma entidade
@@ -3142,6 +4154,39 @@ paths:
       summary: Atualiza um regime tributário
       tags:
       - EntidadeRegimesTributarios
+  /entidades/documento/{documento}:
+    get:
+      description: Retorna os dados de uma entidade pelo CPF/CNPJ
+      parameters:
+      - description: CPF/CNPJ da entidade
+        in: path
+        name: documento
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca entidade por documento
+      tags:
+      - Entidades
   /grupos-entidades:
     get:
       description: Retorna uma lista paginada de grupos de entidade
@@ -3156,9 +4201,9 @@ paths:
         in: query
         name: offset
         type: integer
-      - description: Filtrar por nome
+      - description: Filtrar por descrição
         in: query
-        name: nome
+        name: descricao
         type: string
       produces:
       - application/json
@@ -3222,6 +4267,8 @@ paths:
         name: id
         required: true
         type: integer
+      produces:
+      - application/json
       responses:
         "204":
           description: No Content
@@ -3462,11 +4509,11 @@ paths:
       summary: Atualiza um limite de crédito
       tags:
       - EntidadeLimiteCredito
-  /produto-grupos:
+  /operacoes-fiscais:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista paginada de grupos de produto, com suporte a
+      description: Retorna uma lista paginada de operações fiscais, com suporte a
         filtros.
       parameters:
       - description: Número de registros por página
@@ -3477,17 +4524,17 @@ paths:
         in: query
         name: offset
         type: integer
+      - description: Filtrar por CFOP
+        in: query
+        name: cfop
+        type: string
       - description: Filtrar por descrição
         in: query
         name: descricao
         type: string
-      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+      - description: Filtrar por ID da Empresa Filial
         in: query
-        name: situacao
-        type: integer
-      - description: Filtrar por visibilidade no PDV (1=Sim, 2=Não)
-        in: query
-        name: visivel_frente_caixa
+        name: empresa_filial_id
         type: integer
       produces:
       - application/json
@@ -3495,28 +4542,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoGrupoListResponse'
-      summary: Lista os grupos de produto
+            $ref: '#/definitions/dto.OperacaoFiscalListResponse'
+      summary: Lista as operações fiscais
       tags:
-      - Produto - Grupos
+      - Operações Fiscais
     post:
       consumes:
       - application/json
-      description: Cria um novo grupo de produto com base nos dados fornecidos.
+      description: Cria uma nova operação fiscal com base nos dados fornecidos.
       parameters:
-      - description: Dados para criar o grupo de produto
+      - description: Dados para criar a operação fiscal
         in: body
-        name: grupo
+        name: operacao
         required: true
         schema:
-          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+          $ref: '#/definitions/dto.OperacaoFiscalRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+            $ref: '#/definitions/dto.OperacaoFiscalResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
@@ -3525,16 +4572,16 @@ paths:
           description: Erro interno do servidor
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Cria um novo grupo de produto
+      summary: Cria uma nova operação fiscal
       tags:
-      - Produto - Grupos
-  /produto-grupos/{id}:
+      - Operações Fiscais
+  /operacoes-fiscais/{id}:
     delete:
       consumes:
       - application/json
-      description: Realiza a exclusão lógica de um grupo de produto.
+      description: Realiza a exclusão lógica de uma operação fiscal.
       parameters:
-      - description: ID do Grupo de Produto
+      - description: ID da Operação Fiscal
         in: path
         name: id
         required: true
@@ -3548,15 +4595,15 @@ paths:
           description: Erro ao excluir
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui um grupo de produto
+      summary: Exclui uma operação fiscal
       tags:
-      - Produto - Grupos
+      - Operações Fiscais
     get:
       consumes:
       - application/json
-      description: Retorna os detalhes de um grupo de produto específico.
+      description: Retorna os detalhes de uma operação fiscal específica.
       parameters:
-      - description: ID do Grupo de Produto
+      - description: ID da Operação Fiscal
         in: path
         name: id
         required: true
@@ -3567,54 +4614,115 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+            $ref: '#/definitions/dto.OperacaoFiscalResponse'
         "404":
-          description: Grupo de produto não encontrado
+          description: Operação fiscal não encontrada
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca um grupo de produto por ID
+      summary: Busca uma operação fiscal por ID
       tags:
-      - Produto - Grupos
+      - Operações Fiscais
     put:
       consumes:
       - application/json
-      description: Atualiza os dados de um grupo de produto existente.
+      description: Atualiza os dados de uma operação fiscal existente.
       parameters:
-      - description: ID do Grupo de Produto
+      - description: ID da Operação Fiscal
         in: path
         name: id
         required: true
         type: integer
-      - description: Dados para atualizar o grupo de produto
+      - description: Dados para atualizar a operação fiscal
         in: body
-        name: grupo
+        name: operacao
         required: true
         schema:
-          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+          $ref: '#/definitions/dto.OperacaoFiscalRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+            $ref: '#/definitions/dto.OperacaoFiscalResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "404":
-          description: Grupo de produto não encontrado
+          description: Operação fiscal não encontrada
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza um grupo de produto
+      summary: Atualiza uma operação fiscal
       tags:
-      - Produto - Grupos
-  /produto-marcas:
+      - Operações Fiscais
+  /operacoes-fiscais/cfop/{cfop}:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista paginada de marcas de produto, com suporte a
-        filtros.
+      description: Retorna operações fiscais filtradas por CFOP.
+      parameters:
+      - description: CFOP da Operação Fiscal
+        in: path
+        name: cfop
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OperacaoFiscalResponse'
+            type: array
+        "400":
+          description: CFOP inválido
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Operação fiscal não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca operações fiscais por CFOP
+      tags:
+      - Operações Fiscais
+  /operacoes-fiscais/filial/{filial_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna operações fiscais filtradas por ID da filial.
+      parameters:
+      - description: ID da Filial
+        in: path
+        name: filial_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OperacaoFiscalResponse'
+            type: array
+        "400":
+          description: ID da filial inválido
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Operação fiscal não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca operações fiscais por filial
+      tags:
+      - Operações Fiscais
+  /processos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de processos, com suporte a filtros.
       parameters:
       - description: Número de registros por página
         in: query
@@ -3624,10 +4732,18 @@ paths:
         in: query
         name: offset
         type: integer
+      - description: Filtrar por código
+        in: query
+        name: codigo
+        type: integer
       - description: Filtrar por descrição
         in: query
         name: descricao
         type: string
+      - description: Filtrar por tipo de operação (0=Entrada, 1=Saída)
+        in: query
+        name: tipo_operacao
+        type: integer
       - description: Filtrar por situação (1=Ativo, 2=Inativo)
         in: query
         name: situacao
@@ -3638,28 +4754,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoMarcaListResponse'
-      summary: Lista as marcas de produto
+            $ref: '#/definitions/dto.ProcessoListResponse'
+      summary: Lista os processos
       tags:
-      - Produto - Marcas
+      - Processos
     post:
       consumes:
       - application/json
-      description: Cria uma nova marca de produto com base nos dados fornecidos.
+      description: Cria um novo processo com base nos dados fornecidos.
       parameters:
-      - description: Dados para criar a marca de produto
+      - description: Dados para criar o processo
         in: body
-        name: marca
+        name: processo
         required: true
         schema:
-          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+          $ref: '#/definitions/dto.ProcessoRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+            $ref: '#/definitions/dto.ProcessoResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
@@ -3668,16 +4784,16 @@ paths:
           description: Erro interno do servidor
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Cria uma nova marca de produto
+      summary: Cria um novo processo
       tags:
-      - Produto - Marcas
-  /produto-marcas/{id}:
+      - Processos
+  /processos/{id}:
     delete:
       consumes:
       - application/json
-      description: Realiza a exclusão lógica de uma marca de produto.
+      description: Realiza a exclusão lógica de um processo.
       parameters:
-      - description: ID da Marca de Produto
+      - description: ID do Processo
         in: path
         name: id
         required: true
@@ -3691,15 +4807,15 @@ paths:
           description: Erro ao excluir
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui uma marca de produto
+      summary: Exclui um processo
       tags:
-      - Produto - Marcas
+      - Processos
     get:
       consumes:
       - application/json
-      description: Retorna os detalhes de uma marca de produto específica.
+      description: Retorna os detalhes de um processo específico.
       parameters:
-      - description: ID da Marca de Produto
+      - description: ID do Processo
         in: path
         name: id
         required: true
@@ -3710,141 +4826,57 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+            $ref: '#/definitions/dto.ProcessoResponse'
         "404":
-          description: Marca de produto não encontrada
+          description: Processo não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca uma marca de produto por ID
+      summary: Busca um processo por ID
       tags:
-      - Produto - Marcas
+      - Processos
     put:
       consumes:
       - application/json
-      description: Atualiza os dados de uma marca de produto existente.
+      description: Atualiza os dados de um processo existente.
       parameters:
-      - description: ID da Marca de Produto
+      - description: ID do Processo
         in: path
         name: id
         required: true
         type: integer
-      - description: Dados para atualizar a marca de produto
+      - description: Dados para atualizar o processo
         in: body
-        name: marca
+        name: processo
         required: true
         schema:
-          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+          $ref: '#/definitions/dto.ProcessoRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+            $ref: '#/definitions/dto.ProcessoResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "404":
-          description: Marca de produto não encontrada
+          description: Processo não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza uma marca de produto
+      summary: Atualiza um processo
       tags:
-      - Produto - Marcas
-  /produto-modelos:
+      - Processos
+  /processos/codigo/{codigo}:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista paginada de modelos de produto, com suporte a
-        filtros.
+      description: Retorna os detalhes de um processo específico pelo código.
       parameters:
-      - description: Número de registros por página
-        in: query
-        name: limit
-        type: integer
-      - description: Offset para a paginação
-        in: query
-        name: offset
-        type: integer
-      - description: Filtrar por descrição
-        in: query
-        name: descricao
-        type: string
-      - description: Filtrar por situação (1=Ativo, 2=Inativo)
-        in: query
-        name: situacao
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProdutoModeloListResponse'
-      summary: Lista os modelos de produto
-      tags:
-      - Produto - Modelos
-    post:
-      consumes:
-      - application/json
-      description: Cria um novo modelo de produto com base nos dados fornecidos.
-      parameters:
-      - description: Dados para criar o modelo de produto
-        in: body
-        name: modelo
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ProdutoModeloRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/dto.ProdutoModeloResponse'
-        "400":
-          description: Erro de validação ou dados inválidos
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Erro interno do servidor
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Cria um novo modelo de produto
-      tags:
-      - Produto - Modelos
-  /produto-modelos/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Realiza a exclusão lógica de um modelo de produto.
-      parameters:
-      - description: ID do Modelo de Produto
+      - description: Código do Processo
         in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Nenhum conteúdo
-        "400":
-          description: Erro ao excluir
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui um modelo de produto
-      tags:
-      - Produto - Modelos
-    get:
-      consumes:
-      - application/json
-      description: Retorna os detalhes de um modelo de produto específico.
-      parameters:
-      - description: ID do Modelo de Produto
-        in: path
-        name: id
+        name: codigo
         required: true
         type: integer
       produces:
@@ -3853,191 +4885,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProdutoModeloResponse'
-        "404":
-          description: Modelo de produto não encontrado
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca um modelo de produto por ID
-      tags:
-      - Produto - Modelos
-    put:
-      consumes:
-      - application/json
-      description: Atualiza os dados de um modelo de produto existente.
-      parameters:
-      - description: ID do Modelo de Produto
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Dados para atualizar o modelo de produto
-        in: body
-        name: modelo
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ProdutoModeloRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProdutoModeloResponse'
+            $ref: '#/definitions/dto.ProcessoResponse'
         "400":
-          description: Erro de validação ou dados inválidos
+          description: Código inválido
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "404":
-          description: Modelo de produto não encontrado
+          description: Processo não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza um modelo de produto
+      summary: Busca um processo por código
       tags:
-      - Produto - Modelos
-  /produto-subgrupos:
-    get:
-      consumes:
-      - application/json
-      description: Retorna uma lista paginada de subgrupos de produto, com suporte
-        a filtros.
-      parameters:
-      - description: Número de registros por página
-        in: query
-        name: limit
-        type: integer
-      - description: Offset para a paginação
-        in: query
-        name: offset
-        type: integer
-      - description: Filtrar por descrição
-        in: query
-        name: descricao
-        type: string
-      - description: Filtrar por situação (1=Ativo, 2=Inativo)
-        in: query
-        name: situacao
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProdutoSubgrupoListResponse'
-      summary: Lista os subgrupos de produto
-      tags:
-      - Produto - Subgrupos
-    post:
-      consumes:
-      - application/json
-      description: Cria um novo subgrupo de produto com base nos dados fornecidos.
-      parameters:
-      - description: Dados para criar o subgrupo de produto
-        in: body
-        name: subgrupo
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
-        "400":
-          description: Erro de validação ou dados inválidos
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Erro interno do servidor
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Cria um novo subgrupo de produto
-      tags:
-      - Produto - Subgrupos
-  /produto-subgrupos/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Realiza a exclusão lógica de um subgrupo de produto.
-      parameters:
-      - description: ID do Subgrupo de Produto
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Nenhum conteúdo
-        "400":
-          description: Erro ao excluir
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui um subgrupo de produto
-      tags:
-      - Produto - Subgrupos
-    get:
-      consumes:
-      - application/json
-      description: Retorna os detalhes de um subgrupo de produto específico.
-      parameters:
-      - description: ID do Subgrupo de Produto
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
-        "404":
-          description: Subgrupo de produto não encontrado
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca um subgrupo de produto por ID
-      tags:
-      - Produto - Subgrupos
-    put:
-      consumes:
-      - application/json
-      description: Atualiza os dados de um subgrupo de produto existente.
-      parameters:
-      - description: ID do Subgrupo de Produto
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Dados para atualizar o subgrupo de produto
-        in: body
-        name: subgrupo
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
-        "400":
-          description: Erro de validação ou dados inválidos
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "404":
-          description: Subgrupo de produto não encontrado
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza um subgrupo de produto
-      tags:
-      - Produto - Subgrupos
+      - Processos
   /produto-variacoes:
     get:
       consumes:
@@ -4377,6 +5236,863 @@ paths:
       summary: Atualiza um produto
       tags:
       - Produtos
+  /produtos/cores:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de cores de produto, com suporte a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoCorListResponse'
+      summary: Lista as cores de produto
+      tags:
+      - Produto - Cores
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova cor de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar a cor de produto
+        in: body
+        name: cor
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoCorRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoCorResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria uma nova cor de produto
+      tags:
+      - Produto - Cores
+  /produtos/cores/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de uma cor de produto.
+      parameters:
+      - description: ID da Cor de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui uma cor de produto
+      tags:
+      - Produto - Cores
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de uma cor de produto específica.
+      parameters:
+      - description: ID da Cor de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoCorResponse'
+        "404":
+          description: Cor de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca uma cor de produto por ID
+      tags:
+      - Produto - Cores
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma cor de produto existente.
+      parameters:
+      - description: ID da Cor de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar a cor de produto
+        in: body
+        name: cor
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoCorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoCorResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Cor de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza uma cor de produto
+      tags:
+      - Produto - Cores
+  /produtos/grupos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de grupos de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoListResponse'
+      summary: Lista os grupos de produto
+      tags:
+      - Produto - Grupos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo grupo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o grupo de produto
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo grupo de produto
+      tags:
+      - Produto - Grupos
+  /produtos/grupos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um grupo de produto.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um grupo de produto
+      tags:
+      - Produto - Grupos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um grupo de produto específico.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "404":
+          description: Grupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um grupo de produto por ID
+      tags:
+      - Produto - Grupos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um grupo de produto existente.
+      parameters:
+      - description: ID do Grupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o grupo de produto
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoGrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoGrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Grupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um grupo de produto
+      tags:
+      - Produto - Grupos
+  /produtos/marcas:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de marcas de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaListResponse'
+      summary: Lista as marcas de produto
+      tags:
+      - Produto - Marcas
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova marca de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar a marca de produto
+        in: body
+        name: marca
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria uma nova marca de produto
+      tags:
+      - Produto - Marcas
+  /produtos/marcas/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de uma marca de produto.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui uma marca de produto
+      tags:
+      - Produto - Marcas
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de uma marca de produto específica.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "404":
+          description: Marca de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca uma marca de produto por ID
+      tags:
+      - Produto - Marcas
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma marca de produto existente.
+      parameters:
+      - description: ID da Marca de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar a marca de produto
+        in: body
+        name: marca
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoMarcaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoMarcaResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Marca de produto não encontrada
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza uma marca de produto
+      tags:
+      - Produto - Marcas
+  /produtos/modelos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de modelos de produto, com suporte a
+        filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloListResponse'
+      summary: Lista os modelos de produto
+      tags:
+      - Produto - Modelos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo modelo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o modelo de produto
+        in: body
+        name: modelo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoModeloRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo modelo de produto
+      tags:
+      - Produto - Modelos
+  /produtos/modelos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um modelo de produto.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um modelo de produto
+      tags:
+      - Produto - Modelos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um modelo de produto específico.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "404":
+          description: Modelo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um modelo de produto por ID
+      tags:
+      - Produto - Modelos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um modelo de produto existente.
+      parameters:
+      - description: ID do Modelo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o modelo de produto
+        in: body
+        name: modelo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoModeloRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoModeloResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Modelo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um modelo de produto
+      tags:
+      - Produto - Modelos
+  /produtos/subgrupos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de subgrupos de produto, com suporte
+        a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoListResponse'
+      summary: Lista os subgrupos de produto
+      tags:
+      - Produto - Subgrupos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo subgrupo de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o subgrupo de produto
+        in: body
+        name: subgrupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+  /produtos/subgrupos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um subgrupo de produto.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um subgrupo de produto específico.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "404":
+          description: Subgrupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um subgrupo de produto por ID
+      tags:
+      - Produto - Subgrupos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um subgrupo de produto existente.
+      parameters:
+      - description: ID do Subgrupo de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o subgrupo de produto
+        in: body
+        name: subgrupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoSubgrupoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoSubgrupoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Subgrupo de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um subgrupo de produto
+      tags:
+      - Produto - Subgrupos
+  /produtos/tamanhos:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista paginada de tamanhos de produto, com suporte
+        a filtros.
+      parameters:
+      - description: Número de registros por página
+        in: query
+        name: limit
+        type: integer
+      - description: Offset para a paginação
+        in: query
+        name: offset
+        type: integer
+      - description: Filtrar por descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Filtrar por situação (1=Ativo, 2=Inativo)
+        in: query
+        name: situacao
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoTamanhoListResponse'
+      summary: Lista os tamanhos de produto
+      tags:
+      - Produto - Tamanhos
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo tamanho de produto com base nos dados fornecidos.
+      parameters:
+      - description: Dados para criar o tamanho de produto
+        in: body
+        name: tamanho
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoTamanhoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProdutoTamanhoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo tamanho de produto
+      tags:
+      - Produto - Tamanhos
+  /produtos/tamanhos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Realiza a exclusão lógica de um tamanho de produto.
+      parameters:
+      - description: ID do Tamanho de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Nenhum conteúdo
+        "400":
+          description: Erro ao excluir
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um tamanho de produto
+      tags:
+      - Produto - Tamanhos
+    get:
+      consumes:
+      - application/json
+      description: Retorna os detalhes de um tamanho de produto específico.
+      parameters:
+      - description: ID do Tamanho de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoTamanhoResponse'
+        "404":
+          description: Tamanho de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um tamanho de produto por ID
+      tags:
+      - Produto - Tamanhos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um tamanho de produto existente.
+      parameters:
+      - description: ID do Tamanho de Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualizar o tamanho de produto
+        in: body
+        name: tamanho
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProdutoTamanhoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProdutoTamanhoResponse'
+        "400":
+          description: Erro de validação ou dados inválidos
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Tamanho de produto não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um tamanho de produto
+      tags:
+      - Produto - Tamanhos
   /tabelas-preco:
     get:
       consumes:

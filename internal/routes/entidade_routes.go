@@ -9,14 +9,6 @@ import (
 func RegisterEntidadeRoutes(router *gin.RouterGroup, container *appwire.Container) {
 	// Grupo de rotas de entidade
 	entidade := router.Group("/entidades")
-	{
-		entidade.GET("", container.EntidadeHandler.List)
-		entidade.POST("", container.EntidadeHandler.Create)
-		entidade.GET("/:id", container.EntidadeHandler.GetByID)
-		entidade.PUT("/:id", container.EntidadeHandler.Update)
-		entidade.DELETE("/:id", container.EntidadeHandler.Delete) // Corrected: This was missing
-		// entidade.GET("/documento/:documento", container.EntidadeHandler.GetByDocumento)
-	}
 
 	// Endereços
 	endereco := router.Group("/entidades/:entidade_id/enderecos")
@@ -77,5 +69,14 @@ func RegisterEntidadeRoutes(router *gin.RouterGroup, container *appwire.Containe
 		grupo.GET("/:id", container.GrupoEntidadeHandler.GetByID)
 		grupo.PUT("/:id", container.GrupoEntidadeHandler.Update)
 		grupo.DELETE("/:id", container.GrupoEntidadeHandler.Delete)
+	}
+
+	{
+		entidade.GET("", container.EntidadeHandler.List)
+		entidade.POST("", container.EntidadeHandler.Create)
+		entidade.GET("/:entidade_id", container.EntidadeHandler.GetByID)
+		entidade.PUT("/:entidade_id", container.EntidadeHandler.Update)
+		entidade.DELETE("/:entidade_id", container.EntidadeHandler.Delete) // Corrected: This was missing
+		// entidade.GET("/documento/:documento", container.EntidadeHandler.GetByDocumento)
 	}
 }

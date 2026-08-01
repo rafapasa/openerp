@@ -9,15 +9,6 @@ import (
 func RegisterProdutoRoutes(router *gin.RouterGroup, container *appwire.Container) {
 	// Produtos
 	produto := router.Group("/produtos")
-	{
-		produto.GET("", container.ProdutoHandler.List)
-		produto.POST("", container.ProdutoHandler.Create)
-		produto.GET("/:id", container.ProdutoHandler.GetByID)
-		produto.PUT("/:id", container.ProdutoHandler.Update)
-		produto.DELETE("/:id", container.ProdutoHandler.Delete) // Corrected: This was missing
-		// produto.GET("/codigo/:codigo", container.ProdutoHandler.GetByCodigo)
-		produto.GET("/barras/:codigo_barras", container.ProdutoHandler.GetByCodigoBarras)
-	}
 
 	// Grupos
 	grupo := router.Group("/produtos/grupos")
@@ -88,5 +79,15 @@ func RegisterProdutoRoutes(router *gin.RouterGroup, container *appwire.Container
 		variacao.PUT("/:id", container.ProdutoVariacaoHandler.Update)
 		variacao.DELETE("/:id", container.ProdutoVariacaoHandler.Delete)
 		// variacao.PATCH("/estoque", container.ProdutoVariacaoHandler.UpdateEstoque)
+	}
+
+	{
+		produto.GET("", container.ProdutoHandler.List)
+		produto.POST("", container.ProdutoHandler.Create)
+		produto.GET("/:produto_id", container.ProdutoHandler.GetByID)
+		produto.PUT("/:produto_id", container.ProdutoHandler.Update)
+		produto.DELETE("/:produto_id", container.ProdutoHandler.Delete) // Corrected: This was missing
+		// produto.GET("/codigo/:codigo", container.ProdutoHandler.GetByCodigo)
+		produto.GET("/barras/:codigo_barras", container.ProdutoHandler.GetByCodigoBarras)
 	}
 }

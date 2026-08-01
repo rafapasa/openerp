@@ -61,9 +61,9 @@ func (h *TabelaPrecoHandler) Create(c *gin.Context) {
 // @Param        id   path      int  true  "ID da Tabela de Preço"
 // @Success      200  {object}  dto.TabelaPrecoResponse
 // @Failure      404  {object}  utils.ErrorResponse "Tabela de preço não encontrada"
-// @Router       /tabelas-preco/{id} [get]
+// @Router       /tabelas-preco/{tabela_id} [get]
 func (h *TabelaPrecoHandler) GetByID(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "tabela_id")
 	if !ok {
 		return
 	}
@@ -89,9 +89,9 @@ func (h *TabelaPrecoHandler) GetByID(c *gin.Context) {
 // @Success      200     {object}  dto.TabelaPrecoResponse
 // @Failure      400     {object}  utils.ErrorResponse "Erro de validação ou dados inválidos"
 // @Failure      404     {object}  utils.ErrorResponse "Tabela de preço não encontrada"
-// @Router       /tabelas-preco/{id} [put]
+// @Router       /tabelas-preco/{tabela_id} [put]
 func (h *TabelaPrecoHandler) Update(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "tabela_id")
 	if !ok {
 		return
 	}
@@ -123,9 +123,9 @@ func (h *TabelaPrecoHandler) Update(c *gin.Context) {
 // @Param        id   path      int  true  "ID da Tabela de Preço"
 // @Success      204  "Nenhum conteúdo"
 // @Failure      400  {object}  utils.ErrorResponse "Erro ao excluir"
-// @Router       /tabelas-preco/{id} [delete]
+// @Router       /tabelas-preco/{tabela_id} [delete]
 func (h *TabelaPrecoHandler) Delete(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "tabela_id")
 	if !ok {
 		return
 	}

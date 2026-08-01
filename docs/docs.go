@@ -160,6 +160,233 @@ const docTemplate = `{
                 }
             }
         },
+        "/condicoes-pagamento": {
+            "get": {
+                "description": "Retorna uma lista paginada de condições de pagamento, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Lista as condições de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo de condição (0=À Vista, 1=À Prazo, 9=Sem Pagamento)",
+                        "name": "tipo_condicao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova condição de pagamento com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Cria uma nova condição de pagamento",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a condição de pagamento",
+                        "name": "condicao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/condicoes-pagamento/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma condição de pagamento específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Busca uma condição de pagamento por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Condição de pagamento não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma condição de pagamento existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Atualiza uma condição de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a condição de pagamento",
+                        "name": "condicao",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Condição de pagamento não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma condição de pagamento.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Condições de Pagamento"
+                ],
+                "summary": "Exclui uma condição de pagamento",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Condição de Pagamento",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/documentos-venda": {
             "get": {
                 "description": "Retorna uma lista paginada de documentos de venda, com suporte a filtros.",
@@ -407,18 +634,6 @@ const docTemplate = `{
                         "name": "documento_venda_id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Número de registros por página",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset para a paginação",
-                        "name": "offset",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -651,18 +866,6 @@ const docTemplate = `{
                         "name": "documento_venda_id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Número de registros por página",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset para a paginação",
-                        "name": "offset",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -870,6 +1073,187 @@ const docTemplate = `{
                         "description": "Erro ao excluir",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma lista paginada de entidades",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Lista entidades",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de registros",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset para paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome (razao social)",
+                        "name": "nome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por documento",
+                        "name": "documento",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo (1-Física, 2-Jurídica)",
+                        "name": "tipo_pessoa",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1-Ativo, 2-Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cadastra uma nova entidade (cliente/fornecedor)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Cria uma nova entidade",
+                "parameters": [
+                    {
+                        "description": "Dados da entidade",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades/documento/{documento}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de uma entidade pelo CPF/CNPJ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Busca entidade por documento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CPF/CNPJ da entidade",
+                        "name": "documento",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -1630,7 +2014,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Arquivo do documento",
                         "schema": {
                             "type": "file"
                         }
@@ -2026,6 +2410,176 @@ const docTemplate = `{
                 }
             }
         },
+        "/entidades/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna os dados de uma entidade específica",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Busca entidade por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza os dados de uma entidade existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Atualiza uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados atualizados",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EntidadeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Realiza a exclusão lógica de uma entidade",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entidades"
+                ],
+                "summary": "Exclui uma entidade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da entidade",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/entidades/{id}/regimes-tributarios": {
             "get": {
                 "security": [
@@ -2338,8 +2892,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filtrar por nome",
-                        "name": "nome",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
                         "in": "query"
                     }
                 ],
@@ -2528,6 +3082,9 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Realiza a exclusão lógica de um grupo de entidade",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "GrupoEntidades"
                 ],
@@ -2808,9 +3365,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/produto-grupos": {
+        "/operacoes-fiscais": {
             "get": {
-                "description": "Retorna uma lista paginada de grupos de produto, com suporte a filtros.",
+                "description": "Retorna uma lista paginada de operações fiscais, com suporte a filtros.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2818,9 +3375,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Grupos"
+                    "Operações Fiscais"
                 ],
-                "summary": "Lista os grupos de produto",
+                "summary": "Lista as operações fiscais",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2836,20 +3393,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Filtrar por CFOP",
+                        "name": "cfop",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Filtrar por descrição",
                         "name": "descricao",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
-                        "name": "situacao",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtrar por visibilidade no PDV (1=Sim, 2=Não)",
-                        "name": "visivel_frente_caixa",
+                        "description": "Filtrar por ID da Empresa Filial",
+                        "name": "empresa_filial_id",
                         "in": "query"
                     }
                 ],
@@ -2857,13 +3414,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoListResponse"
+                            "$ref": "#/definitions/dto.OperacaoFiscalListResponse"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Cria um novo grupo de produto com base nos dados fornecidos.",
+                "description": "Cria uma nova operação fiscal com base nos dados fornecidos.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2871,17 +3428,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Grupos"
+                    "Operações Fiscais"
                 ],
-                "summary": "Cria um novo grupo de produto",
+                "summary": "Cria uma nova operação fiscal",
                 "parameters": [
                     {
-                        "description": "Dados para criar o grupo de produto",
-                        "name": "grupo",
+                        "description": "Dados para criar a operação fiscal",
+                        "name": "operacao",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoRequest"
+                            "$ref": "#/definitions/dto.OperacaoFiscalRequest"
                         }
                     }
                 ],
@@ -2889,7 +3446,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
                         }
                     },
                     "400": {
@@ -2907,9 +3464,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/produto-grupos/{id}": {
+        "/operacoes-fiscais/cfop/{cfop}": {
             "get": {
-                "description": "Retorna os detalhes de um grupo de produto específico.",
+                "description": "Retorna operações fiscais filtradas por CFOP.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2917,13 +3474,107 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Grupos"
+                    "Operações Fiscais"
                 ],
-                "summary": "Busca um grupo de produto por ID",
+                "summary": "Busca operações fiscais por CFOP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CFOP da Operação Fiscal",
+                        "name": "cfop",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "CFOP inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/operacoes-fiscais/filial/{filial_id}": {
+            "get": {
+                "description": "Retorna operações fiscais filtradas por ID da filial.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Busca operações fiscais por filial",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID do Grupo de Produto",
+                        "description": "ID da Filial",
+                        "name": "filial_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID da filial inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Operação fiscal não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/operacoes-fiscais/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma operação fiscal específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Operações Fiscais"
+                ],
+                "summary": "Busca uma operação fiscal por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Operação Fiscal",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2933,11 +3584,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
                         }
                     },
                     "404": {
-                        "description": "Grupo de produto não encontrado",
+                        "description": "Operação fiscal não encontrada",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -2945,7 +3596,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Atualiza os dados de um grupo de produto existente.",
+                "description": "Atualiza os dados de uma operação fiscal existente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2953,24 +3604,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Grupos"
+                    "Operações Fiscais"
                 ],
-                "summary": "Atualiza um grupo de produto",
+                "summary": "Atualiza uma operação fiscal",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID do Grupo de Produto",
+                        "description": "ID da Operação Fiscal",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para atualizar o grupo de produto",
-                        "name": "grupo",
+                        "description": "Dados para atualizar a operação fiscal",
+                        "name": "operacao",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoRequest"
+                            "$ref": "#/definitions/dto.OperacaoFiscalRequest"
                         }
                     }
                 ],
@@ -2978,7 +3629,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                            "$ref": "#/definitions/dto.OperacaoFiscalResponse"
                         }
                     },
                     "400": {
@@ -2988,7 +3639,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Grupo de produto não encontrado",
+                        "description": "Operação fiscal não encontrada",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -2996,7 +3647,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Realiza a exclusão lógica de um grupo de produto.",
+                "description": "Realiza a exclusão lógica de uma operação fiscal.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3004,13 +3655,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Grupos"
+                    "Operações Fiscais"
                 ],
-                "summary": "Exclui um grupo de produto",
+                "summary": "Exclui uma operação fiscal",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID do Grupo de Produto",
+                        "description": "ID da Operação Fiscal",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3029,9 +3680,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/produto-marcas": {
+        "/processos": {
             "get": {
-                "description": "Retorna uma lista paginada de marcas de produto, com suporte a filtros.",
+                "description": "Retorna uma lista paginada de processos, com suporte a filtros.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3039,9 +3690,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Marcas"
+                    "Processos"
                 ],
-                "summary": "Lista as marcas de produto",
+                "summary": "Lista os processos",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3056,9 +3707,21 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "Filtrar por código",
+                        "name": "codigo",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Filtrar por descrição",
                         "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por tipo de operação (0=Entrada, 1=Saída)",
+                        "name": "tipo_operacao",
                         "in": "query"
                     },
                     {
@@ -3072,13 +3735,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaListResponse"
+                            "$ref": "#/definitions/dto.ProcessoListResponse"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Cria uma nova marca de produto com base nos dados fornecidos.",
+                "description": "Cria um novo processo com base nos dados fornecidos.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3086,17 +3749,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Marcas"
+                    "Processos"
                 ],
-                "summary": "Cria uma nova marca de produto",
+                "summary": "Cria um novo processo",
                 "parameters": [
                     {
-                        "description": "Dados para criar a marca de produto",
-                        "name": "marca",
+                        "description": "Dados para criar o processo",
+                        "name": "processo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaRequest"
+                            "$ref": "#/definitions/dto.ProcessoRequest"
                         }
                     }
                 ],
@@ -3104,7 +3767,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                            "$ref": "#/definitions/dto.ProcessoResponse"
                         }
                     },
                     "400": {
@@ -3122,9 +3785,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/produto-marcas/{id}": {
+        "/processos/codigo/{codigo}": {
             "get": {
-                "description": "Retorna os detalhes de uma marca de produto específica.",
+                "description": "Retorna os detalhes de um processo específico pelo código.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3132,13 +3795,57 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Marcas"
+                    "Processos"
                 ],
-                "summary": "Busca uma marca de produto por ID",
+                "summary": "Busca um processo por código",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID da Marca de Produto",
+                        "description": "Código do Processo",
+                        "name": "codigo",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProcessoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Código inválido",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Processo não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/processos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um processo específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Busca um processo por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Processo",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3148,11 +3855,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                            "$ref": "#/definitions/dto.ProcessoResponse"
                         }
                     },
                     "404": {
-                        "description": "Marca de produto não encontrada",
+                        "description": "Processo não encontrado",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -3160,7 +3867,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Atualiza os dados de uma marca de produto existente.",
+                "description": "Atualiza os dados de um processo existente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3168,24 +3875,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Marcas"
+                    "Processos"
                 ],
-                "summary": "Atualiza uma marca de produto",
+                "summary": "Atualiza um processo",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID da Marca de Produto",
+                        "description": "ID do Processo",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para atualizar a marca de produto",
-                        "name": "marca",
+                        "description": "Dados para atualizar o processo",
+                        "name": "processo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaRequest"
+                            "$ref": "#/definitions/dto.ProcessoRequest"
                         }
                     }
                 ],
@@ -3193,7 +3900,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                            "$ref": "#/definitions/dto.ProcessoResponse"
                         }
                     },
                     "400": {
@@ -3203,7 +3910,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Marca de produto não encontrada",
+                        "description": "Processo não encontrado",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -3211,7 +3918,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Realiza a exclusão lógica de uma marca de produto.",
+                "description": "Realiza a exclusão lógica de um processo.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3219,443 +3926,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Produto - Marcas"
+                    "Processos"
                 ],
-                "summary": "Exclui uma marca de produto",
+                "summary": "Exclui um processo",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID da Marca de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Nenhum conteúdo"
-                    },
-                    "400": {
-                        "description": "Erro ao excluir",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/produto-modelos": {
-            "get": {
-                "description": "Retorna uma lista paginada de modelos de produto, com suporte a filtros.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Modelos"
-                ],
-                "summary": "Lista os modelos de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Número de registros por página",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset para a paginação",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filtrar por descrição",
-                        "name": "descricao",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
-                        "name": "situacao",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloListResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Cria um novo modelo de produto com base nos dados fornecidos.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Modelos"
-                ],
-                "summary": "Cria um novo modelo de produto",
-                "parameters": [
-                    {
-                        "description": "Dados para criar o modelo de produto",
-                        "name": "modelo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Erro de validação ou dados inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Erro interno do servidor",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/produto-modelos/{id}": {
-            "get": {
-                "description": "Retorna os detalhes de um modelo de produto específico.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Modelos"
-                ],
-                "summary": "Busca um modelo de produto por ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Modelo de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Modelo de produto não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Atualiza os dados de um modelo de produto existente.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Modelos"
-                ],
-                "summary": "Atualiza um modelo de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Modelo de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Dados para atualizar o modelo de produto",
-                        "name": "modelo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Erro de validação ou dados inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Modelo de produto não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Realiza a exclusão lógica de um modelo de produto.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Modelos"
-                ],
-                "summary": "Exclui um modelo de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Modelo de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Nenhum conteúdo"
-                    },
-                    "400": {
-                        "description": "Erro ao excluir",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/produto-subgrupos": {
-            "get": {
-                "description": "Retorna uma lista paginada de subgrupos de produto, com suporte a filtros.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Subgrupos"
-                ],
-                "summary": "Lista os subgrupos de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Número de registros por página",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset para a paginação",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filtrar por descrição",
-                        "name": "descricao",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
-                        "name": "situacao",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoListResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Cria um novo subgrupo de produto com base nos dados fornecidos.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Subgrupos"
-                ],
-                "summary": "Cria um novo subgrupo de produto",
-                "parameters": [
-                    {
-                        "description": "Dados para criar o subgrupo de produto",
-                        "name": "subgrupo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Erro de validação ou dados inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Erro interno do servidor",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/produto-subgrupos/{id}": {
-            "get": {
-                "description": "Retorna os detalhes de um subgrupo de produto específico.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Subgrupos"
-                ],
-                "summary": "Busca um subgrupo de produto por ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Subgrupo de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Subgrupo de produto não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Atualiza os dados de um subgrupo de produto existente.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Subgrupos"
-                ],
-                "summary": "Atualiza um subgrupo de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Subgrupo de Produto",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Dados para atualizar o subgrupo de produto",
-                        "name": "subgrupo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Erro de validação ou dados inválidos",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Subgrupo de produto não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Realiza a exclusão lógica de um subgrupo de produto.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Produto - Subgrupos"
-                ],
-                "summary": "Exclui um subgrupo de produto",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Subgrupo de Produto",
+                        "description": "ID do Processo",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -4055,6 +4332,1296 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/cores": {
+            "get": {
+                "description": "Retorna uma lista paginada de cores de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Lista as cores de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova cor de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Cria uma nova cor de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a cor de produto",
+                        "name": "cor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/cores/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma cor de produto específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Busca uma cor de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Cor de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma cor de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Atualiza uma cor de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a cor de produto",
+                        "name": "cor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoCorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Cor de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma cor de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Cores"
+                ],
+                "summary": "Exclui uma cor de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Cor de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/grupos": {
+            "get": {
+                "description": "Retorna uma lista paginada de grupos de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Grupos"
+                ],
+                "summary": "Lista os grupos de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo grupo de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Grupos"
+                ],
+                "summary": "Cria um novo grupo de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o grupo de produto",
+                        "name": "grupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/grupos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um grupo de produto específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Grupos"
+                ],
+                "summary": "Busca um grupo de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Grupo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um grupo de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Grupos"
+                ],
+                "summary": "Atualiza um grupo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o grupo de produto",
+                        "name": "grupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoGrupoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Grupo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um grupo de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Grupos"
+                ],
+                "summary": "Exclui um grupo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/marcas": {
+            "get": {
+                "description": "Retorna uma lista paginada de marcas de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Marcas"
+                ],
+                "summary": "Lista as marcas de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma nova marca de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Marcas"
+                ],
+                "summary": "Cria uma nova marca de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar a marca de produto",
+                        "name": "marca",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/marcas/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de uma marca de produto específica.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Marcas"
+                ],
+                "summary": "Busca uma marca de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Marca de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Marca de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de uma marca de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Marcas"
+                ],
+                "summary": "Atualiza uma marca de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Marca de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar a marca de produto",
+                        "name": "marca",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoMarcaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Marca de produto não encontrada",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de uma marca de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Marcas"
+                ],
+                "summary": "Exclui uma marca de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Marca de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/modelos": {
+            "get": {
+                "description": "Retorna uma lista paginada de modelos de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Modelos"
+                ],
+                "summary": "Lista os modelos de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo modelo de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Modelos"
+                ],
+                "summary": "Cria um novo modelo de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o modelo de produto",
+                        "name": "modelo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/modelos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um modelo de produto específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Modelos"
+                ],
+                "summary": "Busca um modelo de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Modelo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Modelo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um modelo de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Modelos"
+                ],
+                "summary": "Atualiza um modelo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Modelo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o modelo de produto",
+                        "name": "modelo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoModeloResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Modelo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um modelo de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Modelos"
+                ],
+                "summary": "Exclui um modelo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Modelo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/subgrupos": {
+            "get": {
+                "description": "Retorna uma lista paginada de subgrupos de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Subgrupos"
+                ],
+                "summary": "Lista os subgrupos de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo subgrupo de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Subgrupos"
+                ],
+                "summary": "Cria um novo subgrupo de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o subgrupo de produto",
+                        "name": "subgrupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/subgrupos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um subgrupo de produto específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Subgrupos"
+                ],
+                "summary": "Busca um subgrupo de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Subgrupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Subgrupo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um subgrupo de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Subgrupos"
+                ],
+                "summary": "Atualiza um subgrupo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Subgrupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o subgrupo de produto",
+                        "name": "subgrupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoSubgrupoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Subgrupo de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um subgrupo de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Subgrupos"
+                ],
+                "summary": "Exclui um subgrupo de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Subgrupo de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/tamanhos": {
+            "get": {
+                "description": "Retorna uma lista paginada de tamanhos de produto, com suporte a filtros.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Lista os tamanhos de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Número de registros por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset para a paginação",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por situação (1=Ativo, 2=Inativo)",
+                        "name": "situacao",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo tamanho de produto com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Cria um novo tamanho de produto",
+                "parameters": [
+                    {
+                        "description": "Dados para criar o tamanho de produto",
+                        "name": "tamanho",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/tamanhos/{id}": {
+            "get": {
+                "description": "Retorna os detalhes de um tamanho de produto específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Busca um tamanho de produto por ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tamanho de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados de um tamanho de produto existente.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Atualiza um tamanho de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualizar o tamanho de produto",
+                        "name": "tamanho",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou dados inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Tamanho de produto não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Realiza a exclusão lógica de um tamanho de produto.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Produto - Tamanhos"
+                ],
+                "summary": "Exclui um tamanho de produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Tamanho de Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Nenhum conteúdo"
+                    },
+                    "400": {
+                        "description": "Erro ao excluir",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -4639,6 +6206,209 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "constants.Sexo": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "SexoMasculino",
+                "SexoFeminino"
+            ]
+        },
+        "constants.Status": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                9
+            ],
+            "x-enum-varnames": [
+                "StatusAtivo",
+                "StatusInativo",
+                "StatusBloqueado",
+                "StatusCancelado"
+            ]
+        },
+        "constants.TipoPessoa": {
+            "type": "integer",
+            "enum": [
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "TipoPessoaFisica",
+                "TipoPessoaJuridica"
+            ]
+        },
+        "dto.CondicaoPagamentoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CondicaoPagamentoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CondicaoPagamentoRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "portador_id",
+                "tipo_condicao",
+                "tipo_documento_id"
+            ],
+            "properties": {
+                "comissao": {
+                    "type": "number"
+                },
+                "created_by": {
+                    "description": "============================================================\nUSUÁRIO (para auditoria)\n============================================================",
+                    "type": "integer"
+                },
+                "desconto": {
+                    "type": "number"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "dia_pagamento": {
+                    "type": "integer"
+                },
+                "dias_parcelas": {
+                    "type": "integer"
+                },
+                "entrada": {
+                    "type": "integer"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "juros": {
+                    "type": "number"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "portador_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "tipo_condicao": {
+                    "type": "integer"
+                },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CondicaoPagamentoResponse": {
+            "type": "object",
+            "properties": {
+                "comissao": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "desconto": {
+                    "type": "number"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "dia_pagamento": {
+                    "type": "integer"
+                },
+                "dias_parcelas": {
+                    "type": "integer"
+                },
+                "entrada": {
+                    "type": "integer"
+                },
+                "entrada_label": {
+                    "type": "string"
+                },
+                "forma_pagamento_id": {
+                    "type": "integer"
+                },
+                "forma_pagamento_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "juros": {
+                    "type": "number"
+                },
+                "numero_parcelas": {
+                    "type": "integer"
+                },
+                "portador_id": {
+                    "type": "integer"
+                },
+                "portador_nome": {
+                    "type": "string"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tipo_condicao": {
+                    "type": "integer"
+                },
+                "tipo_condicao_label": {
+                    "type": "string"
+                },
+                "tipo_documento_id": {
+                    "type": "integer"
+                },
+                "tipo_documento_nome": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.DocumentoVendaItemListResponse": {
             "type": "object",
             "properties": {
@@ -4672,10 +6442,22 @@ const docTemplate = `{
                 "created_by": {
                     "type": "integer"
                 },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
                 "descricao_produto": {
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_id": {
                     "type": "integer"
                 },
                 "percentual_desconto": {
@@ -4876,13 +6658,13 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "created_at": {
+                    "description": "Formatted string",
                     "type": "string"
                 },
                 "created_by": {
                     "type": "integer"
                 },
                 "data_vencimento": {
-                    "description": "Formatted string",
                     "type": "string"
                 },
                 "documento": {
@@ -4892,7 +6674,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "forma_pagamento_id": {
-                    "description": "Matches model",
                     "type": "integer"
                 },
                 "forma_pagamento_nome": {
@@ -4914,6 +6695,14 @@ const docTemplate = `{
                 "rotina_contabil_id": {
                     "type": "integer"
                 },
+                "status": {
+                    "description": "Added from model",
+                    "type": "integer"
+                },
+                "status_label": {
+                    "description": "Added for display",
+                    "type": "string"
+                },
                 "tipo_documento_id": {
                     "type": "integer"
                 },
@@ -4921,6 +6710,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "Formatted string",
                     "type": "string"
                 },
                 "updated_by": {
@@ -5611,6 +7401,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EntidadeListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EntidadeResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.EntidadeRegimeTributarioListResponse": {
             "type": "object",
             "properties": {
@@ -5732,6 +7545,261 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EntidadeRequest": {
+            "type": "object",
+            "required": [
+                "empresa_filial_id",
+                "inscricao_federal",
+                "razao_social",
+                "tipo_pessoa"
+            ],
+            "properties": {
+                "arquivo_imp_ddv": {
+                    "type": "string"
+                },
+                "casa_propria": {
+                    "type": "integer"
+                },
+                "classificacao": {
+                    "type": "integer"
+                },
+                "codigo": {
+                    "type": "integer"
+                },
+                "conjuje_cpf": {
+                    "type": "string"
+                },
+                "conjuje_nome": {
+                    "type": "string"
+                },
+                "conjuje_renda": {
+                    "type": "number"
+                },
+                "conjuje_rg": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "============================================================\nUSUÁRIO (para auditoria)\n============================================================",
+                    "type": "integer"
+                },
+                "data_cadastro": {
+                    "description": "============================================================\nDADOS COMERCIAIS\n============================================================",
+                    "type": "string"
+                },
+                "data_nascimento": {
+                    "description": "============================================================\nDADOS PESSOAIS\n============================================================",
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "estado_civil": {
+                    "type": "integer"
+                },
+                "grupo_entidade_id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "horario_id": {
+                    "type": "integer"
+                },
+                "inscricao_estadual": {
+                    "type": "string"
+                },
+                "inscricao_federal": {
+                    "type": "string"
+                },
+                "inscricao_municipal": {
+                    "type": "string"
+                },
+                "inscricao_produtor": {
+                    "type": "string"
+                },
+                "nome_da_mae": {
+                    "type": "string"
+                },
+                "nome_do_pai": {
+                    "type": "string"
+                },
+                "nome_fantasia": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "percentual_comissao": {
+                    "type": "number"
+                },
+                "quant_filhos": {
+                    "type": "integer"
+                },
+                "razao_social": {
+                    "type": "string"
+                },
+                "sexo": {
+                    "$ref": "#/definitions/constants.Sexo"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.Status"
+                },
+                "suframa": {
+                    "type": "string"
+                },
+                "tabela_desconto_id": {
+                    "type": "integer"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "taxa_entrega": {
+                    "type": "number"
+                },
+                "tipo_pessoa": {
+                    "maximum": 2,
+                    "minimum": 1,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/constants.TipoPessoa"
+                        }
+                    ]
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EntidadeResponse": {
+            "type": "object",
+            "properties": {
+                "arquivo_imp_ddv": {
+                    "type": "string"
+                },
+                "casa_propria": {
+                    "type": "integer"
+                },
+                "classificacao": {
+                    "type": "integer"
+                },
+                "codigo": {
+                    "type": "integer"
+                },
+                "conjuje_cpf": {
+                    "type": "string"
+                },
+                "conjuje_nome": {
+                    "type": "string"
+                },
+                "conjuje_renda": {
+                    "type": "number"
+                },
+                "conjuje_rg": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "============================================================\nAUDITORIA\n============================================================",
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "data_cadastro": {
+                    "description": "============================================================\nDADOS COMERCIAIS\n============================================================",
+                    "type": "string"
+                },
+                "data_nascimento": {
+                    "description": "============================================================\nDADOS PESSOAIS\n============================================================",
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "estado_civil": {
+                    "type": "integer"
+                },
+                "estado_civil_label": {
+                    "type": "string"
+                },
+                "grupo_entidade_id": {
+                    "type": "integer"
+                },
+                "horario_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "============================================================\nDADOS PRINCIPAIS\n============================================================",
+                    "type": "integer"
+                },
+                "inscricao_estadual": {
+                    "type": "string"
+                },
+                "inscricao_federal": {
+                    "type": "string"
+                },
+                "inscricao_municipal": {
+                    "type": "string"
+                },
+                "inscricao_produtor": {
+                    "type": "string"
+                },
+                "nome_da_mae": {
+                    "type": "string"
+                },
+                "nome_do_pai": {
+                    "type": "string"
+                },
+                "nome_fantasia": {
+                    "type": "string"
+                },
+                "observacao": {
+                    "type": "string"
+                },
+                "percentual_comissao": {
+                    "type": "number"
+                },
+                "quant_filhos": {
+                    "type": "integer"
+                },
+                "razao_social": {
+                    "type": "string"
+                },
+                "sexo": {
+                    "$ref": "#/definitions/constants.Sexo"
+                },
+                "sexo_label": {
+                    "type": "string"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.Status"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "suframa": {
+                    "type": "string"
+                },
+                "tabela_desconto_id": {
+                    "type": "integer"
+                },
+                "tabela_preco_id": {
+                    "type": "integer"
+                },
+                "taxa_entrega": {
+                    "type": "number"
+                },
+                "tipo_pessoa": {
+                    "$ref": "#/definitions/constants.TipoPessoa"
+                },
+                "tipo_pessoa_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -5835,6 +7903,380 @@ const docTemplate = `{
                 },
                 "usuario": {
                     "$ref": "#/definitions/dto.UsuarioInfo"
+                }
+            }
+        },
+        "dto.OperacaoFiscalListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OperacaoFiscalResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.OperacaoFiscalRequest": {
+            "type": "object",
+            "required": [
+                "cfop",
+                "cst_icms_id",
+                "cst_ipi_id",
+                "cst_pis_cofins_id",
+                "data_ini",
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "cfop": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "data_ini": {
+                    "description": "Formato: YYYY-MM-DD",
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.OperacaoFiscalResponse": {
+            "type": "object",
+            "properties": {
+                "cfop": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "cst_icms_codigo": {
+                    "type": "string"
+                },
+                "cst_icms_id": {
+                    "type": "integer"
+                },
+                "cst_ipi_codigo": {
+                    "type": "string"
+                },
+                "cst_ipi_id": {
+                    "type": "integer"
+                },
+                "cst_pis_cofins_codigo": {
+                    "type": "string"
+                },
+                "cst_pis_cofins_id": {
+                    "type": "integer"
+                },
+                "data_fim": {
+                    "type": "string"
+                },
+                "data_ini": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProcessoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoRequest": {
+            "type": "object",
+            "required": [
+                "codigo",
+                "descricao",
+                "empresa_filial_id",
+                "tipo_operacao"
+            ],
+            "properties": {
+                "codigo": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "despesa_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "natureza_operacao_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_st_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_st_id": {
+                    "type": "integer"
+                },
+                "plano_contas_financeiro_id": {
+                    "type": "integer"
+                },
+                "processo_nf_id": {
+                    "type": "integer"
+                },
+                "receita_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "tipo_operacao": {
+                    "description": "0-Entrada, 1-Saída",
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProcessoResponse": {
+            "type": "object",
+            "properties": {
+                "codigo": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "despesa_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "natureza_operacao_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_fora_est_st_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_id": {
+                    "type": "integer"
+                },
+                "operacao_fiscal_no_est_st_id": {
+                    "type": "integer"
+                },
+                "plano_contas_financeiro_id": {
+                    "type": "integer"
+                },
+                "processo_nf_id": {
+                    "type": "integer"
+                },
+                "receita_id": {
+                    "type": "integer"
+                },
+                "rotina_contabil_descricao": {
+                    "type": "string"
+                },
+                "rotina_contabil_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "tipo_operacao": {
+                    "type": "integer"
+                },
+                "tipo_operacao_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProdutoCorResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string",
+                    "maxLength": 10
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoCorResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
                 }
             }
         },
@@ -6427,6 +8869,90 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "situacao_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ProdutoTamanhoResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
+                    "type": "string",
+                    "maxLength": 10
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProdutoTamanhoResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sigla": {
                     "type": "string"
                 },
                 "updated_at": {

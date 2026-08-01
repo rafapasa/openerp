@@ -64,9 +64,9 @@ func (h *EntidadeHandler) Create(c *gin.Context) {
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /entidades/{id} [get]
+// @Router       /entidades/{entidade_id} [get]
 func (h *EntidadeHandler) GetByID(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "entidade_id")
 	if !ok {
 		return
 	}
@@ -122,9 +122,9 @@ func (h *EntidadeHandler) GetByDocumento(c *gin.Context) {
 // @Failure      404      {object}  map[string]string
 // @Failure      500      {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /entidades/{id} [put]
+// @Router       /entidades/{entidade_id} [put]
 func (h *EntidadeHandler) Update(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "entidade_id")
 	if !ok {
 		return
 	}
@@ -157,9 +157,9 @@ func (h *EntidadeHandler) Update(c *gin.Context) {
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /entidades/{id} [delete]
+// @Router       /entidades/{entidade_id} [delete]
 func (h *EntidadeHandler) Delete(c *gin.Context) {
-	id, ok := utils.ParseIDParam(c, "id")
+	id, ok := utils.ParseIDParam(c, "entidade_id")
 	if !ok {
 		return
 	}

@@ -9,15 +9,6 @@ import (
 func RegisterVendaRoutes(router *gin.RouterGroup, container *appwire.Container) {
 	// Documentos de Venda
 	documento := router.Group("/documentos/venda")
-	{
-		documento.GET("", container.DocumentoVendaHandler.List)
-		documento.POST("", container.DocumentoVendaHandler.Create) // Corrected: This was missing
-		documento.GET("/:id", container.DocumentoVendaHandler.GetByID)
-		documento.PUT("/:id", container.DocumentoVendaHandler.Update)
-		documento.DELETE("/:id", container.DocumentoVendaHandler.Delete)
-		documento.POST("/:id/emitir", container.DocumentoVendaHandler.Emitir)
-		documento.POST("/:id/cancelar", container.DocumentoVendaHandler.Cancelar)
-	}
 
 	// Itens do Documento
 	item := router.Group("/documentos/venda/:documento_id/itens")
@@ -47,5 +38,15 @@ func RegisterVendaRoutes(router *gin.RouterGroup, container *appwire.Container) 
 		condicao.GET("/:id", container.CondicaoPagamentoHandler.GetByID)
 		condicao.PUT("/:id", container.CondicaoPagamentoHandler.Update)
 		condicao.DELETE("/:id", container.CondicaoPagamentoHandler.Delete)
+	}
+
+	{
+		documento.GET("", container.DocumentoVendaHandler.List)
+		documento.POST("", container.DocumentoVendaHandler.Create) // Corrected: This was missing
+		documento.GET("/:documento_id", container.DocumentoVendaHandler.GetByID)
+		documento.PUT("/:documento_id", container.DocumentoVendaHandler.Update)
+		documento.DELETE("/:documento_id", container.DocumentoVendaHandler.Delete)
+		documento.POST("/:documento_id/emitir", container.DocumentoVendaHandler.Emitir)
+		documento.POST("/:documento_id/cancelar", container.DocumentoVendaHandler.Cancelar)
 	}
 }
