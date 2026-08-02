@@ -41,6 +41,7 @@ function Show-Help {
     Write-Host "  air      - Iniciar hot reload com Air (inclui geração de docs)" -ForegroundColor White
     Write-Host "  db:migrate - Rodar migrações do banco de dados" -ForegroundColor White
     Write-Host "  env      - Mostrar variáveis de ambiente" -ForegroundColor White
+    Write-Host "  wire     - Gerar wire " -ForegroundColor White
     Write-Host "  help     - Mostrar esta ajuda" -ForegroundColor White
     Write-Host ""
     Write-Host "Exemplo: .\scripts\dev.ps1 run" -ForegroundColor Cyan
@@ -132,6 +133,11 @@ switch ($Command.Trim()) {
     "env" {
         Write-Host "📋 Environment Variables:" -ForegroundColor Yellow
         Get-Content .env
+    }
+    
+    "wire" {
+        Write-Host "📝 Generating wire..." -ForegroundColor Yellow
+        wire gen ./internal/appwire
     }
 
     "air" {

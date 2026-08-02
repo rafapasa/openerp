@@ -1,0 +1,14 @@
+{
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/prometheus-schema.json": [
+            "prometheus.yml"
+        ]
+    },
+    "yaml.validate": true,
+    "files.associations": {
+        "*.yml": "yaml",
+        "prometheus.yml": "yaml",
+        "grafana/provisioning/**/*.yml": "yaml"
+    },
+    "yaml.format.enable": true
+}

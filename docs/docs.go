@@ -486,7 +486,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/documentos-venda/{id}": {
+        "/documentos-venda/{documento_id}": {
             "get": {
                 "description": "Retorna os detalhes de um documento de venda específico.",
                 "consumes": [
@@ -2410,7 +2410,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/entidades/{id}": {
+        "/entidades/{entidade_id}": {
             "get": {
                 "security": [
                     {
@@ -5844,7 +5844,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/tabelas-preco/{id}": {
+        "/tabelas-preco/{tabela_id}": {
             "get": {
                 "description": "Retorna os detalhes de uma tabela de preço específica.",
                 "consumes": [

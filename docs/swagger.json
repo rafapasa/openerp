@@ -484,7 +484,7 @@
                 }
             }
         },
-        "/documentos-venda/{id}": {
+        "/documentos-venda/{documento_id}": {
             "get": {
                 "description": "Retorna os detalhes de um documento de venda específico.",
                 "consumes": [
@@ -2408,7 +2408,7 @@
                 }
             }
         },
-        "/entidades/{id}": {
+        "/entidades/{entidade_id}": {
             "get": {
                 "security": [
                     {
@@ -5842,7 +5842,7 @@
                 }
             }
         },
-        "/tabelas-preco/{id}": {
+        "/tabelas-preco/{tabela_id}": {
             "get": {
                 "description": "Retorna os detalhes de uma tabela de preço específica.",
                 "consumes": [

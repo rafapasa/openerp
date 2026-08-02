@@ -2633,7 +2633,7 @@ paths:
       summary: Cria um novo documento de venda
       tags:
       - Documentos de Venda
-  /documentos-venda/{id}:
+  /documentos-venda/{documento_id}:
     delete:
       consumes:
       - application/json
@@ -3113,6 +3113,115 @@ paths:
       security:
       - BearerAuth: []
       summary: Cria uma nova entidade
+      tags:
+      - Entidades
+  /entidades/{entidade_id}:
+    delete:
+      description: Realiza a exclusão lógica de uma entidade
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Exclui uma entidade
+      tags:
+      - Entidades
+    get:
+      description: Retorna os dados de uma entidade específica
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Busca entidade por ID
+      tags:
+      - Entidades
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma entidade existente
+      parameters:
+      - description: ID da entidade
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EntidadeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EntidadeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Atualiza uma entidade
       tags:
       - Entidades
   /entidades/{entidadeId}/contatos:
@@ -3864,115 +3973,6 @@ paths:
       summary: Atualiza um endereço
       tags:
       - EntidadeEnderecos
-  /entidades/{id}:
-    delete:
-      description: Realiza a exclusão lógica de uma entidade
-      parameters:
-      - description: ID da entidade
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Exclui uma entidade
-      tags:
-      - Entidades
-    get:
-      description: Retorna os dados de uma entidade específica
-      parameters:
-      - description: ID da entidade
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.EntidadeResponse'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Busca entidade por ID
-      tags:
-      - Entidades
-    put:
-      consumes:
-      - application/json
-      description: Atualiza os dados de uma entidade existente
-      parameters:
-      - description: ID da entidade
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Dados atualizados
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.EntidadeRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.EntidadeResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Atualiza uma entidade
-      tags:
-      - Entidades
   /entidades/{id}/regimes-tributarios:
     get:
       description: Retorna todos os regimes tributários de uma entidade
@@ -6154,7 +6154,7 @@ paths:
       summary: Cria uma nova tabela de preço
       tags:
       - Produto - Tabela de Preços
-  /tabelas-preco/{id}:
+  /tabelas-preco/{tabela_id}:
     delete:
       consumes:
       - application/json

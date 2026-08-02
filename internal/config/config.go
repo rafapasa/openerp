@@ -44,6 +44,11 @@ type Config struct {
 
 	// Timezone
 	TimeZone string
+
+	TracingEnabled     bool   `mapstructure:"TRACING_ENABLED"`
+	JaegerEndpoint     string `mapstructure:"JAEGER_ENDPOINT"`
+	RateLimitEnabled   bool   `mapstructure:"RATE_LIMIT_ENABLED"`
+	RateLimitPerSecond int    `mapstructure:"RATE_LIMIT_PER_SECOND"`
 }
 
 // LoadConfig carrega as configurações do arquivo .env e variáveis de ambiente
@@ -94,7 +99,22 @@ func LoadConfig() *Config {
 
 		// Timezone
 		TimeZone: getEnv("TIME_ZONE", "America/Sao_Paulo"),
+
+		// Observability (com valores padrão)
+		TracingEnabled:     getEnvAsBool("TRACING_ENABLED", false),
+		JaegerEndpoint:     getEnv("JAEGER_ENDPOINT", "localhost:4317"),
+		RateLimitEnabled:   getEnvAsBool("RATE_LIMIT_ENABLED", false),
+		RateLimitPerSecond: getEnvAsInt("RATE_LIMIT_PER_SECOND", 100),
 	}
+}
+
+func getEnvAsBool(s string, defoult bool) bool {
+	if value := os.Getenv(s); value != "" {
+		if value == "true" || value == "1" {
+			return true
+		}
+	}
+	return defoult
 }
 
 // GetDSN retorna a string de conexão com o MySQL
