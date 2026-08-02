@@ -192,8 +192,6 @@ func (h *DocumentoVendaItemHandler) List(c *gin.Context) {
 		respItems[i] = respItem
 	}
 
-	
-
 	utils.RespondWithOK(c, dto.DocumentoVendaItemListResponse{
 		Items:      respItems,
 		Total:      total,

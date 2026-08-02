@@ -60,7 +60,7 @@ var TabelaPrecoRepositories = wire.NewSet(
 // ✅ NOVO: Repositories de Auth e Configuração
 var AuthRepositories = wire.NewSet(
 	repository.NewUsuarioRepository,
-	// repository.NewConfiguracaoRepository, // Se existir
+	repository.NewConfiguracaoRepository, // repository.NewConfiguracaoRepository, // Se existir
 )
 
 // Todos os Repositories

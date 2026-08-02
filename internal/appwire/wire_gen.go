@@ -8,6 +8,7 @@ package appwire
 
 import (
 	"github.com/openerp/backend/internal/config"
+	"github.com/openerp/backend/internal/database"
 	"github.com/openerp/backend/internal/handler"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/service"
@@ -17,7 +18,7 @@ import (
 // Injectors from wire.go:
 
 // InitializeContainer injeta todas as dependências e retorna o Container
-func InitializeContainer(db *gorm.DB) *Container {
+func InitializeContainer(db *gorm.DB, redis *database.Redis) *Container {
 	configConfig := config.LoadConfig()
 	authService := service.NewAuthService(db, configConfig)
 	authHandler := handler.NewAuthHandler(authService)
@@ -71,7 +72,8 @@ func InitializeContainer(db *gorm.DB) *Container {
 	tabelaPrecoRepository := repository.NewTabelaPrecoRepository(db)
 	tabelaPrecoService := service.NewTabelaPrecoService(tabelaPrecoRepository)
 	tabelaPrecoProdutoService := service.NewTabelaPrecoProdutoService(tabelaPrecoProdutoRepository, tabelaPrecoService, produtoService)
-	configuracaoService := service.NewConfiguracaoService(db)
+	configuracaoRepository := repository.NewConfiguracaoRepository(db, redis)
+	configuracaoService := service.NewConfiguracaoService(configuracaoRepository)
 	documentoVendaItemService := service.NewDocumentoVendaItemService(documentoVendaItemRepository, tabelaPrecoProdutoService, configuracaoService)
 	documentoVendaPagamentoRepository := repository.NewDocumentoVendaPagamentoRepository(db)
 	documentoVendaPagamentoService := service.NewDocumentoVendaPagamentoService(db, documentoVendaPagamentoRepository)

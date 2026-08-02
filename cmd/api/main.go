@@ -1,4 +1,3 @@
-// cmd/api/main.go
 package main
 
 import (
@@ -31,15 +30,22 @@ func main() {
 	log.Printf("🚀 Iniciando OpenERP API - Ambiente: %s", cfg.APIEnv)
 
 	// 2. Conectar ao banco de dados
-	db, err := database.NewMySQL(cfg)
+	dbMySQL, err := database.NewMySQL(cfg)
 	if err != nil {
 		log.Fatalf("❌ Erro ao conectar ao banco: %v", err)
 	}
-	defer db.Close()
-	log.Println("✅ Conectado ao banco de dados!")
+	defer dbMySQL.Close()
+	log.Println("✅ Conectado ao banco de dados MySQL!")
+
+	dbRedis, err := database.NewRedis(cfg)
+	if err != nil {
+		log.Fatalf("❌ Erro ao conectar ao Redis: %v", err)
+	}
+	defer dbRedis.Close()
+	log.Println("✅ Conectado ao Redis!")
 
 	// 3. ✅ Wire - Injeta todas as dependências
-	container := appwire.InitializeContainer(db.GetDB())
+	container := appwire.InitializeContainer(dbMySQL.GetDB(), dbRedis)
 
 	// 4. Configurar router
 	router := gin.Default()
