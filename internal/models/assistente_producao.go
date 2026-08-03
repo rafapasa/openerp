@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -42,26 +40,6 @@ type AssistenteProducao struct {
 
 func (AssistenteProducao) TableName() string {
 	return "assistente_producao"
-}
-
-func (a *AssistenteProducao) BeforeCreate(tx *gorm.DB) error {
-	if a.CreatedBy == nil {
-		a.CreatedBy = new(int)
-		*a.CreatedBy = 0
-	}
-	if a.UpdatedBy == nil {
-		a.UpdatedBy = new(int)
-		*a.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (a *AssistenteProducao) BeforeUpdate(tx *gorm.DB) error {
-	if a.UpdatedBy == nil {
-		a.UpdatedBy = new(int)
-		*a.UpdatedBy = 0
-	}
-	return nil
 }
 
 // IsDeleted verifica se o assistente foi deletado logicamente

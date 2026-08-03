@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -62,26 +60,6 @@ type Despesa struct {
 
 func (Despesa) TableName() string {
 	return "despesas"
-}
-
-func (d *Despesa) BeforeCreate(tx *gorm.DB) error {
-	if d.CreatedBy == nil {
-		d.CreatedBy = new(int)
-		*d.CreatedBy = 0
-	}
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (d *Despesa) BeforeUpdate(tx *gorm.DB) error {
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

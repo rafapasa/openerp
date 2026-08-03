@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -57,25 +56,7 @@ func (Usuario) TableName() string {
 	return "usuario"
 }
 
-func (u *Usuario) BeforeCreate(tx *gorm.DB) error {
-	if u.CreatedBy == nil {
-		u.CreatedBy = new(int)
-		*u.CreatedBy = 0
-	}
-	if u.UpdatedBy == nil {
-		u.UpdatedBy = new(int)
-		*u.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (u *Usuario) BeforeUpdate(tx *gorm.DB) error { // CORRIGIDO: adicionado *gorm.DB
-	if u.UpdatedBy == nil {
-		u.UpdatedBy = new(int)
-		*u.UpdatedBy = 0
-	}
-	return nil
-}
+// CORRIGIDO: adicionado *gorm.DB
 
 // ============================================================
 // MÉTODOS AUXILIARES

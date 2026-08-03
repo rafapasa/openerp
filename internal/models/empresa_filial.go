@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -62,7 +60,7 @@ type EmpresaFilial struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	Empresa  *Empresa  `gorm:"foreignKey:EmpresaID;references:emp_id" json:"empresa,omitempty"`
+	Empresa *Empresa `gorm:"foreignKey:EmpresaID;references:emp_id" json:"empresa,omitempty"`
 	// Entidade *Entidade `gorm:"foreignKey:EntidadeID;references:ent_id" json:"entidade,omitempty"`
 }
 
@@ -72,26 +70,6 @@ type EmpresaFilial struct {
 
 func (EmpresaFilial) TableName() string {
 	return "empresa_filial"
-}
-
-func (e *EmpresaFilial) BeforeCreate(tx *gorm.DB) error {
-	if e.CreatedBy == nil {
-		e.CreatedBy = new(int)
-		*e.CreatedBy = 0
-	}
-	if e.UpdatedBy == nil {
-		e.UpdatedBy = new(int)
-		*e.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (e *EmpresaFilial) BeforeUpdate(tx *gorm.DB) error {
-	if e.UpdatedBy == nil {
-		e.UpdatedBy = new(int)
-		*e.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

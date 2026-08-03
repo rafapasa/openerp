@@ -119,8 +119,8 @@ func (s *entidadeRegimeTributarioService) Update(entidadeID, item int, req *dto.
 }
 
 // Delete exclui logicamente um regime tributário.
-func (s *entidadeRegimeTributarioService) Delete(entidadeID, item int) error { 
-	if _, err := s.regimeRepo.FindByID(entidadeID, item); err != nil { 
+func (s *entidadeRegimeTributarioService) Delete(entidadeID, item int) error {
+	if _, err := s.regimeRepo.FindByID(entidadeID, item); err != nil {
 		return err
 	}
 

@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -47,26 +45,6 @@ type RotinaContabilItem struct {
 
 func (RotinaContabilItem) TableName() string {
 	return "rotina_contabil_itens"
-}
-
-func (r *RotinaContabilItem) BeforeCreate(tx *gorm.DB) error {
-	if r.CreatedBy == nil {
-		r.CreatedBy = new(int)
-		*r.CreatedBy = 0
-	}
-	if r.UpdatedBy == nil {
-		r.UpdatedBy = new(int)
-		*r.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (r *RotinaContabilItem) BeforeUpdate(tx *gorm.DB) error {
-	if r.UpdatedBy == nil {
-		r.UpdatedBy = new(int)
-		*r.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

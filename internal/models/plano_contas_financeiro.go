@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -63,26 +61,6 @@ type PlanoContasFinanceiro struct {
 
 func (PlanoContasFinanceiro) TableName() string {
 	return "plano_contas_financeiro"
-}
-
-func (m *PlanoContasFinanceiro) BeforeCreate(tx *gorm.DB) error {
-	if m.CreatedBy == nil {
-		m.CreatedBy = new(int)
-		*m.CreatedBy = 0
-	}
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (m *PlanoContasFinanceiro) BeforeUpdate(tx *gorm.DB) error {
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

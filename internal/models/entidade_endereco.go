@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -53,26 +52,6 @@ type EntidadeEndereco struct {
 
 func (EntidadeEndereco) TableName() string {
 	return "entidade_endereco"
-}
-
-func (m *EntidadeEndereco) BeforeCreate(tx *gorm.DB) error {
-	if m.CreatedBy == nil {
-		m.CreatedBy = new(int)
-		*m.CreatedBy = 0
-	}
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (m *EntidadeEndereco) BeforeUpdate(tx *gorm.DB) error {
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

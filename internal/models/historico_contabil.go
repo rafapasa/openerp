@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -43,26 +41,6 @@ type HistoricoContabil struct {
 
 func (HistoricoContabil) TableName() string {
 	return "historico_contabil"
-}
-
-func (h *HistoricoContabil) BeforeCreate(tx *gorm.DB) error {
-	if h.CreatedBy == nil {
-		h.CreatedBy = new(int)
-		*h.CreatedBy = 0
-	}
-	if h.UpdatedBy == nil {
-		h.UpdatedBy = new(int)
-		*h.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (h *HistoricoContabil) BeforeUpdate(tx *gorm.DB) error {
-	if h.UpdatedBy == nil {
-		h.UpdatedBy = new(int)
-		*h.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

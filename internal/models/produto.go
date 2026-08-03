@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -77,25 +75,9 @@ func (Produto) TableName() string {
 	return "produto"
 }
 
-func (p *Produto) BeforeCreate(tx *gorm.DB) error { // CORRIGIDO: adicionado *gorm.DB
-	if p.CreatedBy == nil {
-		p.CreatedBy = new(int)
-		*p.CreatedBy = 0
-	}
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
-}
+// CORRIGIDO: adicionado *gorm.DB
 
-func (p *Produto) BeforeUpdate(tx *gorm.DB) error { // CORRIGIDO: adicionado *gorm.DB
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
-}
+// CORRIGIDO: adicionado *gorm.DB
 
 // ============================================================
 // MÉTODOS AUXILIARES

@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -47,26 +45,6 @@ type ConvenioBancario struct {
 
 func (ConvenioBancario) TableName() string {
 	return "convenio_bancario"
-}
-
-func (m *ConvenioBancario) BeforeCreate(tx *gorm.DB) error {
-	if m.CreatedBy == nil {
-		m.CreatedBy = new(int)
-		*m.CreatedBy = 0
-	}
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (m *ConvenioBancario) BeforeUpdate(tx *gorm.DB) error {
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -125,29 +124,11 @@ func (DocumentoVenda) TableName() string {
 	return "documento_venda"
 }
 
-func (d *DocumentoVenda) BeforeCreate(tx *gorm.DB) error {
-	if d.CreatedBy == nil {
-		d.CreatedBy = new(int)
-		*d.CreatedBy = 0
-	}
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	// TODO: Gerar número do pedido automaticamente
-	// TODO: Validar se a entidade existe e está ativa
-	return nil
-}
+// TODO: Gerar número do pedido automaticamente
+// TODO: Validar se a entidade existe e está ativa
 
-func (d *DocumentoVenda) BeforeUpdate(tx *gorm.DB) error {
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	// TODO: Se situação mudar para "Fechado", verificar estoque
-	// TODO: Se situação mudar para "Cancelado", liberar estoque
-	return nil
-}
+// TODO: Se situação mudar para "Fechado", verificar estoque
+// TODO: Se situação mudar para "Cancelado", liberar estoque
 
 // ============================================================
 // MÉTODOS AUXILIARES

@@ -3,8 +3,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Empresa struct {
@@ -22,26 +20,6 @@ type Empresa struct {
 
 func (Empresa) TableName() string {
 	return "empresa"
-}
-
-func (e *Empresa) BeforeCreate(tx *gorm.DB) error {
-	if e.CreatedBy == nil {
-		e.CreatedBy = new(int)
-		*e.CreatedBy = 0
-	}
-	if e.UpdatedBy == nil {
-		e.UpdatedBy = new(int)
-		*e.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (e *Empresa) BeforeUpdate(tx *gorm.DB) error {
-	if e.UpdatedBy == nil {
-		e.UpdatedBy = new(int)
-		*e.UpdatedBy = 0
-	}
-	return nil
 }
 
 func (e *Empresa) IsDeleted() bool {

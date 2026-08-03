@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type GrupoUsuario struct {
@@ -37,26 +35,6 @@ type GrupoUsuario struct {
 
 func (GrupoUsuario) TableName() string {
 	return "grupo_usuario"
-}
-
-func (g *GrupoUsuario) BeforeCreate(tx *gorm.DB) error {
-	if g.CreatedBy == nil {
-		g.CreatedBy = new(int)
-		*g.CreatedBy = 0
-	}
-	if g.UpdatedBy == nil {
-		g.UpdatedBy = new(int)
-		*g.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (g *GrupoUsuario) BeforeUpdate(tx *gorm.DB) error {
-	if g.UpdatedBy == nil {
-		g.UpdatedBy = new(int)
-		*g.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -73,26 +71,6 @@ type FormaPagamento struct {
 
 func (FormaPagamento) TableName() string {
 	return "forma_pagamento"
-}
-
-func (f *FormaPagamento) BeforeCreate(tx *gorm.DB) error {
-	if f.CreatedBy == nil {
-		f.CreatedBy = new(int)
-		*f.CreatedBy = 0
-	}
-	if f.UpdatedBy == nil {
-		f.UpdatedBy = new(int)
-		*f.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (f *FormaPagamento) BeforeUpdate(tx *gorm.DB) error {
-	if f.UpdatedBy == nil {
-		f.UpdatedBy = new(int)
-		*f.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

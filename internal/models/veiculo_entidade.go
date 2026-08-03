@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -41,26 +39,6 @@ type VeiculoEntidade struct {
 
 func (VeiculoEntidade) TableName() string {
 	return "veiculo_entidade"
-}
-
-func (v *VeiculoEntidade) BeforeCreate(tx *gorm.DB) error {
-	if v.CreatedBy == nil {
-		v.CreatedBy = new(int)
-		*v.CreatedBy = 0
-	}
-	if v.UpdatedBy == nil {
-		v.UpdatedBy = new(int)
-		*v.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (v *VeiculoEntidade) BeforeUpdate(tx *gorm.DB) error {
-	if v.UpdatedBy == nil {
-		v.UpdatedBy = new(int)
-		*v.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

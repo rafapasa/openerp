@@ -3,9 +3,8 @@ package models
 import (
 	"time"
 
-	"github.com/openerp/backend/internal/appcontext" // Renomeado para evitar conflito com context padrão
+	// Renomeado para evitar conflito com context padrão
 	"github.com/openerp/backend/internal/constants"
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -46,41 +45,20 @@ func (TipoDocumento) TableName() string {
 	return "tipo_documento"
 }
 
-func (m *TipoDocumento) BeforeCreate(tx *gorm.DB) error {
-	// Tenta obter o UserID do contexto do GORM
-	userId := appcontext.GetUserID(tx.Statement.Context)
-	if userId != 0 {
-		m.CreatedBy = &userId
-		m.UpdatedBy = &userId
-	} else {
-		// Fallback para 0 ou um ID de sistema, se o usuário não estiver no contexto
-		// Ou, dependendo da regra de negócio, retornar um erro se CreatedBy for obrigatório
-		if m.CreatedBy == nil {
-			m.CreatedBy = new(int)
-			*m.CreatedBy = 0 // Ou um ID de usuário padrão/sistema
-		}
-		if m.UpdatedBy == nil {
-			m.UpdatedBy = new(int)
-			*m.UpdatedBy = 0 // Ou um ID de usuário padrão/sistema
-		}
-	}
-	return nil
-}
+// Tenta obter o UserID do contexto do GORM
 
-func (m *TipoDocumento) BeforeUpdate(tx *gorm.DB) error {
-	// Tenta obter o UserID do contexto do GORM
-	userID := 	appcontext.	GetUserID(tx.Statement.Context)
-	if userID != 0 {
-		m.UpdatedBy = &userID
-	} else {
-		// Fallback para 0 ou um ID de sistema, se o usuário não estiver no contexto
-		if m.UpdatedBy == nil {
-			m.UpdatedBy = new(int)
-			*m.UpdatedBy = 0 // Ou um ID de usuário padrão/sistema
-		}
-	}
-	return nil
-}
+// Fallback para 0 ou um ID de sistema, se o usuário não estiver no contexto
+// Ou, dependendo da regra de negócio, retornar um erro se CreatedBy for obrigatório
+
+// Ou um ID de usuário padrão/sistema
+
+// Ou um ID de usuário padrão/sistema
+
+// Tenta obter o UserID do contexto do GORM
+
+// Fallback para 0 ou um ID de sistema, se o usuário não estiver no contexto
+
+// Ou um ID de usuário padrão/sistema
 
 // IsActive verifica se o tipo de documento está ativo
 func (m *TipoDocumento) IsActive() bool {

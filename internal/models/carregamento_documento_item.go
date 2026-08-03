@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -45,26 +43,6 @@ type CarregamentoDocumentoItem struct {
 
 func (CarregamentoDocumentoItem) TableName() string {
 	return "carregamento_documento_item"
-}
-
-func (c *CarregamentoDocumentoItem) BeforeCreate(tx *gorm.DB) error {
-	if c.CreatedBy == nil {
-		c.CreatedBy = new(int)
-		*c.CreatedBy = 0
-	}
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (c *CarregamentoDocumentoItem) BeforeUpdate(tx *gorm.DB) error {
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

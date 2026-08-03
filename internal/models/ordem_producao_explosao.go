@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -42,26 +40,6 @@ type OrdemProducaoExplosao struct {
 
 func (OrdemProducaoExplosao) TableName() string {
 	return "ordem_producao_explosao"
-}
-
-func (o *OrdemProducaoExplosao) BeforeCreate(tx *gorm.DB) error {
-	if o.CreatedBy == nil {
-		o.CreatedBy = new(int)
-		*o.CreatedBy = 0
-	}
-	if o.UpdatedBy == nil {
-		o.UpdatedBy = new(int)
-		*o.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (o *OrdemProducaoExplosao) BeforeUpdate(tx *gorm.DB) error {
-	if o.UpdatedBy == nil {
-		o.UpdatedBy = new(int)
-		*o.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

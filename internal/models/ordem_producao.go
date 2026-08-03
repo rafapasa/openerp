@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -58,26 +56,6 @@ type OrdemProducao struct {
 
 func (OrdemProducao) TableName() string {
 	return "ordem_producao"
-}
-
-func (o *OrdemProducao) BeforeCreate(tx *gorm.DB) error {
-	if o.CreatedBy == nil {
-		o.CreatedBy = new(int)
-		*o.CreatedBy = 0
-	}
-	if o.UpdatedBy == nil {
-		o.UpdatedBy = new(int)
-		*o.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (o *OrdemProducao) BeforeUpdate(tx *gorm.DB) error {
-	if o.UpdatedBy == nil {
-		o.UpdatedBy = new(int)
-		*o.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

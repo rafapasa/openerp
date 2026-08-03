@@ -9,19 +9,19 @@ import (
 
 // Container gerencia todas as dependências da aplicação
 type Container struct {
-	db         *gorm.DB
-	services   map[string]interface{}
+	db           *gorm.DB
+	services     map[string]interface{}
 	repositories map[string]interface{}
-	handlers   map[string]interface{}
-	mu         sync.RWMutex
+	handlers     map[string]interface{}
+	mu           sync.RWMutex
 }
 
 func NewContainer(db *gorm.DB) *Container {
 	return &Container{
-		db:          db,
-		services:    make(map[string]interface{}),
+		db:           db,
+		services:     make(map[string]interface{}),
 		repositories: make(map[string]interface{}),
-		handlers:    make(map[string]interface{}),
+		handlers:     make(map[string]interface{}),
 	}
 }
 
@@ -64,7 +64,7 @@ func (c *Container) GetDB() *gorm.DB {
 func (c *Container) GetAllHandlers() map[string]interface{} {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	// Retorna uma cópia para evitar modificações externas
 	handlers := make(map[string]interface{})
 	for k, v := range c.handlers {

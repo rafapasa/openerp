@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -40,36 +38,7 @@ func (GradeProdutoItem) TableName() string {
 	return "grade_produto_item"
 }
 
-func (g *GradeProdutoItem) BeforeCreate(tx *gorm.DB) error {
-	// Buscar próximo item para esta grade
-	var maxItem int
-	err := tx.Model(&GradeProdutoItem{}).
-		Where("grade_id = ?", g.GradeID).
-		Select("COALESCE(MAX(grai_item), 0) + 1").
-		Scan(&maxItem).Error
-	if err != nil {
-		return err
-	}
-	g.Item = maxItem
-
-	if g.CreatedBy == nil {
-		g.CreatedBy = new(int)
-		*g.CreatedBy = 0
-	}
-	if g.UpdatedBy == nil {
-		g.UpdatedBy = new(int)
-		*g.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (g *GradeProdutoItem) BeforeUpdate(tx *gorm.DB) error {
-	if g.UpdatedBy == nil {
-		g.UpdatedBy = new(int)
-		*g.UpdatedBy = 0
-	}
-	return nil
-}
+// Buscar próximo item para esta grade
 
 // ============================================================
 // MÉTODOS AUXILIARES

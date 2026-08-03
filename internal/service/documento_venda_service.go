@@ -333,7 +333,7 @@ func (s *documentoVendaService) AddItem(reqItem *dto.DocumentoVendaItemRequest) 
 	prcId := ddv.ProcessoID
 	opf, err := s.prcService.GetOperacaoFiscal(prcId, opInterna, opSubTrib)
 	if err != nil {
-		return nil,apperrors.NewInternalError("Erro ao buscar operação fiscal.", err)
+		return nil, apperrors.NewInternalError("Erro ao buscar operação fiscal.", err)
 	}
 
 	reqItem.OperacaoFiscalID = utils.IntPtr(opf.ID)

@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -74,26 +72,6 @@ type Processo struct {
 
 func (Processo) TableName() string {
 	return "processo"
-}
-
-func (p *Processo) BeforeCreate(tx *gorm.DB) error {
-	if p.CreatedBy == nil {
-		p.CreatedBy = new(int)
-		*p.CreatedBy = 0
-	}
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (p *Processo) BeforeUpdate(tx *gorm.DB) error {
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

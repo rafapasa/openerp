@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -61,26 +59,6 @@ type TituloBaixa struct {
 
 func (TituloBaixa) TableName() string {
 	return "titulo_baixas"
-}
-
-func (t *TituloBaixa) BeforeCreate(tx *gorm.DB) error {
-	if t.CreatedBy == nil {
-		t.CreatedBy = new(int)
-		*t.CreatedBy = 0
-	}
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (t *TituloBaixa) BeforeUpdate(tx *gorm.DB) error {
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

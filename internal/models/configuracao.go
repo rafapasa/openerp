@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -54,26 +52,6 @@ type Configuracao struct {
 
 func (Configuracao) TableName() string {
 	return "configuracao"
-}
-
-func (c *Configuracao) BeforeCreate(tx *gorm.DB) error {
-	if c.CreatedBy == nil {
-		c.CreatedBy = new(int)
-		*c.CreatedBy = 0
-	}
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (c *Configuracao) BeforeUpdate(tx *gorm.DB) error {
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

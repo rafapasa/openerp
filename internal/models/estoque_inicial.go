@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -43,12 +41,4 @@ type EstoqueInicial struct {
 
 func (EstoqueInicial) TableName() string {
 	return "estoque_inicial"
-}
-
-func (e *EstoqueInicial) BeforeCreate(tx *gorm.DB) error {
-	if e.CreatedBy == nil {
-		e.CreatedBy = new(int)
-		*e.CreatedBy = 0
-	}
-	return nil
 }

@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -41,26 +39,6 @@ type FormatoProduto struct {
 
 func (FormatoProduto) TableName() string {
 	return "formato_produto"
-}
-
-func (f *FormatoProduto) BeforeCreate(tx *gorm.DB) error {
-	if f.CreatedBy == nil {
-		f.CreatedBy = new(int)
-		*f.CreatedBy = 0
-	}
-	if f.UpdatedBy == nil {
-		f.UpdatedBy = new(int)
-		*f.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (f *FormatoProduto) BeforeUpdate(tx *gorm.DB) error {
-	if f.UpdatedBy == nil {
-		f.UpdatedBy = new(int)
-		*f.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

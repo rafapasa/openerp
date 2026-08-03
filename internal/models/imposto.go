@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -41,26 +39,6 @@ type Imposto struct {
 
 func (Imposto) TableName() string {
 	return "imposto"
-}
-
-func (i *Imposto) BeforeCreate(tx *gorm.DB) error {
-	if i.CreatedBy == nil {
-		i.CreatedBy = new(int)
-		*i.CreatedBy = 0
-	}
-	if i.UpdatedBy == nil {
-		i.UpdatedBy = new(int)
-		*i.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (i *Imposto) BeforeUpdate(tx *gorm.DB) error {
-	if i.UpdatedBy == nil {
-		i.UpdatedBy = new(int)
-		*i.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

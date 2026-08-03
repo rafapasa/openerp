@@ -23,7 +23,6 @@ func (s *configuracaoService) LoadConfig() error {
 	panic("not implemented") // TODO: Implementar a função LoadConfig
 }
 
-
 func (s *configuracaoService) GetConfig(configId int) (any, error) {
 	return 1, nil // TODO: Criar busca de configurações no Reddis, em memoria
 	// FIXME: Descrição do bug a ser corrigido

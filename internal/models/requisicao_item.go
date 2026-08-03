@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -48,26 +46,6 @@ type RequisicaoItem struct {
 
 func (RequisicaoItem) TableName() string {
 	return "requisicao_item"
-}
-
-func (r *RequisicaoItem) BeforeCreate(tx *gorm.DB) error {
-	if r.CreatedBy == nil {
-		r.CreatedBy = new(int)
-		*r.CreatedBy = 0
-	}
-	if r.UpdatedBy == nil {
-		r.UpdatedBy = new(int)
-		*r.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (r *RequisicaoItem) BeforeUpdate(tx *gorm.DB) error {
-	if r.UpdatedBy == nil {
-		r.UpdatedBy = new(int)
-		*r.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

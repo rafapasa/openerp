@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -38,26 +36,6 @@ type TituloOcorrencia struct {
 
 func (TituloOcorrencia) TableName() string {
 	return "titulo_ocorrencia"
-}
-
-func (t *TituloOcorrencia) BeforeCreate(tx *gorm.DB) error {
-	if t.CreatedBy == nil {
-		t.CreatedBy = new(int)
-		*t.CreatedBy = 0
-	}
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (t *TituloOcorrencia) BeforeUpdate(tx *gorm.DB) error {
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
 }
 
 func (t *TituloOcorrencia) IsDeleted() bool {

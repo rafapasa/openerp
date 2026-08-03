@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -47,26 +45,6 @@ type ContratoEntidadePagamento struct {
 
 func (ContratoEntidadePagamento) TableName() string {
 	return "contrato_entidade_pagamentos"
-}
-
-func (c *ContratoEntidadePagamento) BeforeCreate(tx *gorm.DB) error {
-	if c.CreatedBy == nil {
-		c.CreatedBy = new(int)
-		*c.CreatedBy = 0
-	}
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (c *ContratoEntidadePagamento) BeforeUpdate(tx *gorm.DB) error {
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

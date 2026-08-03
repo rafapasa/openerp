@@ -9,7 +9,7 @@ import (
 type gormContextKey string
 
 const (
-	UserIDKey   gormContextKey = "gorm_user_id"
+	UserIDKey    gormContextKey = "gorm_user_id"
 	UserEmailKey gormContextKey = "gorm_user_email"
 	TraceIDKey   gormContextKey = "gorm_trace_id"
 )

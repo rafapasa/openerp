@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -44,26 +42,6 @@ type DocumentoVendaVeiculoMotorista struct {
 
 func (DocumentoVendaVeiculoMotorista) TableName() string {
 	return "documento_venda_veiculo_motorista"
-}
-
-func (d *DocumentoVendaVeiculoMotorista) BeforeCreate(tx *gorm.DB) error {
-	if d.CreatedBy == nil {
-		d.CreatedBy = new(int)
-		*d.CreatedBy = 0
-	}
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (d *DocumentoVendaVeiculoMotorista) BeforeUpdate(tx *gorm.DB) error {
-	if d.UpdatedBy == nil {
-		d.UpdatedBy = new(int)
-		*d.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

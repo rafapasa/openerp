@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -38,36 +36,7 @@ func (ProdutoImagem) TableName() string {
 	return "produto_imagem"
 }
 
-func (m *ProdutoImagem) BeforeCreate(tx *gorm.DB) error {
-	// Buscar próximo item
-	var maxItem int
-	err := tx.Model(&ProdutoImagem{}).
-		Where("pro_id = ?", m.ProdutoID).
-		Select("COALESCE(MAX(proimg_item), 0) + 1").
-		Scan(&maxItem).Error
-	if err != nil {
-		return err
-	}
-	m.Item = maxItem
-
-	if m.CreatedBy == nil {
-		m.CreatedBy = new(int)
-		*m.CreatedBy = 0
-	}
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (m *ProdutoImagem) BeforeUpdate(tx *gorm.DB) error {
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
+// Buscar próximo item
 
 func (m *ProdutoImagem) IsDeleted() bool {
 	return m.DeletedAt != nil

@@ -3,8 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/openerp/backend/internal/constants"
 )
 
@@ -56,26 +54,6 @@ type CondicaoPagamento struct {
 
 func (CondicaoPagamento) TableName() string {
 	return "condicao_pagamento"
-}
-
-func (c *CondicaoPagamento) BeforeCreate(tx *gorm.DB) error {
-	if c.CreatedBy == nil {
-		c.CreatedBy = new(int)
-		*c.CreatedBy = 0
-	}
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (c *CondicaoPagamento) BeforeUpdate(tx *gorm.DB) error {
-	if c.UpdatedBy == nil {
-		c.UpdatedBy = new(int)
-		*c.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

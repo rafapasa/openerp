@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -73,26 +71,6 @@ type NotaFiscalItem struct {
 
 func (NotaFiscalItem) TableName() string {
 	return "nota_fiscal_item"
-}
-
-func (n *NotaFiscalItem) BeforeCreate(tx *gorm.DB) error {
-	if n.CreatedBy == nil {
-		n.CreatedBy = new(int)
-		*n.CreatedBy = 0
-	}
-	if n.UpdatedBy == nil {
-		n.UpdatedBy = new(int)
-		*n.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (n *NotaFiscalItem) BeforeUpdate(tx *gorm.DB) error {
-	if n.UpdatedBy == nil {
-		n.UpdatedBy = new(int)
-		*n.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

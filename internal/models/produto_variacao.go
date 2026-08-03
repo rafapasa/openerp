@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -15,12 +13,12 @@ type ProdutoVariacao struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID              int    `gorm:"column:provar_id;primaryKey;autoIncrement" json:"id"`
-	ProdutoID       int    `gorm:"column:pro_id;not null" json:"produto_id"`
-	EmpresaFilialID int    `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
-	CorID           *int   `gorm:"column:cor_id" json:"cor_id,omitempty"`       // Opcional, se nem toda variação tiver cor
-	TamanhoID       *int   `gorm:"column:ptam_id" json:"tamanho_id,omitempty"`   // Opcional, se nem toda variação tiver tamanho
-	SKU             string `gorm:"column:provar_sku;type:varchar(50);uniqueIndex:idx_provar_sku_emf;not null" json:"sku"` // SKU único por filial
+	ID              int     `gorm:"column:provar_id;primaryKey;autoIncrement" json:"id"`
+	ProdutoID       int     `gorm:"column:pro_id;not null" json:"produto_id"`
+	EmpresaFilialID int     `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
+	CorID           *int    `gorm:"column:cor_id" json:"cor_id,omitempty"`                                                 // Opcional, se nem toda variação tiver cor
+	TamanhoID       *int    `gorm:"column:ptam_id" json:"tamanho_id,omitempty"`                                            // Opcional, se nem toda variação tiver tamanho
+	SKU             string  `gorm:"column:provar_sku;type:varchar(50);uniqueIndex:idx_provar_sku_emf;not null" json:"sku"` // SKU único por filial
 	PrecoAdicional  float64 `gorm:"column:provar_preco_adicional;type:decimal(15,4);default:0.00" json:"preco_adicional"`
 	EstoqueAtual    float64 `gorm:"column:provar_estoque_atual;type:decimal(15,4);default:0.00" json:"estoque_atual"` // Estoque desta variação
 
@@ -36,9 +34,9 @@ type ProdutoVariacao struct {
 	// ============================================================
 	// RELACIONAMENTOS
 	// ============================================================
-	Produto       *Produto       `gorm:"foreignKey:ProdutoID;references:pro_id" json:"produto,omitempty"`
-	EmpresaFilial *EmpresaFilial `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
-	Cor           *ProdutoCor    `gorm:"foreignKey:CorID;references:cor_id" json:"cor,omitempty"`
+	Produto       *Produto        `gorm:"foreignKey:ProdutoID;references:pro_id" json:"produto,omitempty"`
+	EmpresaFilial *EmpresaFilial  `gorm:"foreignKey:EmpresaFilialID;references:emf_id" json:"empresa_filial,omitempty"`
+	Cor           *ProdutoCor     `gorm:"foreignKey:CorID;references:cor_id" json:"cor,omitempty"`
 	Tamanho       *ProdutoTamanho `gorm:"foreignKey:TamanhoID;references:ptam_id" json:"tamanho,omitempty"`
 }
 
@@ -48,26 +46,8 @@ func (ProdutoVariacao) TableName() string {
 }
 
 // BeforeCreate hook do GORM para preencher CreatedBy e UpdatedBy
-func (m *ProdutoVariacao) BeforeCreate(tx *gorm.DB) error {
-	if m.CreatedBy == nil {
-		m.CreatedBy = new(int)
-		*m.CreatedBy = 0
-	}
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
 
 // BeforeUpdate hook do GORM para preencher UpdatedBy
-func (m *ProdutoVariacao) BeforeUpdate(tx *gorm.DB) error {
-	if m.UpdatedBy == nil {
-		m.UpdatedBy = new(int)
-		*m.UpdatedBy = 0
-	}
-	return nil
-}
 
 // IsDeleted verifica se o registro foi deletado logicamente
 func (m *ProdutoVariacao) IsDeleted() bool {

@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -39,26 +37,6 @@ type ProcessoOperacao struct {
 
 func (ProcessoOperacao) TableName() string {
 	return "processo_operacao"
-}
-
-func (p *ProcessoOperacao) BeforeCreate(tx *gorm.DB) error {
-	if p.CreatedBy == nil {
-		p.CreatedBy = new(int)
-		*p.CreatedBy = 0
-	}
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (p *ProcessoOperacao) BeforeUpdate(tx *gorm.DB) error {
-	if p.UpdatedBy == nil {
-		p.UpdatedBy = new(int)
-		*p.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================

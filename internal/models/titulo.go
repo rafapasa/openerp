@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/openerp/backend/internal/constants"
-	"gorm.io/gorm"
 )
 
 // ============================================================
@@ -97,26 +96,6 @@ type Titulo struct {
 
 func (Titulo) TableName() string {
 	return "titulos"
-}
-
-func (t *Titulo) BeforeCreate(tx *gorm.DB) error {
-	if t.CreatedBy == nil {
-		t.CreatedBy = new(int)
-		*t.CreatedBy = 0
-	}
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
-}
-
-func (t *Titulo) BeforeUpdate(tx *gorm.DB) error {
-	if t.UpdatedBy == nil {
-		t.UpdatedBy = new(int)
-		*t.UpdatedBy = 0
-	}
-	return nil
 }
 
 // ============================================================
