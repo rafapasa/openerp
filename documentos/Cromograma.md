@@ -89,6 +89,8 @@
 ### **[NOVO] Fase 10: Melhorias Gerais e Refatoração**
 *   **[NOVO]** **Refatorar Scripts PowerShell:** Unificar `dev.ps1`, `dev1.ps1` e `criar.ps1` em um único script `dev.ps1` mais robusto, utilizando o `param` block para argumentos, que é uma prática mais moderna e segura.
 *   **[NOVO]** **Padronizar Auditoria:** Garantir que todos os models tenham os campos `created_by` e `updated_by` e que os hooks `BeforeCreate`/`BeforeUpdate` sejam usados para preenchê-los, possivelmente extraindo o ID do usuário do contexto da requisição.
+*   **[100%]** **Refatorar Scripts PowerShell:** Unificar `dev.ps1`, `dev1.ps1` e `criar.ps1` em um único script `dev.ps1` mais robusto, utilizando o `param` block para argumentos, que é uma prática mais moderna e segura.
+*   **[NOVO]** **Padronizar Auditoria:** Garantir que todos os models tenham os campos `created_by` e `updated_by` e que os hooks `BeforeCreate`/`BeforeUpdate` sejam usados para preenchê-los, possivelmente extraindo o ID do usuário do contexto da requisição.
 *   **[NOVO]** **Melhorar Tratamento de Erros:** Padronizar as respostas de erro da API, talvez usando um `error handler` centralizado no Gin para converter erros de serviço (ex: `apperrors.NewValidationError`) em respostas HTTP 400 ou 404 apropriadas.
 *   **[NOVO]** **Implementar Cache:** Para dados que não mudam com frequência (ex: Tipos de Documento, Formas de Pagamento), implementar um cache com Redis (a dependência `go-redis` já está no projeto) para melhorar a performance.
 

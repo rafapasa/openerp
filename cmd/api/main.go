@@ -56,6 +56,7 @@ func main() {
 		logger.Log.Fatal("❌ Erro ao conectar ao MySQL", zap.Error(err))
 	}
 	defer dbMySQL.Close()
+	database.RegisterAuditCallbacks(dbMySQL.GetDB())
 	logger.Log.Info("✅ Conectado ao MySQL")
 
 	dbRedis, err := database.NewRedis(cfg)
@@ -72,7 +73,7 @@ func main() {
 	router := setupRouter(cfg)
 
 	// 8. Middlewares
-	setupMiddlewares(router, cfg)
+	setupMiddlewares(router, cfg, dbMySQL)
 
 	// 9. Rotas
 	setupPublicRoutes(router, container.AuthHandler)
@@ -123,13 +124,14 @@ func setupRouter(cfg *config.Config) *gin.Engine {
 	return router
 }
 
-func setupMiddlewares(router *gin.Engine, cfg *config.Config) {
+func setupMiddlewares(router *gin.Engine, cfg *config.Config, dbMySQL *database.MySQL) {
 	// Ordem importa!
-	router.Use(middleware.RecoveryMiddleware())
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.RecoveryMiddleware())
 	router.Use(logger.LoggerMiddleware())
 	router.Use(metrics.PrometheusMiddleware())
+	router.Use(middleware.GormContextMiddleware(dbMySQL.GetDB())) // Passe a instância do GORM para o middleware
 
 	if cfg.TracingEnabled {
 		router.Use(tracing.TracingMiddleware("openerp-api"))
@@ -158,6 +160,7 @@ func setupPublicRoutes(router *gin.Engine, authHandler *handler.AuthHandler) {
 func setupProtectedRoutes(router *gin.Engine, container *appwire.Container, cfg *config.Config) {
 	api := router.Group("/api/v1")
 	api.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+
 	routes.RegisterAllRoutes(api, container)
 }
 

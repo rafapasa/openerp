@@ -10,5 +10,8 @@
         "prometheus.yml": "yaml",
         "grafana/provisioning/**/*.yml": "yaml"
     },
-    "yaml.format.enable": true
+    "yaml.format.enable": true,
+    "yaml.disableSchemaDetection": [
+        "file:///d%3A/PrjGO/OpenERP/backend/grafana/provisioning/datasources/prometheus.yml"
+    ]
 }

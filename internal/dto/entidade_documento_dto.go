@@ -3,6 +3,7 @@ package dto
 import (
 	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 
@@ -44,6 +45,10 @@ type EntidadeDocumentoRequest struct {
 	// ============================================================
 	CreatedBy *int `json:"created_by,omitempty"`
 	UpdatedBy *int `json:"updated_by,omitempty"`
+
+	// Internal fields for validated data
+	decodedArquivo     []byte
+	parsedDataInclusao time.Time
 }
 
 // ============================================================
@@ -101,39 +106,16 @@ func (r *EntidadeDocumentoRequest) ToModel() (*models.EntidadeDocumento, error) 
 		return nil, nil
 	}
 
-	// 1. Validar se o arquivo é Base64 válido
-	if r.Arquivo != "" {
-		if _, err := base64.StdEncoding.DecodeString(r.Arquivo); err != nil {
-			return nil, fmt.Errorf("arquivo inválido: %w", err)
-		}
-	}
-
+	// Assume validation has already happened, so decodedArquivo and parsedDataInclusao are set
 	documento := &models.EntidadeDocumento{
-		EntidadeID: r.EntidadeID,
-		Descricao:  utils.StringPtr(r.Descricao),
-		Tipo:       utils.StringPtr(r.Tipo),
-		CreatedBy:  r.CreatedBy,
-		UpdatedBy:  r.UpdatedBy,
+		EntidadeID:   r.EntidadeID,
+		Descricao:    utils.StringPtr(r.Descricao),
+		DataInclusao: r.parsedDataInclusao, // Use the parsed time
+		Arquivo:      r.decodedArquivo,     // Use the decoded byte slice
+		Tipo:         utils.StringPtr(r.Tipo),
+		CreatedBy:    r.CreatedBy,
+		UpdatedBy:    r.UpdatedBy,
 	}
-
-	// 2. Converter DataInclusao
-	if r.DataInclusao != "" {
-		if data, err := utils.ParseDate(r.DataInclusao); err == nil {
-			documento.DataInclusao = data
-		} else {
-			return nil, fmt.Errorf("data de inclusão inválida: %w", err)
-		}
-	}
-
-	// 3. Converter Arquivo (Base64 para []byte)
-	if r.Arquivo != "" {
-		data, err := base64.StdEncoding.DecodeString(r.Arquivo)
-		if err != nil {
-			return nil, fmt.Errorf("erro ao decodificar arquivo: %w", err)
-		}
-		documento.Arquivo = data
-	}
-
 	return documento, nil
 }
 
@@ -253,5 +235,27 @@ func getContentType(data []byte) string {
 // Validate valida o EntidadeDocumentoRequest
 func (r *EntidadeDocumentoRequest) Validate() error {
 	validate := validator.New()
-	return validate.Struct(r)
+	if err := validate.Struct(r); err != nil {
+		return err
+	}
+
+	// 1. Validar e decodificar o arquivo Base64
+	if r.Arquivo != "" {
+		decoded, err := base64.StdEncoding.DecodeString(r.Arquivo)
+		if err != nil {
+			return fmt.Errorf("arquivo inválido: o campo 'arquivo' deve ser uma string Base64 válida: %w", err)
+		}
+		r.decodedArquivo = decoded
+	}
+
+	// 2. Validar e parsear a DataInclusao
+	if r.DataInclusao != "" {
+		parsedDate, err := utils.ParseDate(r.DataInclusao)
+		if err != nil {
+			return fmt.Errorf("data de inclusão inválida: o campo 'data_inclusao' deve estar no formato 'YYYY-MM-DD': %w", err)
+		}
+		r.parsedDataInclusao = parsedDate
+	}
+
+	return nil
 }
