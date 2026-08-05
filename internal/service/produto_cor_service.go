@@ -1,10 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -12,12 +13,12 @@ import (
 
 // ProdutoCorService define os métodos públicos para o serviço de cores de produto.
 type ProdutoCorService interface {
-	Create(req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error)
-	GetByID(id int) (*dto.ProdutoCorResponse, error)
-	Update(id int, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error)
-	Delete(id int) error
-	List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoCorResponse, int64, error)
-	FindByID(id int) (*models.ProdutoCor, error) // Adicionado para uso interno por outros serviços
+	Create(ctx context.Context, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error)
+	GetByID(ctx context.Context, id int) (*dto.ProdutoCorResponse, error)
+	Update(ctx context.Context, id int, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error)
+	Delete(ctx context.Context, id int) error
+	List(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]dto.ProdutoCorResponse, int64, error)
+	FindByID(ctx context.Context, id int) (*models.ProdutoCor, error) // Adicionado para uso interno por outros serviços
 }
 
 type produtoCorService struct {
@@ -76,8 +77,8 @@ func (s *produtoCorService) mapModelToResponse(cor *models.ProdutoCor) (*dto.Pro
 // ============================================================
 
 // Create cria uma nova cor de produto.
-func (s *produtoCorService) Create(req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error) {
-	if err := s.validateProdutoCor(0, req); err != nil {
+func (s *produtoCorService) Create(ctx context.Context, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error) {
+	if err := s.validateProdutoCor(0, req); err != nil { // Context not used in validateProdutoCor
 		return nil, err
 	}
 
@@ -94,8 +95,8 @@ func (s *produtoCorService) Create(req *dto.ProdutoCorRequest) (*dto.ProdutoCorR
 }
 
 // GetByID busca uma cor de produto pelo ID.
-func (s *produtoCorService) GetByID(id int) (*dto.ProdutoCorResponse, error) {
-	cor, err := s.repo.FindByID(id)
+func (s *produtoCorService) GetByID(ctx context.Context, id int) (*dto.ProdutoCorResponse, error) {
+	cor, err := s.repo.FindByID(id) // Context not used in FindByID
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +107,12 @@ func (s *produtoCorService) GetByID(id int) (*dto.ProdutoCorResponse, error) {
 }
 
 // FindByID busca uma cor de produto pelo ID (retorna o modelo).
-func (s *produtoCorService) FindByID(id int) (*models.ProdutoCor, error) {
-	return s.repo.FindByID(id)
+func (s *produtoCorService) FindByID(ctx context.Context, id int) (*models.ProdutoCor, error) {
+	return s.repo.FindByID(id) // Context not used in FindByID
 }
 
 // Update atualiza uma cor de produto existente.
-func (s *produtoCorService) Update(id int, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error) {
+func (s *produtoCorService) Update(ctx context.Context, id int, req *dto.ProdutoCorRequest) (*dto.ProdutoCorResponse, error) {
 	existingCor, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -137,13 +138,13 @@ func (s *produtoCorService) Update(id int, req *dto.ProdutoCorRequest) (*dto.Pro
 }
 
 // Delete realiza a exclusão lógica de uma cor de produto.
-func (s *produtoCorService) Delete(id int) error {
+func (s *produtoCorService) Delete(ctx context.Context, id int) error {
 	// TODO: Adicionar verificação de dependências (ex: se a cor está em uso por alguma variação de produto)
 	return s.repo.Delete(id)
 }
 
 // List lista cores de produto com paginação e filtros.
-func (s *produtoCorService) List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoCorResponse, int64, error) {
+func (s *produtoCorService) List(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]dto.ProdutoCorResponse, int64, error) {
 	cores, total, err := s.repo.List(limit, offset, filters)
 	if err != nil {
 		return nil, 0, err

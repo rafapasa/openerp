@@ -2,16 +2,18 @@ package models
 
 import (
 	"time"
+
+	"github.com/openerp/backend/internal/constants"
 )
 
 type GrupoUsuario struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID              int    `gorm:"column:gpu_id;primaryKey;autoIncrement" json:"id"`
-	Descricao       string `gorm:"column:gpu_descricao;type:varchar(100);not null" json:"descricao"`
-	EmpresaFilialID int    `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
-	Situacao        int    `gorm:"column:gpu_situacao;not null" json:"situacao"`
+	ID              int              `gorm:"column:gpu_id;primaryKey;autoIncrement" json:"id"`
+	Descricao       string           `gorm:"column:gpu_descricao;type:varchar(100);not null" json:"descricao"`
+	EmpresaFilialID int              `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
+	Situacao        constants.Status `gorm:"column:gpu_situacao;not null" json:"situacao"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA (sem prefixo gpu_)
@@ -41,7 +43,7 @@ func (GrupoUsuario) TableName() string {
 // MÉTODOS AUXILIARES
 // ============================================================
 
-// CORRIGIDO: IsDeleted com D maiúsculo
+// IsDeleted verifica se o grupo de usuário foi deletado logicamente.
 func (g *GrupoUsuario) IsDeleted() bool {
 	return g.DeletedAt != nil
 }
@@ -52,7 +54,7 @@ func (g *GrupoUsuario) SoftDelete() {
 	g.Situacao = 0 // Marca como inativo também
 }
 
-// IsActive verifica se o grupo de usuário está ativo (não deletado e situação ativa)
+// IsActive verifica se o grupo de usuário está ativo (não deletado e situação ativa).
 func (g *GrupoUsuario) IsActive() bool {
 	return g.DeletedAt == nil && g.Situacao == 1
 }

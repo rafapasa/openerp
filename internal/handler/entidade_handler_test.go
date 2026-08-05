@@ -213,7 +213,7 @@ func (s *EntidadeTestSuite) insertUsuarioFilial() {
 func (s *EntidadeTestSuite) insertGrupoUsuario() {
 	grupo := models.GrupoUsuario{
 		Descricao: "adm",
-		Situacao:  int(constants.StatusAtivo),
+		Situacao:  constants.StatusAtivo,
 	}
 	err := s.DB.Create(&grupo).Error
 	if err != nil {

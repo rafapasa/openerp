@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/middleware"
 	"github.com/openerp/backend/internal/service"
 	"github.com/openerp/backend/internal/utils"

@@ -8,26 +8,26 @@ import (
 
 func RegisterVendaRoutes(router *gin.RouterGroup, container *appwire.Container) {
 	// Documentos de Venda
-	documento := router.Group("/documentos/venda")
+	documento := router.Group("/documentos-venda")
 
 	// Itens do Documento
-	item := router.Group("/documentos/venda/:documento_id/itens")
+	item := router.Group("/documentos-venda/:documento_id/itens")
 	{
-		item.GET("", container.DocumentoVendaItemHandler.List)
-		item.POST("", container.DocumentoVendaItemHandler.Create) // Corrected: This was missing
-		item.GET("/:item", container.DocumentoVendaItemHandler.GetByID)
-		item.PUT("/:item", container.DocumentoVendaItemHandler.Update)
-		item.DELETE("/:item", container.DocumentoVendaItemHandler.Delete)
+		item.GET("", container.DocumentoVendaHandler.ListItem)
+		item.POST("", container.DocumentoVendaHandler.AddItem) // Corrected: This was missing
+		item.GET("/:item", container.DocumentoVendaHandler.GetByID)
+		item.PUT("/:item", container.DocumentoVendaHandler.EditItem)
+		item.DELETE("/:item", container.DocumentoVendaHandler.DeleteItem)
 	}
 
 	// Pagamentos
-	pagamento := router.Group("/documentos/venda/:documento_id/pagamentos")
+	pagamento := router.Group("/documentos-venda/:documento_id/pagamentos")
 	{
-		pagamento.GET("", container.DocumentoVendaPagamentoHandler.List)
-		pagamento.POST("", container.DocumentoVendaPagamentoHandler.Create) // Corrected: This was missing
-		pagamento.GET("/:item", container.DocumentoVendaPagamentoHandler.GetByID)
-		pagamento.PUT("/:item", container.DocumentoVendaPagamentoHandler.Update)
-		pagamento.DELETE("/:item", container.DocumentoVendaPagamentoHandler.Delete)
+		pagamento.GET("", container.DocumentoVendaHandler.List)
+		pagamento.POST("", container.DocumentoVendaHandler.Create) // Corrected: This was missing
+		pagamento.GET("/:item", container.DocumentoVendaHandler.GetByID)
+		pagamento.PUT("/:item", container.DocumentoVendaHandler.Update)
+		pagamento.DELETE("/:item", container.DocumentoVendaHandler.Delete)
 	}
 
 	// Condições de Pagamento

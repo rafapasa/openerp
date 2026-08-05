@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
 
 	"gorm.io/gorm"
 

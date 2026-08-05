@@ -503,7 +503,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     }
@@ -539,7 +539,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
@@ -590,7 +590,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     }
@@ -614,9 +614,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/documentos/venda/{documento_venda_id}/itens": {
-            "get": {
-                "description": "Retorna uma lista paginada de itens para um documento de venda específico.",
+        "/documentos-venda/{documento_id}/cancelar": {
+            "post": {
+                "description": "Cancela um documento de venda, alterando seu status para cancelado.",
                 "consumes": [
                     "application/json"
                 ],
@@ -624,14 +624,114 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Itens"
+                    "Documentos de Venda"
+                ],
+                "summary": "Cancela um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao cancelar documento",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Documento não pode ser cancelado (validação de negócio)",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos-venda/{documento_id}/emitir": {
+            "post": {
+                "description": "Emite um documento de venda, alterando seu status para emitido.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
+                ],
+                "summary": "Emite um documento de venda",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Documento de Venda",
+                        "name": "documento_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao emitir documento",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Documento não pode ser emitido (validação de negócio)",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documentos-venda/{documento_id}/itens": {
+            "get": {
+                "description": "Retorna todos os itens de um documento de venda específico.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Documentos de Venda"
                 ],
                 "summary": "Lista os itens de um documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     }
@@ -640,11 +740,14 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaItemListResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                            }
                         }
                     },
-                    "500": {
-                        "description": "Erro interno do servidor",
+                    "404": {
+                        "description": "Documento de venda não encontrado",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -652,7 +755,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria um novo item para um documento de venda específico.",
+                "description": "Adiciona um novo item a um documento de venda existente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -660,19 +763,19 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Itens"
+                    "Documentos de Venda"
                 ],
-                "summary": "Cria um novo item para um documento de venda",
+                "summary": "Adiciona um item ao documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para criar o item do documento de venda",
+                        "description": "Dados do item",
                         "name": "item",
                         "in": "body",
                         "required": true,
@@ -685,7 +788,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
                         }
                     },
                     "400": {
@@ -694,8 +797,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     },
-                    "500": {
-                        "description": "Erro interno do servidor",
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação de negócio (ex: estoque insuficiente)",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -703,52 +812,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/documentos/venda/{documento_venda_id}/itens/{item}": {
-            "get": {
-                "description": "Retorna os detalhes de um item de documento de venda específico.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Documentos de Venda - Itens"
-                ],
-                "summary": "Busca um item de documento de venda por ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Número do Item",
-                        "name": "item",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Item não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/documentos-venda/{documento_id}/itens/{item}": {
             "put": {
-                "description": "Atualiza os dados de um item de documento de venda existente.",
+                "description": "Atualiza os dados de um item específico de um documento de venda.",
                 "consumes": [
                     "application/json"
                 ],
@@ -756,27 +822,27 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Itens"
+                    "Documentos de Venda"
                 ],
-                "summary": "Atualiza um item de documento de venda",
+                "summary": "Edita um item do documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Número do Item",
+                        "description": "ID do Item",
                         "name": "item",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para atualizar o item do documento de venda",
-                        "name": "item_data",
+                        "description": "Dados atualizados do item",
+                        "name": "item",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -788,7 +854,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
                         }
                     },
                     "400": {
@@ -798,7 +864,13 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Item não encontrado",
+                        "description": "Documento de venda ou item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação de negócio",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -806,7 +878,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Exclui logicamente um item de documento de venda.",
+                "description": "Remove um item específico de um documento de venda.",
                 "consumes": [
                     "application/json"
                 ],
@@ -814,31 +886,46 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Itens"
+                    "Documentos de Venda"
                 ],
-                "summary": "Exclui um item de documento de venda",
+                "summary": "Remove um item do documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Número do Item",
+                        "description": "ID do Item",
                         "name": "item",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Nenhum conteúdo"
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentoVendaResponse"
+                        }
                     },
                     "400": {
-                        "description": "Erro ao excluir",
+                        "description": "Erro ao remover item",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Documento de venda ou item não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação de negócio",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -846,9 +933,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/documentos/venda/{documento_venda_id}/pagamentos": {
+        "/documentos-venda/{documento_id}/pagamentos": {
             "get": {
-                "description": "Retorna uma lista paginada de pagamentos para um documento de venda específico.",
+                "description": "Retorna todos os pagamentos de um documento de venda específico.",
                 "consumes": [
                     "application/json"
                 ],
@@ -856,14 +943,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Pagamentos"
+                    "Documentos de Venda"
                 ],
                 "summary": "Lista os pagamentos de um documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     }
@@ -872,11 +959,14 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoListResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
+                            }
                         }
                     },
-                    "500": {
-                        "description": "Erro interno do servidor",
+                    "404": {
+                        "description": "Documento de venda não encontrado",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -884,7 +974,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Adiciona um novo pagamento a um documento de venda específico.",
+                "description": "Adiciona um novo pagamento a um documento de venda existente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -892,19 +982,19 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Pagamentos"
+                    "Documentos de Venda"
                 ],
-                "summary": "Adiciona um novo pagamento a um documento de venda",
+                "summary": "Adiciona um pagamento ao documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para adicionar o pagamento",
+                        "description": "Dados do pagamento",
                         "name": "pagamento",
                         "in": "body",
                         "required": true,
@@ -926,8 +1016,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     },
-                    "500": {
-                        "description": "Erro interno do servidor",
+                    "404": {
+                        "description": "Documento de venda não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação de negócio (ex: valor excede o total)",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -935,52 +1031,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/documentos/venda/{documento_venda_id}/pagamentos/{item}": {
-            "get": {
-                "description": "Retorna os detalhes de um pagamento específico de um documento de venda.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Documentos de Venda - Pagamentos"
-                ],
-                "summary": "Busca um pagamento de documento de venda por ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Número do Item do Pagamento",
-                        "name": "item",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Pagamento não encontrado",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/documentos-venda/{documento_id}/pagamentos/{pagamento}": {
             "put": {
-                "description": "Atualiza os dados de um pagamento existente de um documento de venda.",
+                "description": "Atualiza os dados de um pagamento específico de um documento de venda.",
                 "consumes": [
                     "application/json"
                 ],
@@ -988,26 +1041,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Pagamentos"
+                    "Documentos de Venda"
                 ],
-                "summary": "Atualiza um pagamento de documento de venda",
+                "summary": "Edita um pagamento do documento de venda",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "name": "documento_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Número do Item do Pagamento",
-                        "name": "item",
+                        "description": "ID do Pagamento",
+                        "name": "pagamento",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Dados para atualizar o pagamento",
+                        "description": "Dados atualizados do pagamento",
                         "name": "pagamento",
                         "in": "body",
                         "required": true,
@@ -1030,15 +1083,63 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Pagamento não encontrado",
+                        "description": "Documento de venda ou pagamento não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação de negócio",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/empresas-filiais": {
+            "get": {
+                "description": "Retorna uma lista paginada de filiais de empresa",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresa - Filiais"
+                ],
+                "summary": "Lista todas as filiais de empresa",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de itens por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Número de itens a pular",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     }
                 }
             },
-            "delete": {
-                "description": "Exclui logicamente um pagamento de um documento de venda.",
+            "post": {
+                "description": "Cria uma nova filial de empresa com os dados fornecidos",
                 "consumes": [
                     "application/json"
                 ],
@@ -1046,31 +1147,199 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Documentos de Venda - Pagamentos"
+                    "Empresa - Filiais"
                 ],
-                "summary": "Exclui um pagamento de documento de venda",
+                "summary": "Cria uma nova filial de empresa",
+                "parameters": [
+                    {
+                        "description": "Dados da Filial de Empresa",
+                        "name": "filial",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/empresas-filiais/{id}": {
+            "get": {
+                "description": "Retorna uma filial de empresa específica pelo seu ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresa - Filiais"
+                ],
+                "summary": "Busca uma filial de empresa pelo ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID do Documento de Venda",
-                        "name": "documento_venda_id",
+                        "description": "ID da Filial de Empresa",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza uma filial de empresa com os dados fornecidos pelo ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresa - Filiais"
+                ],
+                "summary": "Atualiza uma filial de empresa existente",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Filial de Empresa",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
+                        "description": "Dados da Filial de Empresa para atualização",
+                        "name": "filial",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmpresaFilialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Exclui logicamente uma filial de empresa pelo ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresa - Filiais"
+                ],
+                "summary": "Exclui uma filial de empresa",
+                "parameters": [
+                    {
                         "type": "integer",
-                        "description": "Número do Item do Pagamento",
-                        "name": "item",
+                        "description": "ID da Filial de Empresa",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "204": {
-                        "description": "Nenhum conteúdo"
+                        "description": "No Content"
                     },
                     "400": {
-                        "description": "Erro ao excluir",
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -3109,6 +3378,256 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/grupos-usuario": {
+            "get": {
+                "description": "Retorna uma lista paginada de grupos de usuário",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Grupo de Usuário"
+                ],
+                "summary": "Lista todos os grupos de usuário",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limite de itens por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Número de itens a pular",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria um novo grupo de usuário com os dados fornecidos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Grupo de Usuário"
+                ],
+                "summary": "Cria um novo grupo de usuário",
+                "parameters": [
+                    {
+                        "description": "Dados do Grupo de Usuário",
+                        "name": "grupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/grupos-usuario/{id}": {
+            "get": {
+                "description": "Retorna um grupo de usuário específico pelo seu ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Grupo de Usuário"
+                ],
+                "summary": "Busca um grupo de usuário pelo ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza um grupo de usuário com os dados fornecidos pelo ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Grupo de Usuário"
+                ],
+                "summary": "Atualiza um grupo de usuário existente",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados do Grupo de Usuário para atualização",
+                        "name": "grupo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GrupoUsuarioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Exclui logicamente um grupo de usuário pelo ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Grupo de Usuário"
+                ],
+                "summary": "Exclui um grupo de usuário",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Grupo de Usuário",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     }
                 }
@@ -6206,6 +6725,25 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "constants.EstadoCivil": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ],
+            "x-enum-varnames": [
+                "EstadoCivilSolteiro",
+                "EstadoCivilCasado",
+                "EstadoCivilDivorciado",
+                "EstadoCivilViuvo",
+                "EstadoCivilSeparado",
+                "EstadoCivilUniaoEstavel"
+            ]
+        },
         "constants.Sexo": {
             "type": "integer",
             "enum": [
@@ -6409,29 +6947,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.DocumentoVendaItemListResponse": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.DocumentoVendaItemResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.DocumentoVendaItemRequest": {
             "type": "object",
             "required": [
@@ -6544,29 +7059,6 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.DocumentoVendaResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.DocumentoVendaPagamentoListResponse": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.DocumentoVendaPagamentoResponse"
                     }
                 },
                 "limit": {
@@ -6945,6 +7437,161 @@ const docTemplate = `{
                 },
                 "vendedor_nome": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.EmpresaFilialListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EmpresaFilialResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EmpresaFilialRequest": {
+            "type": "object",
+            "required": [
+                "aliquota_cofins",
+                "aliquota_pis",
+                "empresa_id",
+                "nome",
+                "numero"
+            ],
+            "properties": {
+                "aliquota_cofins": {
+                    "type": "number",
+                    "maximum": 99.99,
+                    "minimum": 0
+                },
+                "aliquota_funrural": {
+                    "type": "number",
+                    "maximum": 99.99,
+                    "minimum": 0
+                },
+                "aliquota_iss": {
+                    "type": "number",
+                    "maximum": 99.99,
+                    "minimum": 0
+                },
+                "aliquota_pis": {
+                    "type": "number",
+                    "maximum": 99.99,
+                    "minimum": 0
+                },
+                "codigo_cnae": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "empresa_id": {
+                    "type": "integer"
+                },
+                "endereco_web": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "entidade_id": {
+                    "type": "integer"
+                },
+                "logomarca_web": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "mei": {
+                    "description": "0 ou 1",
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "numero": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.EmpresaFilialResponse": {
+            "type": "object",
+            "properties": {
+                "aliquota_cofins": {
+                    "type": "number"
+                },
+                "aliquota_funrural": {
+                    "type": "number"
+                },
+                "aliquota_iss": {
+                    "type": "number"
+                },
+                "aliquota_pis": {
+                    "type": "number"
+                },
+                "codigo_cnae": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "empresa_id": {
+                    "type": "integer"
+                },
+                "empresa_nome": {
+                    "type": "string"
+                },
+                "endereco_web": {
+                    "type": "string"
+                },
+                "entidade_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "logomarca_web": {
+                    "type": "string"
+                },
+                "mei": {
+                    "type": "integer"
+                },
+                "mei_label": {
+                    "type": "string"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "numero": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
                 }
             }
         },
@@ -7714,7 +8361,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "estado_civil": {
-                    "type": "integer"
+                    "$ref": "#/definitions/constants.EstadoCivil"
                 },
                 "estado_civil_label": {
                     "type": "string"
@@ -7863,6 +8510,89 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.GrupoUsuarioListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GrupoUsuarioResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GrupoUsuarioRequest": {
+            "type": "object",
+            "required": [
+                "descricao",
+                "empresa_filial_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "type": "integer"
+                },
+                "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GrupoUsuarioResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "descricao": {
+                    "type": "string"
+                },
+                "empresa_filial_id": {
+                    "type": "integer"
+                },
+                "empresa_filial_nome": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "situacao": {
+                    "$ref": "#/definitions/constants.Status"
+                },
+                "situacao_label": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "integer"
                 }
             }
         },
@@ -9371,12 +10101,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1a",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
-	Schemes:          []string{"http", "https"},
-	Title:            "OpenERP API",
-	Description:      "API do sistema OpenERP.",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
+	Schemes:          []string{},
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -1,10 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -12,12 +13,12 @@ import (
 
 // ProdutoTamanhoService define os métodos públicos para o serviço de tamanhos de produto.
 type ProdutoTamanhoService interface {
-	Create(req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error)
-	GetByID(id int) (*dto.ProdutoTamanhoResponse, error)
-	Update(id int, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error)
-	Delete(id int) error
-	List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoTamanhoResponse, int64, error)
-	FindByID(id int) (*models.ProdutoTamanho, error) // Adicionado para uso interno por outros serviços
+	Create(ctx context.Context, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error)
+	GetByID(ctx context.Context, id int) (*dto.ProdutoTamanhoResponse, error)
+	Update(ctx context.Context, id int, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error)
+	Delete(ctx context.Context, id int) error
+	List(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]dto.ProdutoTamanhoResponse, int64, error)
+	FindByID(ctx context.Context, id int) (*models.ProdutoTamanho, error) // Adicionado para uso interno por outros serviços
 }
 
 type produtoTamanhoService struct {
@@ -76,8 +77,8 @@ func (s *produtoTamanhoService) mapModelToResponse(tamanho *models.ProdutoTamanh
 // ============================================================
 
 // Create cria um novo tamanho de produto.
-func (s *produtoTamanhoService) Create(req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error) {
-	if err := s.validateProdutoTamanho(0, req); err != nil {
+func (s *produtoTamanhoService) Create(ctx context.Context, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error) {
+	if err := s.validateProdutoTamanho(0, req); err != nil { // Context not used in validateProdutoTamanho
 		return nil, err
 	}
 
@@ -94,8 +95,8 @@ func (s *produtoTamanhoService) Create(req *dto.ProdutoTamanhoRequest) (*dto.Pro
 }
 
 // GetByID busca um tamanho de produto pelo ID.
-func (s *produtoTamanhoService) GetByID(id int) (*dto.ProdutoTamanhoResponse, error) {
-	tamanho, err := s.repo.FindByID(id)
+func (s *produtoTamanhoService) GetByID(ctx context.Context, id int) (*dto.ProdutoTamanhoResponse, error) {
+	tamanho, err := s.repo.FindByID(id) // Context not used in FindByID
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +107,12 @@ func (s *produtoTamanhoService) GetByID(id int) (*dto.ProdutoTamanhoResponse, er
 }
 
 // FindByID busca um tamanho de produto pelo ID (retorna o modelo).
-func (s *produtoTamanhoService) FindByID(id int) (*models.ProdutoTamanho, error) {
-	return s.repo.FindByID(id)
+func (s *produtoTamanhoService) FindByID(ctx context.Context, id int) (*models.ProdutoTamanho, error) {
+	return s.repo.FindByID(id) // Context not used in FindByID
 }
 
 // Update atualiza um tamanho de produto existente.
-func (s *produtoTamanhoService) Update(id int, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error) {
+func (s *produtoTamanhoService) Update(ctx context.Context, id int, req *dto.ProdutoTamanhoRequest) (*dto.ProdutoTamanhoResponse, error) {
 	existingTamanho, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -137,13 +138,13 @@ func (s *produtoTamanhoService) Update(id int, req *dto.ProdutoTamanhoRequest) (
 }
 
 // Delete realiza a exclusão lógica de um tamanho de produto.
-func (s *produtoTamanhoService) Delete(id int) error {
+func (s *produtoTamanhoService) Delete(ctx context.Context, id int) error {
 	// TODO: Adicionar verificação de dependências (ex: se o tamanho está em uso por alguma variação de produto)
 	return s.repo.Delete(id)
 }
 
 // List lista tamanhos de produto com paginação e filtros.
-func (s *produtoTamanhoService) List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoTamanhoResponse, int64, error) {
+func (s *produtoTamanhoService) List(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]dto.ProdutoTamanhoResponse, int64, error) {
 	tamanhos, total, err := s.repo.List(limit, offset, filters)
 	if err != nil {
 		return nil, 0, err

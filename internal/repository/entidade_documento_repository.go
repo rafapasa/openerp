@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/models"
 )
 

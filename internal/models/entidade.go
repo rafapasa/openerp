@@ -14,39 +14,39 @@ type Entidade struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID                 int                  `gorm:"column:ent_id;primaryKey;autoIncrement" json:"id"`
-	GrupoEntidadeID    *int                 `gorm:"column:gpe_id" json:"grupo_entidade_id,omitempty"`
-	EmpresaFilialID    int                  `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
-	TabelaPrecoID      *int                 `gorm:"column:tbp_id" json:"tabela_preco_id,omitempty"`
-	TabelaDescontoID   *int                 `gorm:"column:tdesc_id" json:"tabela_desconto_id,omitempty"`
-	HorarioID          *int                 `gorm:"column:hor_id" json:"horario_id,omitempty"`
-	Codigo             *int                 `gorm:"column:ent_codigo" json:"codigo,omitempty"`
-	TipoPessoa         constants.TipoPessoa `gorm:"column:ent_tipopessoa;not null" json:"tipo_pessoa"`
-	RazaoSocial        string               `gorm:"column:ent_razaosocial;type:varchar(100);not null" json:"razao_social"`
-	NomeFantasia       *string              `gorm:"column:ent_nomefantasia;type:varchar(100)" json:"nome_fantasia,omitempty"`
-	InscricaoFederal   string               `gorm:"column:ent_inscricaofederal;type:varchar(20);not null" json:"inscricao_federal"`
-	InscricaoEstadual  *string              `gorm:"column:ent_inscricaoestadual;type:varchar(20)" json:"inscricao_estadual,omitempty"`
-	InscricaoProdutor  *string              `gorm:"column:ent_inscricaoprodutor;type:varchar(20)" json:"inscricao_produtor,omitempty"`
-	InscricaoMunicipal *string              `gorm:"column:ent_inscricaomunicipal;type:varchar(20)" json:"inscricao_municipal,omitempty"`
-	Suframa            *string              `gorm:"column:ent_suframa;type:varchar(9)" json:"suframa,omitempty"`
-	Situacao           constants.Status     `gorm:"column:ent_situacao;not null;default:1" json:"situacao"`
-	Classificacao      *int                 `gorm:"column:ent_classificacao" json:"classificacao,omitempty"`
-	Observacao         *string              `gorm:"column:ent_observacao;type:text" json:"observacao,omitempty"`
-	DataNascimento     *time.Time           `gorm:"column:ent_datanascimento;type:date" json:"data_nascimento,omitempty"`
-	NomeDaMae          *string              `gorm:"column:ent_nomedamae;type:varchar(255)" json:"nome_da_mae,omitempty"`
-	NomeDoPai          *string              `gorm:"column:ent_nomedopai;type:varchar(255)" json:"nome_do_pai,omitempty"`
-	Sexo               constants.Sexo       `gorm:"column:ent_sexo" json:"sexo,omitempty"` // AGORA CORRETO
-	CasaPropria        *int                 `gorm:"column:ent_casapropria" json:"casa_propria,omitempty"`
-	EstadoCivil        *int                 `gorm:"column:ent_estadocivil" json:"estado_civil,omitempty"`
-	ConjujeNome        *string              `gorm:"column:ent_conjuje_nome;type:varchar(255)" json:"conjuje_nome,omitempty"`
-	ConjujeCPF         *string              `gorm:"column:ent_conjuje_cpf;type:varchar(20)" json:"conjuje_cpf,omitempty"`
-	ConjujeRenda       *float64             `gorm:"column:ent_conjuje_renda;type:decimal(15,2)" json:"conjuje_renda,omitempty"`
-	ConjujeRG          *string              `gorm:"column:ent_conjuje_rg;type:varchar(20)" json:"conjuje_rg,omitempty"`
-	QuantFilhos        *int                 `gorm:"column:ent_quantfilhos" json:"quant_filhos,omitempty"`
-	DataCadastro       *time.Time           `gorm:"column:ent_datacadastro;type:datetime" json:"data_cadastro,omitempty"`
-	PercentualComissao *float64             `gorm:"column:ent_percentualcomissao;type:decimal(5,2)" json:"percentual_comissao,omitempty"`
-	TaxaEntrega        *float64             `gorm:"column:ent_taxaentrega;type:decimal(10,2)" json:"taxa_entrega,omitempty"`
-	ArquivoImpDDV      *string              `gorm:"column:ent_arq_imp_ddv;type:varchar(255)" json:"arquivo_imp_ddv,omitempty"`
+	ID                 int                    `gorm:"column:ent_id;primaryKey;autoIncrement" json:"id"`
+	GrupoEntidadeID    *int                   `gorm:"column:gpe_id" json:"grupo_entidade_id,omitempty"`
+	EmpresaFilialID    int                    `gorm:"column:emf_id;not null" json:"empresa_filial_id"`
+	TabelaPrecoID      *int                   `gorm:"column:tbp_id" json:"tabela_preco_id,omitempty"`
+	TabelaDescontoID   *int                   `gorm:"column:tdesc_id" json:"tabela_desconto_id,omitempty"`
+	HorarioID          *int                   `gorm:"column:hor_id" json:"horario_id,omitempty"`
+	Codigo             *int                   `gorm:"column:ent_codigo" json:"codigo,omitempty"`
+	TipoPessoa         constants.TipoPessoa   `gorm:"column:ent_tipopessoa;not null" json:"tipo_pessoa"`
+	RazaoSocial        string                 `gorm:"column:ent_razaosocial;type:varchar(100);not null" json:"razao_social"`
+	NomeFantasia       *string                `gorm:"column:ent_nomefantasia;type:varchar(100)" json:"nome_fantasia,omitempty"`
+	InscricaoFederal   string                 `gorm:"column:ent_inscricaofederal;type:varchar(20);not null" json:"inscricao_federal"`
+	InscricaoEstadual  *string                `gorm:"column:ent_inscricaoestadual;type:varchar(20)" json:"inscricao_estadual,omitempty"`
+	InscricaoProdutor  *string                `gorm:"column:ent_inscricaoprodutor;type:varchar(20)" json:"inscricao_produtor,omitempty"`
+	InscricaoMunicipal *string                `gorm:"column:ent_inscricaomunicipal;type:varchar(20)" json:"inscricao_municipal,omitempty"`
+	Suframa            *string                `gorm:"column:ent_suframa;type:varchar(9)" json:"suframa,omitempty"`
+	Situacao           constants.Status       `gorm:"column:ent_situacao;not null;default:1" json:"situacao"`
+	Classificacao      *int                   `gorm:"column:ent_classificacao" json:"classificacao,omitempty"`
+	Observacao         *string                `gorm:"column:ent_observacao;type:text" json:"observacao,omitempty"`
+	DataNascimento     *time.Time             `gorm:"column:ent_datanascimento;type:date" json:"data_nascimento,omitempty"`
+	NomeDaMae          *string                `gorm:"column:ent_nomedamae;type:varchar(255)" json:"nome_da_mae,omitempty"`
+	NomeDoPai          *string                `gorm:"column:ent_nomedopai;type:varchar(255)" json:"nome_do_pai,omitempty"`
+	Sexo               constants.Sexo         `gorm:"column:ent_sexo" json:"sexo,omitempty"` // AGORA CORRETO
+	CasaPropria        *int                   `gorm:"column:ent_casapropria" json:"casa_propria,omitempty"`
+	EstadoCivil        *constants.EstadoCivil `gorm:"column:ent_estadocivil" json:"estado_civil,omitempty"`
+	ConjujeNome        *string                `gorm:"column:ent_conjuje_nome;type:varchar(255)" json:"conjuje_nome,omitempty"`
+	ConjujeCPF         *string                `gorm:"column:ent_conjuje_cpf;type:varchar(20)" json:"conjuje_cpf,omitempty"`
+	ConjujeRenda       *float64               `gorm:"column:ent_conjuje_renda;type:decimal(15,2)" json:"conjuje_renda,omitempty"`
+	ConjujeRG          *string                `gorm:"column:ent_conjuje_rg;type:varchar(20)" json:"conjuje_rg,omitempty"`
+	QuantFilhos        *int                   `gorm:"column:ent_quantfilhos" json:"quant_filhos,omitempty"`
+	DataCadastro       *time.Time             `gorm:"column:ent_datacadastro;type:datetime" json:"data_cadastro,omitempty"`
+	PercentualComissao *float64               `gorm:"column:ent_percentualcomissao;type:decimal(5,2)" json:"percentual_comissao,omitempty"`
+	TaxaEntrega        *float64               `gorm:"column:ent_taxaentrega;type:decimal(10,2)" json:"taxa_entrega,omitempty"`
+	ArquivoImpDDV      *string                `gorm:"column:ent_arq_imp_ddv;type:varchar(255)" json:"arquivo_imp_ddv,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

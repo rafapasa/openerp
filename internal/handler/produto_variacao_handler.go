@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/service"
 	"github.com/openerp/backend/internal/utils"
 )
@@ -46,7 +46,7 @@ func (h *ProdutoVariacaoHandler) Create(c *gin.Context) {
 	// 	req.CreatedBy = &id
 	// }
 
-	resp, err := h.service.Create(&req)
+	resp, err := h.service.Create(c, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -73,7 +73,7 @@ func (h *ProdutoVariacaoHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.service.GetByID(id)
+	resp, err := h.service.GetByID(c, id)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -113,7 +113,7 @@ func (h *ProdutoVariacaoHandler) Update(c *gin.Context) {
 	// 	req.UpdatedBy = &id
 	// }
 
-	resp, err := h.service.Update(id, &req)
+	resp, err := h.service.Update(c, id, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return

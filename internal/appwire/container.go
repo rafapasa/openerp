@@ -26,10 +26,8 @@ type Container struct {
 	ProdutoVariacaoHandler *handler.ProdutoVariacaoHandler
 
 	// Venda Handlers
-	DocumentoVendaHandler          *handler.DocumentoVendaHandler
-	DocumentoVendaItemHandler      *handler.DocumentoVendaItemHandler
-	DocumentoVendaPagamentoHandler *handler.DocumentoVendaPagamentoHandler
-	CondicaoPagamentoHandler       *handler.CondicaoPagamentoHandler
+	DocumentoVendaHandler    *handler.DocumentoVendaHandler
+	CondicaoPagamentoHandler *handler.CondicaoPagamentoHandler
 
 	// Fiscal Handlers
 	OperacaoFiscalHandler *handler.OperacaoFiscalHandler
@@ -62,9 +60,6 @@ func NewContainer(
 	produtoVariacaoHandler *handler.ProdutoVariacaoHandler,
 	// Venda Handlers
 	documentoVendaHandler *handler.DocumentoVendaHandler,
-	documentoVendaItemHandler *handler.DocumentoVendaItemHandler,
-	documentoVendaPagamentoHandler *handler.DocumentoVendaPagamentoHandler,
-	condicaoPagamentoHandler *handler.CondicaoPagamentoHandler,
 	// Fiscal Handlers
 	operacaoFiscalHandler *handler.OperacaoFiscalHandler,
 	processoHandler *handler.ProcessoHandler,
@@ -92,10 +87,7 @@ func NewContainer(
 		ProdutoTamanhoHandler:  produtoTamanhoHandler,
 		ProdutoVariacaoHandler: produtoVariacaoHandler,
 		// Venda
-		DocumentoVendaHandler:          documentoVendaHandler,
-		DocumentoVendaItemHandler:      documentoVendaItemHandler,
-		DocumentoVendaPagamentoHandler: documentoVendaPagamentoHandler, // Corrected: This was missing
-		CondicaoPagamentoHandler:       condicaoPagamentoHandler,
+		DocumentoVendaHandler: documentoVendaHandler,
 		// Fiscal
 		OperacaoFiscalHandler: operacaoFiscalHandler,
 		ProcessoHandler:       processoHandler,

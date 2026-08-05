@@ -79,7 +79,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	// 3. Realizar o login
-	usuario, accessToken, refreshToken, err := h.authService.Login(
+	usuario, accessToken, refreshToken, err := h.authService.Login(c,
 		req.Login,
 		req.Senha,
 		req.EmpresaID,
@@ -146,7 +146,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	}
 
 	// 3. Gerar novo access token
-	accessToken, err := h.authService.RefreshToken(req.RefreshToken)
+	accessToken, err := h.authService.RefreshToken(c, req.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error":   "invalid_refresh_token",

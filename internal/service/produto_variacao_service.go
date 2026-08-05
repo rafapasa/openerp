@@ -1,10 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -12,9 +13,9 @@ import (
 
 // ProdutoVariacaoService define os métodos públicos para o serviço de variações de produto.
 type ProdutoVariacaoService interface {
-	Create(req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
-	GetByID(id int) (*dto.ProdutoVariacaoResponse, error)
-	Update(id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
+	Create(ctx context.Context, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
+	GetByID(ctx context.Context, id int) (*dto.ProdutoVariacaoResponse, error)
+	Update(ctx context.Context, id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error)
 	Delete(id int) error
 	List(limit, offset int, filters map[string]interface{}) ([]dto.ProdutoVariacaoResponse, int64, error)
 }
@@ -46,7 +47,7 @@ func NewProdutoVariacaoService(
 // MÉTODOS DE VALIDAÇÃO (PRIVADOS)
 // ============================================================
 
-func (s *produtoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariacaoRequest, isUpdate bool) error {
+func (s *produtoVariacaoService) validateProdutoVariacao(ctx context.Context, req *dto.ProdutoVariacaoRequest, isUpdate bool) error {
 	if req.ProdutoID <= 0 {
 		return apperrors.NewValidationError("O campo 'produto_id' é obrigatório e deve ser um valor positivo.")
 	}
@@ -76,17 +77,17 @@ func (s *produtoVariacaoService) validateProdutoVariacao(req *dto.ProdutoVariaca
 	}
 
 	// Verificar se Cor existe (se informada)
-	if req.CorID != nil && *req.CorID > 0 { // Changed from s.corRepo to s.corService
-		_, err := s.corService.FindByID(*req.CorID)
+	if req.CorID != nil && *req.CorID > 0 {
+		_, err := s.corService.FindByID(ctx, *req.CorID)
 		if err != nil {
 			return err
 		}
 
 	}
 
-	// Verificar se Tamanho existe (se informada)
+	// Verificar se Tamanho existe (se informado)
 	if req.TamanhoID != nil && *req.TamanhoID > 0 { // Changed from s.tamanhoRepo to s.tamanhoService
-		_, err := s.tamanhoService.FindByID(*req.TamanhoID)
+		_, err := s.tamanhoService.FindByID(ctx, *req.TamanhoID)
 		if err != nil {
 			return err
 		}
@@ -139,8 +140,8 @@ func (s *produtoVariacaoService) mapModelToResponse(variacao *models.ProdutoVari
 // ============================================================
 
 // Create cria uma nova variação de produto.
-func (s *produtoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
-	if err := s.validateProdutoVariacao(req, false); err != nil {
+func (s *produtoVariacaoService) Create(ctx context.Context, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
+	if err := s.validateProdutoVariacao(ctx, req, false); err != nil {
 		return nil, err
 	}
 
@@ -166,7 +167,7 @@ func (s *produtoVariacaoService) Create(req *dto.ProdutoVariacaoRequest) (*dto.P
 // (No diff, ele já está presente, então não há mudança real aqui, apenas a menção para a interface)
 
 // GetByID busca uma variação de produto pelo ID.
-func (s *produtoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) GetByID(ctx context.Context, id int) (*dto.ProdutoVariacaoResponse, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
@@ -183,13 +184,13 @@ func (s *produtoVariacaoService) GetByID(id int) (*dto.ProdutoVariacaoResponse, 
 }
 
 // Update atualiza uma variação de produto existente.
-func (s *produtoVariacaoService) Update(id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
+func (s *produtoVariacaoService) Update(ctx context.Context, id int, req *dto.ProdutoVariacaoRequest) (*dto.ProdutoVariacaoResponse, error) {
 	if id <= 0 {
 		return nil, apperrors.NewValidationError("ID da variação de produto inválido.")
 	}
 	req.ID = id
 
-	if err := s.validateProdutoVariacao(req, true); err != nil {
+	if err := s.validateProdutoVariacao(ctx, req, true); err != nil {
 		return nil, err
 	}
 

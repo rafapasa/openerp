@@ -87,6 +87,36 @@ func (s Status) IsValid() error {
 	return fmt.Errorf("status inválido: %d. Valores válidos são 1 (Ativo), 2 (Inativo), 3 (Bloqueado), 9 (Cancelado)", s)
 }
 
+type EstadoCivil int
+
+const (
+	EstadoCivilSolteiro     EstadoCivil = 1
+	EstadoCivilCasado       EstadoCivil = 2
+	EstadoCivilDivorciado   EstadoCivil = 3
+	EstadoCivilViuvo        EstadoCivil = 4
+	EstadoCivilSeparado     EstadoCivil = 5
+	EstadoCivilUniaoEstavel EstadoCivil = 6
+)
+
+func (e EstadoCivil) String() string {
+	switch e {
+	case EstadoCivilSolteiro:
+		return "Solteiro"
+	case EstadoCivilCasado:
+		return "Casado"
+	case EstadoCivilDivorciado:
+		return "Divorciado"
+	case EstadoCivilViuvo:
+		return "Viuvo"
+	case EstadoCivilSeparado:
+		return "Separado"
+	case EstadoCivilUniaoEstavel:
+		return "União Estável"
+	default:
+		return "Desconhecido"
+	}
+}
+
 // ============================================================
 // TIPO DE PESSOA
 // ============================================================

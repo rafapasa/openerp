@@ -3,8 +3,6 @@ package dto
 import (
 	"time"
 
-	"github.com/go-playground/validator/v10"
-
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
@@ -100,19 +98,19 @@ type EntidadeResponse struct {
 	// ============================================================
 	// DADOS PESSOAIS
 	// ============================================================
-	DataNascimento   string          `json:"data_nascimento,omitempty"`
-	NomeDaMae        *string         `json:"nome_da_mae,omitempty"`
-	NomeDoPai        *string         `json:"nome_do_pai,omitempty"`
-	Sexo             *constants.Sexo `json:"sexo,omitempty"`
-	SexoLabel        *string         `json:"sexo_label,omitempty"`
-	CasaPropria      *int            `json:"casa_propria,omitempty"`
-	EstadoCivil      *int            `json:"estado_civil,omitempty"`
-	EstadoCivilLabel *string         `json:"estado_civil_label,omitempty"`
-	ConjujeNome      *string         `json:"conjuje_nome,omitempty"`
-	ConjujeCPF       *string         `json:"conjuje_cpf,omitempty"`
-	ConjujeRenda     *float64        `json:"conjuje_renda,omitempty"`
-	ConjujeRG        *string         `json:"conjuje_rg,omitempty"`
-	QuantFilhos      *int            `json:"quant_filhos,omitempty"`
+	DataNascimento   string                 `json:"data_nascimento,omitempty"`
+	NomeDaMae        *string                `json:"nome_da_mae,omitempty"`
+	NomeDoPai        *string                `json:"nome_do_pai,omitempty"`
+	Sexo             *constants.Sexo        `json:"sexo,omitempty"`
+	SexoLabel        *string                `json:"sexo_label,omitempty"`
+	CasaPropria      *int                   `json:"casa_propria,omitempty"`
+	EstadoCivil      *constants.EstadoCivil `json:"estado_civil,omitempty"`
+	EstadoCivilLabel *string                `json:"estado_civil_label,omitempty"`
+	ConjujeNome      *string                `json:"conjuje_nome,omitempty"`
+	ConjujeCPF       *string                `json:"conjuje_cpf,omitempty"`
+	ConjujeRenda     *float64               `json:"conjuje_renda,omitempty"`
+	ConjujeRG        *string                `json:"conjuje_rg,omitempty"`
+	QuantFilhos      *int                   `json:"quant_filhos,omitempty"`
 
 	// ============================================================
 	// DADOS COMERCIAIS
@@ -222,7 +220,7 @@ func (r *EntidadeResponse) FromModel(entidade *models.Entidade) *EntidadeRespons
 	}
 
 	if r.EstadoCivil != nil {
-		r.EstadoCivilLabel = utils.StringPtr(getEstadoCivilLabel(*r.EstadoCivil))
+		r.EstadoCivilLabel = utils.StringPtr((*r.EstadoCivil).String())
 	}
 
 	// 3. Formatar datas (o mapper não faz isso)
@@ -294,7 +292,7 @@ func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *Entidad
 		r.SexoLabel = utils.StringPtr(constants.Sexo(entidade.Sexo).String())
 	}
 	if r.EstadoCivil != nil { // Check if EstadoCivil is set
-		r.EstadoCivilLabel = utils.StringPtr(getEstadoCivilLabel(*r.EstadoCivil))
+		r.EstadoCivilLabel = utils.StringPtr(r.EstadoCivil.String())
 	}
 
 	// Datas
@@ -311,33 +309,10 @@ func (r *EntidadeResponse) fromModelFallback(entidade *models.Entidade) *Entidad
 }
 
 // ============================================================
-// FUNÇÕES AUXILIARES
-// ============================================================
-
-// getEstadoCivilLabel retorna o label do estado civil
-func getEstadoCivilLabel(valor int) string {
-	switch valor {
-	case 1:
-		return "Solteiro(a)"
-	case 2:
-		return "Casado(a)"
-	case 3:
-		return "Divorciado(a)"
-	case 4:
-		return "Viúvo(a)"
-	case 5:
-		return "União Estável"
-	default:
-		return "Não informado"
-	}
-}
-
-// ============================================================
 // MÉTODOS DE VALIDAÇÃO
 // ============================================================
 
 // Validate valida o EntidadeRequest
 func (r *EntidadeRequest) Validate() error {
-	validate := validator.New()
-	return validate.Struct(r)
+	return utils.ValidateMandatoryFields(r)
 }

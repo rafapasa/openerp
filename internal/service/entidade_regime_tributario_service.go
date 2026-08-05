@@ -1,7 +1,7 @@
 package service
 
 import (
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
 	"gorm.io/gorm"
 
 	"github.com/openerp/backend/internal/dto"

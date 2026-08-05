@@ -1,9 +1,10 @@
 package service
 
 import (
+	"context"
 	"strings"
 
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
 
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
@@ -13,9 +14,9 @@ import (
 
 // EntidadeLimiteCreditoService define os métodos públicos para o serviço de limite de crédito de entidade.
 type EntidadeLimiteCreditoService interface {
-	Create(req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error)
-	GetByID(id int) (*models.EntidadeLimiteCredito, error)
-	Update(id int, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error)
+	Create(ctx context.Context, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error)
+	GetByID(ctx context.Context, id int) (*models.EntidadeLimiteCredito, error)
+	Update(ctx context.Context, id int, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error)
 	Delete(id int) error
 	List(limit, offset int, filters map[string]interface{}) ([]models.EntidadeLimiteCredito, int64, error)
 }
@@ -43,8 +44,8 @@ func NewEntidadeLimiteCreditoService(db *gorm.DB, elcRepo repository.EntidadeLim
 // ============================================================
 
 // Create cria um novo limite de crédito.
-func (s *entidadeLimiteCreditoService) Create(req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
-	descricao := strings.TrimSpace(req.Descricao)
+func (s *entidadeLimiteCreditoService) Create(ctx context.Context, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
+	descricao := strings.TrimSpace(req.Descricao) // Context not used in ExistsByDescricao
 	exists, err := s.limiteRepo.ExistsByDescricao(descricao, 0)
 	if err != nil { //
 		return nil, apperrors.NewInternalError("Erro ao verificar descrição.", err) //
@@ -68,13 +69,13 @@ func (s *entidadeLimiteCreditoService) Create(req *dto.EntidadeLimiteCreditoRequ
 }
 
 // GetByID busca um limite de crédito por ID.
-func (s *entidadeLimiteCreditoService) GetByID(id int) (*models.EntidadeLimiteCredito, error) { //
-	return s.limiteRepo.FindByID(id) //
+func (s *entidadeLimiteCreditoService) GetByID(ctx context.Context, id int) (*models.EntidadeLimiteCredito, error) { //
+	return s.limiteRepo.FindByID(id) // Context not used in FindByID
 }
 
 // Update atualiza um limite de crédito.
-func (s *entidadeLimiteCreditoService) Update(id int, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
-	limite, err := s.limiteRepo.FindByID(id)
+func (s *entidadeLimiteCreditoService) Update(ctx context.Context, id int, req *dto.EntidadeLimiteCreditoRequest) (*models.EntidadeLimiteCredito, error) {
+	limite, err := s.limiteRepo.FindByID(id) // Context not used in FindByID
 	if err != nil {
 		return nil, err //
 	}

@@ -1,5 +1,20 @@
-basePath: /api/v1
 definitions:
+  constants.EstadoCivil:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    type: integer
+    x-enum-varnames:
+    - EstadoCivilSolteiro
+    - EstadoCivilCasado
+    - EstadoCivilDivorciado
+    - EstadoCivilViuvo
+    - EstadoCivilSeparado
+    - EstadoCivilUniaoEstavel
   constants.Sexo:
     enum:
     - 1
@@ -152,21 +167,6 @@ definitions:
       updated_by:
         type: integer
     type: object
-  dto.DocumentoVendaItemListResponse:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/dto.DocumentoVendaItemResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
   dto.DocumentoVendaItemRequest:
     properties:
       created_by:
@@ -242,21 +242,6 @@ definitions:
       items:
         items:
           $ref: '#/definitions/dto.DocumentoVendaResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.DocumentoVendaPagamentoListResponse:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/dto.DocumentoVendaPagamentoResponse'
         type: array
       limit:
         type: integer
@@ -561,6 +546,114 @@ definitions:
         type: integer
       vendedor_nome:
         type: string
+    type: object
+  dto.EmpresaFilialListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EmpresaFilialResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.EmpresaFilialRequest:
+    properties:
+      aliquota_cofins:
+        maximum: 99.99
+        minimum: 0
+        type: number
+      aliquota_funrural:
+        maximum: 99.99
+        minimum: 0
+        type: number
+      aliquota_iss:
+        maximum: 99.99
+        minimum: 0
+        type: number
+      aliquota_pis:
+        maximum: 99.99
+        minimum: 0
+        type: number
+      codigo_cnae:
+        maxLength: 20
+        type: string
+      created_by:
+        type: integer
+      empresa_id:
+        type: integer
+      endereco_web:
+        maxLength: 1000
+        type: string
+      entidade_id:
+        type: integer
+      logomarca_web:
+        maxLength: 1000
+        type: string
+      mei:
+        description: 0 ou 1
+        type: integer
+      nome:
+        maxLength: 100
+        type: string
+      numero:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - aliquota_cofins
+    - aliquota_pis
+    - empresa_id
+    - nome
+    - numero
+    type: object
+  dto.EmpresaFilialResponse:
+    properties:
+      aliquota_cofins:
+        type: number
+      aliquota_funrural:
+        type: number
+      aliquota_iss:
+        type: number
+      aliquota_pis:
+        type: number
+      codigo_cnae:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      empresa_id:
+        type: integer
+      empresa_nome:
+        type: string
+      endereco_web:
+        type: string
+      entidade_id:
+        type: integer
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      logomarca_web:
+        type: string
+      mei:
+        type: integer
+      mei_label:
+        type: string
+      nome:
+        type: string
+      numero:
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
     type: object
   dto.EntidadeContatoListResponse:
     properties:
@@ -1165,7 +1258,7 @@ definitions:
       empresa_filial_id:
         type: integer
       estado_civil:
-        type: integer
+        $ref: '#/definitions/constants.EstadoCivil'
       estado_civil_label:
         type: string
       grupo_entidade_id:
@@ -1267,6 +1360,61 @@ definitions:
         type: integer
       updated_at:
         type: string
+    type: object
+  dto.GrupoUsuarioListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.GrupoUsuarioResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.GrupoUsuarioRequest:
+    properties:
+      created_by:
+        type: integer
+      descricao:
+        maxLength: 100
+        type: string
+      empresa_filial_id:
+        type: integer
+      situacao:
+        type: integer
+      updated_by:
+        type: integer
+    required:
+    - descricao
+    - empresa_filial_id
+    type: object
+  dto.GrupoUsuarioResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      descricao:
+        type: string
+      empresa_filial_id:
+        type: integer
+      empresa_filial_nome:
+        type: string
+      id:
+        type: integer
+      situacao:
+        $ref: '#/definitions/constants.Status'
+      situacao_label:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
     type: object
   dto.LoginRequest:
     properties:
@@ -2317,12 +2465,8 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:8080
 info:
   contact: {}
-  description: API do sistema OpenERP.
-  title: OpenERP API
-  version: 0.1a
 paths:
   /auth/login:
     post:
@@ -2641,7 +2785,7 @@ paths:
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: id
+        name: documento_id
         required: true
         type: integer
       produces:
@@ -2667,7 +2811,7 @@ paths:
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: id
+        name: documento_id
         required: true
         type: integer
       produces:
@@ -2691,7 +2835,7 @@ paths:
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: id
+        name: documento_id
         required: true
         type: integer
       - description: Dados para atualizar o documento de venda
@@ -2718,16 +2862,15 @@ paths:
       summary: Atualiza um documento de venda
       tags:
       - Documentos de Venda
-  /documentos/venda/{documento_venda_id}/itens:
-    get:
+  /documentos-venda/{documento_id}/cancelar:
+    post:
       consumes:
       - application/json
-      description: Retorna uma lista paginada de itens para um documento de venda
-        específico.
+      description: Cancela um documento de venda, alterando seu status para cancelado.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
       produces:
@@ -2736,25 +2879,93 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.DocumentoVendaItemListResponse'
-        "500":
-          description: Erro interno do servidor
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "400":
+          description: Erro ao cancelar documento
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Documento de venda não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "422":
+          description: Documento não pode ser cancelado (validação de negócio)
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cancela um documento de venda
+      tags:
+      - Documentos de Venda
+  /documentos-venda/{documento_id}/emitir:
+    post:
+      consumes:
+      - application/json
+      description: Emite um documento de venda, alterando seu status para emitido.
+      parameters:
+      - description: ID do Documento de Venda
+        in: path
+        name: documento_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "400":
+          description: Erro ao emitir documento
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Documento de venda não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "422":
+          description: Documento não pode ser emitido (validação de negócio)
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Emite um documento de venda
+      tags:
+      - Documentos de Venda
+  /documentos-venda/{documento_id}/itens:
+    get:
+      consumes:
+      - application/json
+      description: Retorna todos os itens de um documento de venda específico.
+      parameters:
+      - description: ID do Documento de Venda
+        in: path
+        name: documento_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.DocumentoVendaItemResponse'
+            type: array
+        "404":
+          description: Documento de venda não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Lista os itens de um documento de venda
       tags:
-      - Documentos de Venda - Itens
+      - Documentos de Venda
     post:
       consumes:
       - application/json
-      description: Cria um novo item para um documento de venda específico.
+      description: Adiciona um novo item a um documento de venda existente.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
-      - description: Dados para criar o item do documento de venda
+      - description: Dados do item
         in: body
         name: item
         required: true
@@ -2766,57 +2977,34 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.DocumentoVendaItemResponse'
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Erro interno do servidor
+        "404":
+          description: Documento de venda não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Cria um novo item para um documento de venda
+        "422":
+          description: 'Erro de validação de negócio (ex: estoque insuficiente)'
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Adiciona um item ao documento de venda
       tags:
-      - Documentos de Venda - Itens
-  /documentos/venda/{documento_venda_id}/itens/{item}:
+      - Documentos de Venda
+  /documentos-venda/{documento_id}/itens/{item}:
     delete:
       consumes:
       - application/json
-      description: Exclui logicamente um item de documento de venda.
+      description: Remove um item específico de um documento de venda.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
-      - description: Número do Item
-        in: path
-        name: item
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Nenhum conteúdo
-        "400":
-          description: Erro ao excluir
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui um item de documento de venda
-      tags:
-      - Documentos de Venda - Itens
-    get:
-      consumes:
-      - application/json
-      description: Retorna os detalhes de um item de documento de venda específico.
-      parameters:
-      - description: ID do Documento de Venda
-        in: path
-        name: documento_venda_id
-        required: true
-        type: integer
-      - description: Número do Item
+      - description: ID do Item
         in: path
         name: item
         required: true
@@ -2827,32 +3015,40 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.DocumentoVendaItemResponse'
-        "404":
-          description: Item não encontrado
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
+        "400":
+          description: Erro ao remover item
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca um item de documento de venda por ID
+        "404":
+          description: Documento de venda ou item não encontrado
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "422":
+          description: Erro de validação de negócio
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Remove um item do documento de venda
       tags:
-      - Documentos de Venda - Itens
+      - Documentos de Venda
     put:
       consumes:
       - application/json
-      description: Atualiza os dados de um item de documento de venda existente.
+      description: Atualiza os dados de um item específico de um documento de venda.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
-      - description: Número do Item
+      - description: ID do Item
         in: path
         name: item
         required: true
         type: integer
-      - description: Dados para atualizar o item do documento de venda
+      - description: Dados atualizados do item
         in: body
-        name: item_data
+        name: item
         required: true
         schema:
           $ref: '#/definitions/dto.DocumentoVendaItemRequest'
@@ -2862,28 +3058,31 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.DocumentoVendaItemResponse'
+            $ref: '#/definitions/dto.DocumentoVendaResponse'
         "400":
           description: Erro de validação ou dados inválidos
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "404":
-          description: Item não encontrado
+          description: Documento de venda ou item não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza um item de documento de venda
+        "422":
+          description: Erro de validação de negócio
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Edita um item do documento de venda
       tags:
-      - Documentos de Venda - Itens
-  /documentos/venda/{documento_venda_id}/pagamentos:
+      - Documentos de Venda
+  /documentos-venda/{documento_id}/pagamentos:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista paginada de pagamentos para um documento de venda
-        específico.
+      description: Retorna todos os pagamentos de um documento de venda específico.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
       produces:
@@ -2892,25 +3091,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.DocumentoVendaPagamentoListResponse'
-        "500":
-          description: Erro interno do servidor
+            items:
+              $ref: '#/definitions/dto.DocumentoVendaPagamentoResponse'
+            type: array
+        "404":
+          description: Documento de venda não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Lista os pagamentos de um documento de venda
       tags:
-      - Documentos de Venda - Pagamentos
+      - Documentos de Venda
     post:
       consumes:
       - application/json
-      description: Adiciona um novo pagamento a um documento de venda específico.
+      description: Adiciona um novo pagamento a um documento de venda existente.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
-      - description: Dados para adicionar o pagamento
+      - description: Dados do pagamento
         in: body
         name: pagamento
         required: true
@@ -2927,88 +3128,35 @@ paths:
           description: Erro de validação ou dados inválidos
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Erro interno do servidor
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Adiciona um novo pagamento a um documento de venda
-      tags:
-      - Documentos de Venda - Pagamentos
-  /documentos/venda/{documento_venda_id}/pagamentos/{item}:
-    delete:
-      consumes:
-      - application/json
-      description: Exclui logicamente um pagamento de um documento de venda.
-      parameters:
-      - description: ID do Documento de Venda
-        in: path
-        name: documento_venda_id
-        required: true
-        type: integer
-      - description: Número do Item do Pagamento
-        in: path
-        name: item
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Nenhum conteúdo
-        "400":
-          description: Erro ao excluir
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Exclui um pagamento de documento de venda
-      tags:
-      - Documentos de Venda - Pagamentos
-    get:
-      consumes:
-      - application/json
-      description: Retorna os detalhes de um pagamento específico de um documento
-        de venda.
-      parameters:
-      - description: ID do Documento de Venda
-        in: path
-        name: documento_venda_id
-        required: true
-        type: integer
-      - description: Número do Item do Pagamento
-        in: path
-        name: item
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.DocumentoVendaPagamentoResponse'
         "404":
-          description: Pagamento não encontrado
+          description: Documento de venda não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Busca um pagamento de documento de venda por ID
+        "422":
+          description: 'Erro de validação de negócio (ex: valor excede o total)'
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Adiciona um pagamento ao documento de venda
       tags:
-      - Documentos de Venda - Pagamentos
+      - Documentos de Venda
+  /documentos-venda/{documento_id}/pagamentos/{pagamento}:
     put:
       consumes:
       - application/json
-      description: Atualiza os dados de um pagamento existente de um documento de
+      description: Atualiza os dados de um pagamento específico de um documento de
         venda.
       parameters:
       - description: ID do Documento de Venda
         in: path
-        name: documento_venda_id
+        name: documento_id
         required: true
         type: integer
-      - description: Número do Item do Pagamento
+      - description: ID do Pagamento
         in: path
-        name: item
+        name: pagamento
         required: true
         type: integer
-      - description: Dados para atualizar o pagamento
+      - description: Dados atualizados do pagamento
         in: body
         name: pagamento
         required: true
@@ -3026,12 +3174,182 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "404":
-          description: Pagamento não encontrado
+          description: Documento de venda ou pagamento não encontrado
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Atualiza um pagamento de documento de venda
+        "422":
+          description: Erro de validação de negócio
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Edita um pagamento do documento de venda
       tags:
-      - Documentos de Venda - Pagamentos
+      - Documentos de Venda
+  /empresas-filiais:
+    get:
+      description: Retorna uma lista paginada de filiais de empresa
+      parameters:
+      - default: 10
+        description: Limite de itens por página
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Número de itens a pular
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EmpresaFilialListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Lista todas as filiais de empresa
+      tags:
+      - Empresa - Filiais
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova filial de empresa com os dados fornecidos
+      parameters:
+      - description: Dados da Filial de Empresa
+        in: body
+        name: filial
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EmpresaFilialRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.EmpresaFilialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria uma nova filial de empresa
+      tags:
+      - Empresa - Filiais
+  /empresas-filiais/{id}:
+    delete:
+      description: Exclui logicamente uma filial de empresa pelo ID
+      parameters:
+      - description: ID da Filial de Empresa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui uma filial de empresa
+      tags:
+      - Empresa - Filiais
+    get:
+      description: Retorna uma filial de empresa específica pelo seu ID
+      parameters:
+      - description: ID da Filial de Empresa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EmpresaFilialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca uma filial de empresa pelo ID
+      tags:
+      - Empresa - Filiais
+    put:
+      consumes:
+      - application/json
+      description: Atualiza uma filial de empresa com os dados fornecidos pelo ID
+      parameters:
+      - description: ID da Filial de Empresa
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados da Filial de Empresa para atualização
+        in: body
+        name: filial
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EmpresaFilialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EmpresaFilialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza uma filial de empresa existente
+      tags:
+      - Empresa - Filiais
   /entidades:
     get:
       description: Retorna uma lista paginada de entidades
@@ -4349,6 +4667,172 @@ paths:
       summary: Atualiza um grupo de entidade
       tags:
       - GrupoEntidades
+  /grupos-usuario:
+    get:
+      description: Retorna uma lista paginada de grupos de usuário
+      parameters:
+      - default: 10
+        description: Limite de itens por página
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Número de itens a pular
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoUsuarioListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Lista todos os grupos de usuário
+      tags:
+      - Grupo de Usuário
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo grupo de usuário com os dados fornecidos
+      parameters:
+      - description: Dados do Grupo de Usuário
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GrupoUsuarioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.GrupoUsuarioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Cria um novo grupo de usuário
+      tags:
+      - Grupo de Usuário
+  /grupos-usuario/{id}:
+    delete:
+      description: Exclui logicamente um grupo de usuário pelo ID
+      parameters:
+      - description: ID do Grupo de Usuário
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Exclui um grupo de usuário
+      tags:
+      - Grupo de Usuário
+    get:
+      description: Retorna um grupo de usuário específico pelo seu ID
+      parameters:
+      - description: ID do Grupo de Usuário
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoUsuarioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Busca um grupo de usuário pelo ID
+      tags:
+      - Grupo de Usuário
+    put:
+      consumes:
+      - application/json
+      description: Atualiza um grupo de usuário com os dados fornecidos pelo ID
+      parameters:
+      - description: ID do Grupo de Usuário
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados do Grupo de Usuário para atualização
+        in: body
+        name: grupo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GrupoUsuarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GrupoUsuarioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Atualiza um grupo de usuário existente
+      tags:
+      - Grupo de Usuário
   /limites-credito:
     get:
       description: Retorna uma lista paginada de limites de crédito
@@ -6396,7 +6880,4 @@ paths:
       summary: Atualiza um produto em uma tabela de preço
       tags:
       - Produto - Tabela de Preços
-schemes:
-- http
-- https
 swagger: "2.0"

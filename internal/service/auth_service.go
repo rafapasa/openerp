@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
@@ -16,9 +17,9 @@ import (
 
 // authServiceInterface define o contrato para as operações de autenticação.
 type AuthService interface {
-	Login(login, senha string, empresaID *int) (*models.Usuario, string, string, error)
-	RefreshToken(refreshToken string) (string, error)
-	ValidateToken(token string) (*utils.JWTClaims, error)
+	Login(ctx context.Context, login, senha string, empresaID *int) (*models.Usuario, string, string, error)
+	RefreshToken(ctx context.Context, refreshToken string) (string, error)
+	ValidateToken(ctx context.Context, token string) (*utils.JWTClaims, error)
 }
 
 // authService implementa authServiceInterface para gerenciar a autenticação de usuários.
@@ -40,9 +41,9 @@ func NewAuthService(db *gorm.DB, cfg *config.Config) AuthService {
 }
 
 // Login realiza o login do usuário
-func (s *authService) Login(login, senha string, empresaID *int) (*models.Usuario, string, string, error) {
+func (s *authService) Login(ctx context.Context, login, senha string, empresaID *int) (*models.Usuario, string, string, error) {
 	// 1. Buscar o usuário pelo login (COM GRUPO)
-	usuario, err := s.userRepo.FindByLoginWithGrupo(login)
+	usuario, err := s.userRepo.FindByLoginWithGrupo(ctx, login)
 	if err != nil {
 		return nil, "", "", errors.New("usuário ou senha inválidos")
 	}
@@ -64,7 +65,7 @@ func (s *authService) Login(login, senha string, empresaID *int) (*models.Usuari
 	}
 
 	// 5. Definir empresaID
-	empresaIDFinal := s.getEmpresaID(usuario.ID, empresaID)
+	empresaIDFinal := s.getEmpresaID(ctx, usuario.ID, empresaID)
 
 	// 6. Gerar tokens
 	accessToken, err := utils.GenerateToken(
@@ -97,13 +98,13 @@ func (s *authService) Login(login, senha string, empresaID *int) (*models.Usuari
 }
 
 // RefreshToken renova o token de acesso
-func (s *authService) RefreshToken(refreshToken string) (string, error) {
+func (s *authService) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
 	claims, err := utils.ValidateRefreshToken(refreshToken, s.jwtSecret)
 	if err != nil {
 		return "", errors.New("refresh token inválido")
 	}
 
-	usuario, err := s.userRepo.FindByIDWithGrupo(claims.UserID)
+	usuario, err := s.userRepo.FindByID(ctx, claims.UserID)
 	if err != nil {
 		return "", errors.New("usuário não encontrado")
 	}
@@ -128,17 +129,17 @@ func (s *authService) RefreshToken(refreshToken string) (string, error) {
 	return accessToken, nil
 }
 
-func (s *authService) ValidateToken(token string) (*utils.JWTClaims, error) {
+func (s *authService) ValidateToken(ctx context.Context, token string) (*utils.JWTClaims, error) {
 	return utils.ValidateToken(token, s.jwtSecret)
 }
 
 // getEmpresaID retorna o ID da empresa a ser usada no token
-func (s *authService) getEmpresaID(usuarioID int, empresaID *int) int {
+func (s *authService) getEmpresaID(ctx context.Context, usuarioID int, empresaID *int) int {
 	if empresaID != nil && *empresaID > 0 {
 		return *empresaID
 	}
 
-	filiais, err := s.userRepo.FindUsuarioFiliais(usuarioID)
+	filiais, err := s.userRepo.FindUsuarioFiliais(ctx, usuarioID)
 	if err == nil && len(filiais) > 0 {
 		return filiais[0].EmpresaFilialID
 	}

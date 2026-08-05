@@ -1,50 +1,145 @@
 package dto
 
-import "time"
+import (
+	"github.com/openerp/backend/internal/models"
+	"github.com/openerp/backend/internal/utils"
+)
 
 // ============================================================
-// DTOs para DocumentoVendaHistorico
+// DTO: DocumentoVendaHistoricoRequest
 // ============================================================
 
-// DocumentoVendaHistoricoRequest representa os dados para registrar uma mudança de situação de documento de venda.
 type DocumentoVendaHistoricoRequest struct {
 	DocumentoVendaID int    `json:"documento_venda_id" binding:"required"`
-	SituacaoAnterior int    `json:"situacao_anterior" binding:"required"`
-	SituacaoAtual    int    `json:"situacao_atual" binding:"required"`
-	Observacao       string `json:"observacao,omitempty"`
+	Item             int    `json:"item" binding:"required"`
+	UsuarioID        int    `json:"usuario_id" binding:"required"`
+	FluxoID          int    `json:"fluxo_id" binding:"required"`
+	FluxoSequencia   int    `json:"fluxo_sequencia" binding:"required"`
+	DataHistorico    string `json:"data_historico" binding:"required"` // Formato: 2006-01-02
+	Descricao        string `json:"descricao" binding:"required"`
+	Motivo           string `json:"motivo,omitempty"`
 	CreatedBy        *int   `json:"created_by,omitempty"`
+	UpdatedBy        *int   `json:"updated_by,omitempty"`
 }
 
-// DocumentoVendaHistoricoResponse representa os dados de um registro de histórico de situação de documento de venda retornado pela API.
+// ============================================================
+// DTO: DocumentoVendaHistoricoResponse
+// ============================================================
+
 type DocumentoVendaHistoricoResponse struct {
-	ID                   int       `json:"id"`
-	DocumentoVendaID     int       `json:"documento_venda_id"`
-	SituacaoAnterior     int       `json:"situacao_anterior"`
-	SituacaoAnteriorDesc string    `json:"situacao_anterior_desc,omitempty"` // Descrição da situação anterior
-	SituacaoAtual        int       `json:"situacao_atual"`
-	SituacaoAtualDesc    string    `json:"situacao_atual_desc,omitempty"` // Descrição da situação atual
-	Observacao           string    `json:"observacao,omitempty"`
-	CreatedAt            time.Time `json:"created_at"`
-	CreatedBy            *int      `json:"created_by,omitempty"`
-	CreatedByName        string    `json:"created_by_name,omitempty"` // Nome do usuário que realizou a mudança
+	DocumentoVendaID int    `json:"documento_venda_id"`
+	Item             int    `json:"item"`
+	UsuarioID        int    `json:"usuario_id"`
+	UsuarioNome      string `json:"usuario_nome,omitempty"`
+	FluxoID          int    `json:"fluxo_id"`
+	FluxoSequencia   int    `json:"fluxo_sequencia"`
+	DataHistorico    string `json:"data_historico"`
+	Descricao        string `json:"descricao"`
+	Motivo           string `json:"motivo,omitempty"`
+	CreatedAt        string `json:"created_at"`
+	UpdatedAt        string `json:"updated_at"`
 }
 
-// DocumentoVendaHistoricoListResponse representa a estrutura de resposta para uma lista paginada de históricos de situação de documento de venda.
+// ============================================================
+// DTO: DocumentoVendaHistoricoListResponse
+// ============================================================
+
 type DocumentoVendaHistoricoListResponse struct {
 	Items      []DocumentoVendaHistoricoResponse `json:"items"`
 	Total      int64                             `json:"total"`
+	Page       int                               `json:"page"`
 	Limit      int                               `json:"limit"`
-	Offset     int                               `json:"offset"`
 	TotalPages int                               `json:"total_pages"`
 }
 
-// DocumentoVendaHistoricoFilter representa os parâmetros de filtro para buscar históricos de situação de documento de venda.
+// ============================================================
+// DTO: DocumentoVendaHistoricoFilter
+// ============================================================
+
 type DocumentoVendaHistoricoFilter struct {
-	DocumentoVendaID *int       `form:"documento_venda_id"`
-	SituacaoAnterior *int       `form:"situacao_anterior"`
-	SituacaoAtual    *int       `form:"situacao_atual"`
-	DataInicio       *time.Time `form:"data_inicio"`
-	DataFim          *time.Time `form:"data_fim"`
-	Limit            int        `form:"limit,default=10"`
-	Offset           int        `form:"offset,default=0"`
+	DocumentoVendaID *int    `form:"documento_venda_id" json:"documento_venda_id,omitempty"`
+	UsuarioID        *int    `form:"usuario_id" json:"usuario_id,omitempty"`
+	FluxoID          *int    `form:"fluxo_id" json:"fluxo_id,omitempty"`
+	DataInicio       *string `form:"data_inicio" json:"data_inicio,omitempty"` // Formato: 2006-01-02
+	DataFim          *string `form:"data_fim" json:"data_fim,omitempty"`       // Formato: 2006-01-02
+	Page             int     `form:"page" json:"page,omitempty"`
+	Limit            int     `form:"limit" json:"limit,omitempty"`
+	Sort             string  `form:"sort" json:"sort,omitempty"`
+	Order            string  `form:"order" json:"order,omitempty"`
+}
+
+// ============================================================
+// MÉTODOS AUXILIARES
+// ============================================================
+
+func (r *DocumentoVendaHistoricoRequest) ToModel() (*models.DocumentoVendaHistorico, error) {
+	if r == nil {
+		return nil, nil
+	}
+
+	ddvh := &models.DocumentoVendaHistorico{}
+
+	// 1. Usar o mapper para copiar campos
+	if err := utils.MapToModel(r, ddvh); err != nil {
+		return nil, err
+	}
+
+	return ddvh, nil
+}
+
+// FromModel converte models.DocumentoVenda para DocumentoVendaResponse
+func (r *DocumentoVendaHistoricoResponse) FromModel(ddvh *models.DocumentoVendaHistorico) (*DocumentoVendaHistoricoResponse, error) {
+	if ddvh == nil {
+		return nil, nil
+	}
+
+	// 1. Usar o mapper para copiar campos
+	if err := utils.MapToDTO(ddvh, r); err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+// GetPageOrDefault retorna a página ou 1 se não definido
+func (f *DocumentoVendaHistoricoFilter) GetPageOrDefault() int {
+	if f.Page <= 0 {
+		return 1
+	}
+	return f.Page
+}
+
+// GetLimitOrDefault retorna o limite ou 20 se não definido
+func (f *DocumentoVendaHistoricoFilter) GetLimitOrDefault() int {
+	if f.Limit <= 0 {
+		return 20
+	}
+	if f.Limit > 100 {
+		return 100
+	}
+	return f.Limit
+}
+
+// GetOffset retorna o offset para paginação
+func (f *DocumentoVendaHistoricoFilter) GetOffset() int {
+	return (f.GetPageOrDefault() - 1) * f.GetLimitOrDefault()
+}
+
+// GetSortOrDefault retorna o campo de ordenação ou "ddvh_datahistorico" se não definido
+func (f *DocumentoVendaHistoricoFilter) GetSortOrDefault() string {
+	if f.Sort == "" {
+		return "ddvh_datahistorico"
+	}
+	return f.Sort
+}
+
+// GetOrderOrDefault retorna a direção de ordenação ou "DESC" se não definido
+func (f *DocumentoVendaHistoricoFilter) GetOrderOrDefault() string {
+	if f.Order == "" {
+		return "DESC"
+	}
+	if f.Order != "ASC" && f.Order != "DESC" {
+		return "DESC"
+	}
+	return f.Order
 }

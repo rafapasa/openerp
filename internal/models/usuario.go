@@ -14,23 +14,23 @@ type Usuario struct {
 	// ============================================================
 	// CAMPOS PRINCIPAIS
 	// ============================================================
-	ID             int              `gorm:"column:usu_id;primaryKey;autoIncrement" json:"id"`
-	GrupoUsuarioID int              `gorm:"column:gpu_id;not null" json:"grupo_usuario_id"`
-	Nome           string           `gorm:"column:usu_nome;type:varchar(100);not null" json:"nome"`
-	Login          string           `gorm:"column:usu_login;type:varchar(20);not null;unique" json:"login"`
-	Senha          string           `gorm:"column:usu_senha;type:varchar(100);not null" json:"-"`
-	Situacao       constants.Status `gorm:"column:usu_situiacao;not null;default:1" json:"situacao"`
-	Observacoes    *string          `gorm:"column:usu_observacoes;type:text" json:"observacoes,omitempty"`
-	SenhaExclusao  *string          `gorm:"column:usu_senhaexclusao;type:varchar(100)" json:"-"`
-	AlterarColGrid *int             `gorm:"column:usu_alterarcolgrid;default:1" json:"alterar_col_grid,omitempty"`
-	EmailSMTP      *string          `gorm:"column:usu_emailsmtp;type:varchar(200)" json:"email_smtp,omitempty"`
-	PortaSMTP      *int             `gorm:"column:usu_portasmtp" json:"porta_smtp,omitempty"`
-	SenhaSMTP      *string          `gorm:"column:usu_senhasmtp;type:varchar(20)" json:"-"`
-	ServidorSMTP   *string          `gorm:"column:usu_servidorsmtp;type:varchar(200)" json:"servidor_smtp,omitempty"`
-	UsarTLS        *int             `gorm:"column:usu_usartls" json:"usar_tls,omitempty"`
-	UsarSSL        *int             `gorm:"column:usu_usarssl" json:"usar_ssl,omitempty"`
-	UsuarioSMTP    *string          `gorm:"column:usu_usuariosmtp;type:varchar(200)" json:"usuario_smtp,omitempty"`
-	ExigirSenhaDV  *int             `gorm:"column:usu_exigirsenhadv" json:"exigir_senha_dv,omitempty"`
+	ID             int               `gorm:"column:usu_id;primaryKey;autoIncrement" json:"id"`
+	GrupoUsuarioID int               `gorm:"column:gpu_id;not null" json:"grupo_usuario_id"`
+	Nome           string            `gorm:"column:usu_nome;type:varchar(100);not null" json:"nome"`
+	Login          string            `gorm:"column:usu_login;type:varchar(20);not null;unique" json:"login"`
+	Senha          string            `gorm:"column:usu_senha;type:varchar(100);not null" json:"-"`
+	Situacao       constants.Status  `gorm:"column:usu_situiacao;not null;default:1" json:"situacao"`
+	Observacoes    *string           `gorm:"column:usu_observacoes;type:text" json:"observacoes,omitempty"`
+	SenhaExclusao  *string           `gorm:"column:usu_senhaexclusao;type:varchar(100)" json:"-"`
+	AlterarColGrid *constants.SimNao `gorm:"column:usu_alterarcolgrid;default:1" json:"alterar_col_grid,omitempty"`
+	EmailSMTP      *string           `gorm:"column:usu_emailsmtp;type:varchar(200)" json:"email_smtp,omitempty"`
+	PortaSMTP      *int              `gorm:"column:usu_portasmtp" json:"porta_smtp,omitempty"`
+	SenhaSMTP      *string           `gorm:"column:usu_senhasmtp;type:varchar(20)" json:"-"`
+	ServidorSMTP   *string           `gorm:"column:usu_servidorsmtp;type:varchar(200)" json:"servidor_smtp,omitempty"`
+	UsarTLS        *constants.SimNao `gorm:"column:usu_usartls" json:"usar_tls,omitempty"`
+	UsarSSL        *constants.SimNao `gorm:"column:usu_usarssl" json:"usar_ssl,omitempty"`
+	UsuarioSMTP    *string           `gorm:"column:usu_usuariosmtp;type:varchar(200)" json:"usuario_smtp,omitempty"`
+	ExigirSenhaDV  *constants.SimNao `gorm:"column:usu_exigirsenhadv" json:"exigir_senha_dv,omitempty"`
 
 	// ============================================================
 	// CAMPOS DE AUDITORIA

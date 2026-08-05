@@ -1,9 +1,10 @@
 package service
 
 import (
+	"context"
 	"strings"
 
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
 
 	"github.com/openerp/backend/internal/dto"
 	"github.com/openerp/backend/internal/models"
@@ -12,9 +13,9 @@ import (
 
 // ProdutoSubgrupoService define os métodos públicos para o serviço de subgrupo de produto.
 type ProdutoSubgrupoService interface {
-	Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
-	GetByID(id int) (*models.ProdutoSubgrupo, error)
-	Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
+	Create(ctx context.Context, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
+	GetByID(ctx context.Context, id int) (*models.ProdutoSubgrupo, error)
+	Update(ctx context.Context, id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error)
 	Delete(id int) error
 	List(limit, offset int, filters map[string]interface{}) ([]models.ProdutoSubgrupo, int64, error)
 }
@@ -42,8 +43,8 @@ func NewProdutoSubgrupoService(prosgRepo repository.ProdutoSubgrupoRepository) P
 // ============================================================
 
 // Create cria um novo subgrupo de produto.
-func (s *produtoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
-	if err := req.Validate(); err != nil {
+func (s *produtoSubgrupoService) Create(ctx context.Context, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+	if err := req.Validate(); err != nil { // Context not used in Validate
 		return nil, err
 	}
 
@@ -69,13 +70,13 @@ func (s *produtoSubgrupoService) Create(req *dto.ProdutoSubgrupoRequest) (*model
 }
 
 // GetByID busca um subgrupo de produto por ID.
-func (s *produtoSubgrupoService) GetByID(id int) (*models.ProdutoSubgrupo, error) {
-	return s.prosgRepo.FindByID(id) //
+func (s *produtoSubgrupoService) GetByID(ctx context.Context, id int) (*models.ProdutoSubgrupo, error) {
+	return s.prosgRepo.FindByID(id) // Context not used in FindByID
 }
 
 // Update atualiza um subgrupo de produto.
-func (s *produtoSubgrupoService) Update(id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
-	subgrupo, err := s.prosgRepo.FindByID(id)
+func (s *produtoSubgrupoService) Update(ctx context.Context, id int, req *dto.ProdutoSubgrupoRequest) (*models.ProdutoSubgrupo, error) {
+	subgrupo, err := s.prosgRepo.FindByID(id) // Context not used in FindByID
 	if err != nil {
 		return nil, err
 	}

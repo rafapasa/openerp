@@ -55,7 +55,7 @@ func (h *EntidadeLimiteCreditoHandler) Create(c *gin.Context) {
 	req.CreatedBy = &userID
 	req.UpdatedBy = &userID
 
-	limite, err := h.service.Create(&req)
+	limite, err := h.service.Create(c, &req)
 	if err != nil {
 		utils.RespondWithValidationError(c, err.Error())
 		return
@@ -129,7 +129,7 @@ func (h *EntidadeLimiteCreditoHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	limite, err := h.service.GetByID(id)
+	limite, err := h.service.GetByID(c, id)
 	if err != nil {
 		utils.RespondWithNotFoundError(c, err.Error())
 		return
@@ -168,7 +168,7 @@ func (h *EntidadeLimiteCreditoHandler) Update(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	req.UpdatedBy = &userID
 
-	limite, err := h.service.Update(id, &req)
+	limite, err := h.service.Update(c, id, &req)
 	if err != nil {
 		utils.RespondWithValidationError(c, err.Error())
 		return

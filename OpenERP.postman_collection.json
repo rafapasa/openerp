@@ -1,0 +1,510 @@
+{
+  "info": {
+    "_postman_id": "7434bc7d-21bd-4b08-8314-ed767b02606d",
+    "name": "OpenERP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12121999",
+    "_collection_link": "https://go.postman.co/collection/12121999-7434bc7d-21bd-4b08-8314-ed767b02606d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Status",
+      "item": [
+        {
+          "name": "helth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\health",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/api/v1/status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\v1\\status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\ping",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "ping"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"login\": \"admin\",\r\n    \"senha\": \"admin123\",\r\n    \"empresa_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/v1/auth/login",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/api/v1/auth/me",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refresh_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJsb2dpbiI6ImFkbWluIiwiZ3J1cG9faWQiOjEsImVtcHJlc2FfaWQiOjEsInR5cGUiOiJyZWZyZXNoIiwiaXNzIjoib3BlbmVycCIsInN1YiI6InVzZXJfYXV0aCIsImV4cCI6MTc4MzE0NDI4OSwibmJmIjoxNzgyNTM5NDg5LCJpYXQiOjE3ODI1Mzk0ODl9.JG_lXTqNT1_R4dse2HZpRE3YW6hztYYgy3wN41AvqKw\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/v1/auth/refresh",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/api/v1/auth/logout",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entidade",
+      "item": [
+        {
+          "name": "Endereço",
+          "item": [
+            {
+              "name": "List",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/v1/entidades/1/enderecos",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "entidades",
+                    "1",
+                    "enderecos"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"entidade_id\": 1,\r\n    \"pais_id\": 219,\r\n    \"estado_id\": 42,\r\n    \"municipio_id\": 4468,\r\n    \"tipo\": 1,\r\n    \"cep\": \"89874-000\",\r\n    \"logradouro\": \"Rua XV de Novembro\",\r\n    \"numero\": \"123\",\r\n    \"complemento\": \"Apto 45\",\r\n    \"bairro\": \"Centro\",\r\n    \"distancia\": 5.5,\r\n    \"observacao\": \"Endereço principal da matriz\",\r\n    \"situacao\": 1,\r\n    \"data_ini\": \"2026-01-01\",\r\n    \"data_fim\": null,\r\n    \"created_by\": 1,\r\n    \"updated_by\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/v1/entidades/1/enderecos",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "entidades",
+                    "1",
+                    "enderecos"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"entidade_id\": 1,\r\n    \"pais_id\": 219,\r\n    \"estado_id\": 42,\r\n    \"municipio_id\": 4468,\r\n    \"tipo\": 1,\r\n    \"cep\": \"89874-000\",\r\n    \"logradouro\": \"Travessa Ana Albrechet\",\r\n    \"numero\": \"68\",\r\n    \"complemento\": \"Apto 45\",\r\n    \"bairro\": \"Centro\",\r\n    \"distancia\": 5.5,\r\n    \"observacao\": \"Endereço principal da matriz\",\r\n    \"situacao\": 1,\r\n    \"data_ini\": \"2026-01-01\",\r\n    \"data_fim\": null,\r\n    \"created_by\": 1,\r\n    \"updated_by\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/v1/entidades/1/enderecos/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "entidades",
+                    "1",
+                    "enderecos",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"entidade_id\": 1,\r\n    \"pais_id\": 219,\r\n    \"estado_id\": 42,\r\n    \"municipio_id\": 4468,\r\n    \"tipo\": 1,\r\n    \"cep\": \"89874-000\",\r\n    \"logradouro\": \"Travessa Ana Albrechet\",\r\n    \"numero\": \"68\",\r\n    \"complemento\": \"Apto 45\",\r\n    \"bairro\": \"Centro\",\r\n    \"distancia\": 5.5,\r\n    \"observacao\": \"Endereço principal da matriz\",\r\n    \"situacao\": 1,\r\n    \"data_ini\": \"2026-01-01\",\r\n    \"data_fim\": null,\r\n    \"created_by\": 1,\r\n    \"updated_by\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/v1/entidades/1/enderecos/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "entidades",
+                    "1",
+                    "enderecos",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Contatos",
+          "item": [
+            {
+              "name": "New Request",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/api/v1/entidades",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "entidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"empresa_filial_id\": 1,\r\n    \"codigo\": 3,\r\n    \"tipo_pessoa\": 1,\r\n    \"razao_social\": \"Alberto Pasa\",\r\n    \"inscricao_federal\": \"34670041991\",\r\n    \"situacao\": 1,\r\n    \"sexo\": 1,\r\n    \"data_nascimento\": \"1982-02-07\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/v1/entidades",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "entidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 2,\r\n    \"empresa_filial_id\": 1,\r\n    \"codigo\": 2,\r\n    \"tipo_pessoa\": 1,\r\n    \"razao_social\": \"Rafael Alberto Pasa\",\r\n    \"nome_fantasia\": \"Rafão\",\r\n    \"inscricao_federal\": \"036.248.419-80\",\r\n    \"situacao\": 2,\r\n    \"data_nascimento\": \"1982-02-07\",\r\n    \"data_cadastro\": \"2026-07-06T13:30:00-03:00\",\r\n    \"sexo\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/v1/entidades/2",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "entidades",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/api/v1/entidades/3",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "entidades",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

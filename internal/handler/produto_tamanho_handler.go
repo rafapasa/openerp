@@ -42,7 +42,7 @@ func (h *ProdutoTamanhoHandler) Create(c *gin.Context) {
 	req.CreatedBy = &userID
 	req.UpdatedBy = &userID
 
-	tamanho, err := h.service.Create(&req)
+	tamanho, err := h.service.Create(c, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -66,7 +66,7 @@ func (h *ProdutoTamanhoHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	tamanho, err := h.service.GetByID(id)
+	tamanho, err := h.service.GetByID(c, id)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -100,7 +100,7 @@ func (h *ProdutoTamanhoHandler) Update(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	req.UpdatedBy = &userID
 
-	tamanho, err := h.service.Update(id, &req)
+	tamanho, err := h.service.Update(c, id, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -124,7 +124,7 @@ func (h *ProdutoTamanhoHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.Delete(id); err != nil {
+	if err := h.service.Delete(c, id); err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
 	}
@@ -149,7 +149,7 @@ func (h *ProdutoTamanhoHandler) List(c *gin.Context) {
 
 	filters := utils.QueryParamsToFilters(c)
 
-	tamanhos, total, err := h.service.List(limit, offset, filters)
+	tamanhos, total, err := h.service.List(c, limit, offset, filters)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return

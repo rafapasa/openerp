@@ -42,7 +42,7 @@ func (h *ProdutoSubgrupoHandler) Create(c *gin.Context) {
 	req.CreatedBy = &userID
 	req.UpdatedBy = &userID
 
-	subgrupo, err := h.service.Create(&req)
+	subgrupo, err := h.service.Create(c, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -68,7 +68,7 @@ func (h *ProdutoSubgrupoHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	subgrupo, err := h.service.GetByID(id)
+	subgrupo, err := h.service.GetByID(c, id)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return
@@ -104,7 +104,7 @@ func (h *ProdutoSubgrupoHandler) Update(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	req.UpdatedBy = &userID
 
-	subgrupo, err := h.service.Update(id, &req)
+	subgrupo, err := h.service.Update(c, id, &req)
 	if err != nil {
 		utils.RespondWithErrorAny(c, err)
 		return

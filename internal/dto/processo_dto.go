@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/constants"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 )

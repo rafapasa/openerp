@@ -84,15 +84,10 @@ func InitializeContainer(db *gorm.DB, redis *database.Redis) *Container {
 	documentoVendaItemServiceFactory := service.NewDocumentoVendaItemServiceFactory(tabelaPrecoProdutoService, configuracaoService)
 	documentoVendaService := service.NewDocumentoVendaService(db, documentoVendaRepository, documentoVendaItemService, documentoVendaPagamentoService, entidadeService, processoService, documentoVendaItemServiceFactory)
 	documentoVendaHandler := handler.NewDocumentoVendaHandler(documentoVendaService)
-	documentoVendaItemHandler := handler.NewDocumentoVendaItemHandler(documentoVendaItemService)
-	documentoVendaPagamentoHandler := handler.NewDocumentoVendaPagamentoHandler(documentoVendaService, documentoVendaPagamentoService)
-	condicaoPagamentoRepository := repository.NewCondicaoPagamentoRepository(db)
-	condicaoPagamentoService := service.NewCondicaoPagamentoService(condicaoPagamentoRepository)
-	condicaoPagamentoHandler := handler.NewCondicaoPagamentoHandler(condicaoPagamentoService)
 	operacaoFiscalHandler := handler.NewOperacaoFiscalHandler(operacaoFiscalService)
 	processoHandler := handler.NewProcessoHandler(processoService)
 	tabelaPrecoHandler := handler.NewTabelaPrecoHandler(tabelaPrecoService)
 	tabelaPrecoProdutoHandler := handler.NewTabelaPrecoProdutoHandler(tabelaPrecoProdutoService)
-	container := NewContainer(authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler, entidadeLimiteCreditoHandler, entidadeRegimeTributarioHandler, grupoEntidadeHandler, produtoHandler, produtoGrupoHandler, produtoSubgrupoHandler, produtoMarcaHandler, produtoModeloHandler, produtoCorHandler, produtoTamanhoHandler, produtoVariacaoHandler, documentoVendaHandler, documentoVendaItemHandler, documentoVendaPagamentoHandler, condicaoPagamentoHandler, operacaoFiscalHandler, processoHandler, tabelaPrecoHandler, tabelaPrecoProdutoHandler)
+	container := NewContainer(authHandler, entidadeHandler, entidadeEnderecoHandler, entidadeContatoHandler, entidadeDocumentoHandler, entidadeLimiteCreditoHandler, entidadeRegimeTributarioHandler, grupoEntidadeHandler, produtoHandler, produtoGrupoHandler, produtoSubgrupoHandler, produtoMarcaHandler, produtoModeloHandler, produtoCorHandler, produtoTamanhoHandler, produtoVariacaoHandler, documentoVendaHandler, operacaoFiscalHandler, processoHandler, tabelaPrecoHandler, tabelaPrecoProdutoHandler)
 	return container
 }

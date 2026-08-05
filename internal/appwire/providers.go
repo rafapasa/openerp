@@ -1,9 +1,9 @@
-// internal/appwire/providers.go
 package appwire
 
 import (
 	"github.com/google/wire"
 
+	"github.com/openerp/backend/internal/appvalidation"
 	"github.com/openerp/backend/internal/config"
 	"github.com/openerp/backend/internal/handler"
 	"github.com/openerp/backend/internal/repository"
@@ -42,6 +42,7 @@ var VendaRepositories = wire.NewSet(
 	repository.NewDocumentoVendaRepository,
 	repository.NewDocumentoVendaItemRepository,
 	repository.NewDocumentoVendaPagamentoRepository,
+	repository.NewDocumentoVendaHistoricoRepository,
 	repository.NewCondicaoPagamentoRepository,
 )
 
@@ -129,6 +130,8 @@ var AuthServices = wire.NewSet(
 
 var Config = wire.NewSet(
 	config.LoadConfig,
+	appvalidation.NewPlayValidator,
+	appvalidation.NewDocumentValidator,
 )
 
 // Todos os Services
@@ -171,8 +174,6 @@ var ProdutoHandlers = wire.NewSet(
 // Handlers de Venda
 var VendaHandlers = wire.NewSet(
 	handler.NewDocumentoVendaHandler,
-	handler.NewDocumentoVendaItemHandler,
-	handler.NewDocumentoVendaPagamentoHandler,
 	handler.NewCondicaoPagamentoHandler,
 )
 

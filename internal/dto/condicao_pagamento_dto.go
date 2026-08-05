@@ -5,10 +5,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	apperrors "github.com/openerp/backend/internal/erros"
+	"github.com/openerp/backend/internal/apperrors"
+	"github.com/openerp/backend/internal/models"
 
 	"github.com/openerp/backend/internal/constants"
-	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/utils"
 )
 

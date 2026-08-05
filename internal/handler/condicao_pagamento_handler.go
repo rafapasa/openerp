@@ -45,7 +45,11 @@ func (h *CondicaoPagamentoHandler) Create(c *gin.Context) {
 	}
 
 	var resp dto.CondicaoPagamentoResponse
-	resp.FromModel(condicao)
+	if err := resp.FromModel(condicao); err != nil{
+		utils.RespondWithErrorAny(c, err)
+		return
+	
+	}
 	utils.RespondWithCreated(c, resp)
 }
 

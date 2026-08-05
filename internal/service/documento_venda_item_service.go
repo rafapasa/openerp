@@ -3,9 +3,9 @@ package service
 import (
 	"fmt"
 
+	"github.com/openerp/backend/internal/apperrors"
 	"github.com/openerp/backend/internal/constants"
 	"github.com/openerp/backend/internal/dto"
-	apperrors "github.com/openerp/backend/internal/erros"
 	"github.com/openerp/backend/internal/models"
 	"github.com/openerp/backend/internal/repository"
 	"github.com/openerp/backend/internal/utils"
@@ -79,13 +79,17 @@ func (s *documentoVendaItemService) Create(req *dto.DocumentoVendaItemRequest) e
 	}
 
 	configEditValUnit, err := s.configService.GetConfig(constants.CONFIG_VALOR_UNITARIO_VENDA_HABILITADO)
+	if err != nil {
+		return err
+	}
+	
 	configTbpId, err := s.getTabelaPrecoPadrao()
 	if err != nil {
 		return err
 	}
 
-	dvi := &models.DocumentoVendaItem{}
-	if err := utils.MapToModel(req, dvi); err != nil {
+	dvi, err := req.ToModel()
+	if err != nil {
 		return apperrors.NewInternalError("Erro ao mapear dados do item.", err)
 	}
 
